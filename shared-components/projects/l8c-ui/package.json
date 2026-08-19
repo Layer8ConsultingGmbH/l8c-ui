@@ -1,6 +1,6 @@
 ﻿{
   "name": "@l8c/ui",
-  "version": "0.0.12",
+  "version": "1.0.0",
   "description": "Shared Angular ui components library",
   "repository": {
     "type": "git",
