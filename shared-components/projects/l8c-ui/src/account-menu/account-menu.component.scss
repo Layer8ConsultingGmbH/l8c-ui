@@ -1,0 +1,189 @@
+.account-menu {
+  position: relative;
+  display: inline-block;
+}
+
+.account-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0.7rem 0.3rem 0.45rem;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill, 999px);
+  cursor: pointer;
+  font-size: var(--font-size-sm, 14px);
+  font-family: var(--font-family);
+  transition: all var(--transition-base, 0.2s ease);
+  white-space: nowrap;
+
+  &:hover:not(.open) {
+    background: var(--text-hover);
+    border-color: var(--text-hover-border);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+
+  &.open {
+    background: var(--text-active);
+    border-color: var(--text-active-border);
+  }
+
+  .account-icon {
+    flex-shrink: 0;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .account-name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1;
+  }
+
+  .chevron-icon {
+    flex-shrink: 0;
+    color: var(--text-muted);
+    transition: transform var(--transition-base, 0.2s ease);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &.open .chevron-icon {
+    transform: rotate(180deg);
+  }
+}
+
+.account-menu-dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  min-width: 240px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--surface-radius, 12px);
+  box-shadow: var(--shadow-high);
+  z-index: 10000;
+  overflow: hidden;
+}
+
+.account-menu-list {
+  list-style: none;
+  padding: 6px;
+  margin: 0;
+}
+
+// Header
+.menu-header {
+  padding: 0.35rem 0.65rem 0.3rem;
+  font-size: var(--font-size-xs, 12px);
+  font-weight: var(--font-weight-semibold, 600);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+// Divider
+.menu-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 4px 0;
+}
+
+// Regular Menu Item
+.account-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.65rem;
+  cursor: pointer;
+  border-radius: var(--radius-md, 8px);
+  border: 1px solid transparent;
+  font-size: var(--font-size-sm, 14px);
+  color: var(--text);
+  transition: all var(--transition-fast, 0.15s ease);
+
+  &:hover,
+  &.hovered {
+    background: var(--text-hover);
+    border-color: var(--text-hover-border);
+  }
+
+  .menu-item-icon {
+    flex-shrink: 0;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  span {
+    flex: 1;
+    line-height: 1;
+  }
+}
+
+// Button Group (Theme/Language)
+.menu-button-group {
+  padding: 0.5rem 0.65rem;
+
+  .button-group-label {
+    display: block;
+    font-size: var(--font-size-xs, 12px);
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+
+  .button-group-buttons {
+    display: flex;
+    gap: 6px;
+
+    .group-button {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      padding: 0.35rem;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm, 6px);
+      color: var(--text);
+      font-size: var(--font-size-xs, 12px);
+      font-family: var(--font-family);
+      cursor: pointer;
+      transition: all var(--transition-fast, 0.15s ease);
+      white-space: nowrap;
+
+      &:hover:not(.active) {
+        background: var(--text-hover);
+        border-color: var(--text-hover-border);
+      }
+
+      &.active {
+        background: var(--text-active);
+        border-color: var(--text-active-border);
+      }
+
+      l8c-icon {
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      span {
+        line-height: 1;
+      }
+    }
+  }
+}

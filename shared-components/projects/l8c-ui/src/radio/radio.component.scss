@@ -1,0 +1,94 @@
+:host {
+  display: block;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+
+  &.disabled {
+    cursor: default;
+    opacity: 0.6;
+  }
+
+  // Framed, selectable row (appearance 'row')
+  &.row {
+    gap: var(--space-sm, 12px);
+    padding: 0.7rem 0.9rem;
+    border-radius: var(--radius-sm, 6px);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: var(--font-size-base, 1rem);
+    transition: all 0.15s ease;
+
+    &:hover:not(.disabled) {
+      border-color: var(--primary);
+    }
+
+    &.checked {
+      background: var(--text-active);
+      border-color: var(--primary);
+    }
+  }
+}
+
+// The native input stays in the accessibility tree but is drawn custom
+.radio-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+// Appearance 'plain': filled circle with a dot
+.radio-circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--border-strong);
+  border-radius: 50%;
+  background-color: var(--surface-2);
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+
+  &.checked {
+    border-color: var(--primary);
+    background-color: var(--primary);
+
+    .radio-dot {
+      width: 8px;
+      height: 8px;
+      background-color: var(--on-primary, #ffffff);
+      border-radius: 50%;
+    }
+  }
+}
+
+// Appearance 'row': outlined ring with a gradient dot
+.radio-ring {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  border: 2px solid var(--text-faint);
+
+  &.checked {
+    border-color: var(--primary);
+    background: radial-gradient(circle, var(--primary) 40%, transparent 45%);
+  }
+}
+
+.radio-label {
+  font-family: var(--font-family, inherit);
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+.radio-option:not(.row) .radio-label {
+  font-size: var(--font-size-sm, 0.875rem);
+}

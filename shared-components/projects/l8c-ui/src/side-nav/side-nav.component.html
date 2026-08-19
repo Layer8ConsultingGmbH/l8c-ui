@@ -1,0 +1,112 @@
+<aside
+  class="side-nav"
+  [class.collapsed]="collapsed()"
+  [style.width.px]="collapsed() ? collapsedWidth() : width()"
+  [style.top]="topOffset()"
+>
+  <!-- Top Slot (e.g. ProductSwitcher) -->
+  @if (topTemplate(); as top) {
+    <div class="nav-top">
+      <ng-container *ngTemplateOutlet="top; context: { $implicit: collapsed() }" />
+    </div>
+  }
+
+  <!-- Header Slot -->
+  @if (headerTemplate(); as header) {
+    @if (!collapsed()) {
+      <div class="nav-header">
+        <ng-container *ngTemplateOutlet="header" />
+      </div>
+    }
+  }
+
+  <!-- Navigation Items -->
+  <nav class="nav-items">
+    @for (item of items(); track item.key) {
+      <button
+        type="button"
+        class="nav-item"
+        [class.active]="isSectionActive(item)"
+        [class.hover]="isHovered(item.key)"
+        [class.collapsed]="collapsed()"
+        [title]="collapsed() ? item.label : undefined"
+        [attr.aria-current]="isSectionActive(item) ? 'page' : undefined"
+        (mouseenter)="setHoverItem(item.key)"
+        (mouseleave)="setHoverItem(null)"
+        (click)="handleItemClick(item, $event)"
+      >
+        <span class="nav-item-icon" [class.active]="isSectionActive(item)">
+          <l8c-icon [name]="getIconName(item.icon)" />
+        </span>
+
+        @if (!collapsed()) {
+          <span class="nav-item-label">{{ item.label }}</span>
+        }
+      </button>
+
+      <!-- Collapsed: flyout with sub items next to the rail -->
+      @if (collapsed() && flyoutItem() === item.key && item.children && item.children.length > 0) {
+        <div
+          class="nav-flyout"
+          role="menu"
+          [style.top.px]="flyoutTop()"
+          [style.left.px]="collapsedWidth() + 10"
+        >
+          <div class="nav-flyout-header">{{ item.label }}</div>
+          @for (child of item.children; track child.key) {
+            <button
+              type="button"
+              role="menuitem"
+              class="nav-flyout-item"
+              [class.active]="isActive(child.key)"
+              (click)="handleNavigate(child.key)"
+            >
+              {{ child.label }}
+            </button>
+          }
+        </div>
+      }
+
+      <!-- Sub Items: only expanded while their section is active -->
+      @if (!collapsed() && isSectionActive(item) && item.children && item.children.length > 0) {
+        @for (child of item.children; track child.key) {
+          <button
+            type="button"
+            class="nav-sub-item"
+            [class.active]="isActive(child.key)"
+            [attr.aria-current]="isActive(child.key) ? 'page' : undefined"
+            (click)="handleNavigate(child.key)"
+          >
+            <span class="nav-sub-item-label">{{ child.label }}</span>
+          </button>
+        }
+      }
+    }
+  </nav>
+
+  <!-- Footer Slot -->
+  @if (footerTemplate(); as footer) {
+    @if (!collapsed()) {
+      <div class="nav-footer">
+        <ng-container *ngTemplateOutlet="footer" />
+      </div>
+    }
+  }
+
+  <!-- Collapse Toggle -->
+  <button
+    type="button"
+    class="collapse-toggle"
+    [class.collapsed]="collapsed()"
+    [title]="collapsed() ? expandLabel() : collapseLabel()"
+    (click)="toggleCollapse()"
+  >
+    <span class="collapse-toggle-icon">
+      <l8c-icon [name]="collapsed() ? 'panel-left' : 'panel-left-close'" />
+    </span>
+
+    @if (!collapsed()) {
+      <span class="collapse-toggle-label">{{ collapseLabel() }}</span>
+    }
+  </button>
+</aside>

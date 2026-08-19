@@ -1,0 +1,37 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "cli": {
+    "packageManager": "npm",
+    "analytics": false
+  },
+  "newProjectRoot": "projects",
+  "projects": {
+    "l8c-ui": {
+      "projectType": "library",
+      "root": "projects/l8c-ui",
+      "sourceRoot": "projects/l8c-ui/src",
+      "prefix": "l8c",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:ng-packagr",
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/l8c-ui/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/l8c-ui/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular/build:unit-test",
+          "options": {
+            "tsConfig": "projects/l8c-ui/tsconfig.spec.json"
+          }
+        }
+      }
+    }
+  }
+}

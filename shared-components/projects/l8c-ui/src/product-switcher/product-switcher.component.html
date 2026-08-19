@@ -1,0 +1,60 @@
+<div class="product-switcher">
+  <button
+    type="button"
+    class="switcher-button"
+    [class.open]="open()"
+    [class.collapsed]="collapsed()"
+    [class.block]="block()"
+    [attr.aria-haspopup]="'menu'"
+    [attr.aria-expanded]="open()"
+    [title]="collapsed() ? activeProduct().label : undefined"
+    (click)="toggleMenu()"
+  >
+    <span class="switcher-icon">
+      <l8c-icon name="layout-grid" />
+    </span>
+
+    @if (!collapsed()) {
+      <span class="switcher-label">{{ activeProduct().label }}</span>
+
+      <span class="switcher-chevron" [class.rotated]="open()">
+        <l8c-icon name="chevron-down" />
+      </span>
+    }
+  </button>
+
+  @if (open()) {
+    <div class="switcher-menu" [class.collapsed-position]="collapsed()" role="menu">
+      <div class="menu-header">Switch product</div>
+
+      <div class="menu-items">
+        @for (product of products(); track product.key) {
+          <button
+            type="button"
+            role="menuitem"
+            class="menu-item"
+            [class.active]="isActive(product.key)"
+            (click)="selectProduct(product.key)"
+          >
+            <span class="item-icon-box" [class.active]="isActive(product.key)">
+              <l8c-icon [name]="getIconName(product.icon)" />
+            </span>
+
+            <span class="item-content">
+              <span class="item-label">{{ product.label }}</span>
+              @if (product.desc) {
+                <span class="item-desc">{{ product.desc }}</span>
+              }
+            </span>
+
+            @if (isActive(product.key)) {
+              <span class="item-check">
+                <l8c-icon name="check" />
+              </span>
+            }
+          </button>
+        }
+      </div>
+    </div>
+  }
+</div>

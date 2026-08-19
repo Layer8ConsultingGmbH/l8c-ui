@@ -1,0 +1,46 @@
+<div class="select-container">
+  @if (label()) {
+    <label class="select-label" [class.required]="required()">
+      {{ label() }}
+      @if (required()) {
+        <span class="required-indicator">*</span>
+      }
+    </label>
+  }
+
+  <div
+    class="select-wrapper"
+    [class.focused]="isFocused()"
+    [class.error]="error()"
+    [class.disabled]="disabled()"
+  >
+    <!-- Selection is bound per option (not via [value] on the select):
+         options often arrive async, and a [value] set before the matching
+         option exists would silently not apply. -->
+    <select
+      [disabled]="disabled()"
+      [required]="required()"
+      [attr.aria-label]="ariaLabel() || label()"
+      (change)="onChange_internal($event)"
+      (focus)="onFocus()"
+      (blur)="onBlur()"
+      class="select-field"
+    >
+      @if (placeholder()) {
+        <option value="" [selected]="!value()">{{ placeholder() }}</option>
+      }
+      @for (option of options(); track option.value) {
+        <option [value]="option.value" [selected]="option.value === value()">
+          {{ option.label }}
+        </option>
+      }
+    </select>
+    <div class="select-icon">
+      <l8c-icon [name]="'chevron-down'"></l8c-icon>
+    </div>
+  </div>
+
+  @if (error()) {
+    <span class="error-message">{{ error() }}</span>
+  }
+</div>

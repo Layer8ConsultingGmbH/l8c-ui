@@ -1,0 +1,16 @@
+<label class="checkbox-option" [class.disabled]="disabled()">
+  <input
+    type="checkbox"
+    class="checkbox-input"
+    [checked]="checked()"
+    [disabled]="disabled()"
+    [attr.aria-label]="ariaLabel()"
+    (change)="onToggle()"
+  />
+  <span class="checkbox-box" [class.checked]="checked()">
+    @if (checked()) {
+      <l8c-icon class="checkmark" [name]="'check'" [size]="14" />
+    }
+  </span>
+  <span class="checkbox-label"><ng-content></ng-content></span>
+</label>

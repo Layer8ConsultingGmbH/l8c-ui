@@ -1,0 +1,78 @@
+<div class="pagination-container">
+  @if (showPageInfo() && totalItems() > 0) {
+    <div class="page-info">
+      {{ pageInfoText() }}
+    </div>
+  }
+
+  <div class="pagination-controls">
+    @if (showPageSizeSelector()) {
+      <div class="page-size-selector">
+        <label for="pageSize">{{ itemsPerPageLabel() }}</label>
+        <select id="pageSize" class="page-size-select" (change)="onPageSizeChange($event)">
+          @for (option of pageSizeOptions(); track option) {
+            <option [value]="option" [selected]="option === pageSize()">{{ option }}</option>
+          }
+        </select>
+      </div>
+    }
+
+    <nav class="pagination" aria-label="Pagination">
+      @if (showFirstLast()) {
+        <button
+          class="pagination-btn"
+          [disabled]="!canGoPrevious()"
+          (click)="goToFirst()"
+          aria-label="First page"
+          title="First page"
+        >
+          <span class="icon-double-left">&laquo;</span>
+        </button>
+      }
+
+      <button
+        class="pagination-btn"
+        [disabled]="!canGoPrevious()"
+        (click)="goToPrevious()"
+        aria-label="Previous page"
+        title="Previous page"
+      >
+        <span class="icon-left">&lsaquo;</span>
+      </button>
+
+      @for (page of visiblePages(); track page) {
+        <button
+          class="pagination-btn"
+          [class.active]="page === currentPage()"
+          (click)="goToPage(page)"
+          [attr.aria-label]="'Page ' + (page + 1)"
+          [attr.aria-current]="page === currentPage() ? 'page' : null"
+        >
+          {{ page + 1 }}
+        </button>
+      }
+
+      <button
+        class="pagination-btn"
+        [disabled]="!canGoNext()"
+        (click)="goToNext()"
+        aria-label="Next page"
+        title="Next page"
+      >
+        <span class="icon-right">&rsaquo;</span>
+      </button>
+
+      @if (showFirstLast()) {
+        <button
+          class="pagination-btn"
+          [disabled]="!canGoNext()"
+          (click)="goToLast()"
+          aria-label="Last page"
+          title="Last page"
+        >
+          <span class="icon-double-right">&raquo;</span>
+        </button>
+      }
+    </nav>
+  </div>
+</div>

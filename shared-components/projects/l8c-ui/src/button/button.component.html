@@ -1,0 +1,27 @@
+<button
+  [type]="type()"
+  [disabled]="disabled()"
+  [attr.aria-label]="ariaLabel()"
+  [class.btn-primary]="action() === 'primary'"
+  [class.btn-secondary]="action() === 'secondary'"
+  [class.btn-nav]="action() === 'nav'"
+  [class.btn-ghost]="action() === 'ghost'"
+  [class.btn-tab]="action() === 'tab'"
+  [class.btn-danger]="action() === 'danger'"
+  [class.btn-mini]="size() === 'mini'"
+  [class.btn-default]="size() === 'default'"
+  [class.btn-large]="size() === 'large'"
+  [class.btn-active]="active()"
+  [class.btn-icon-only]="iconName() !== null && !hasText()"
+  [class.tone-primary]="tone() === 'primary'"
+  [class.tone-danger]="tone() === 'danger'"
+  [class.tone-success]="tone() === 'success'"
+  [class.tone-warning]="tone() === 'warning'"
+  (click)="onClick($event)"
+>
+  @if (iconName()) {
+    <l8c-icon [name]="iconName()!" [size]="iconSize()" />
+  }
+
+  <span #label class="btn-label"><ng-content></ng-content></span>
+</button>

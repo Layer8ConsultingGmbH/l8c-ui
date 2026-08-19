@@ -1,0 +1,55 @@
+:host {
+  display: block;
+}
+
+.checkbox-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+
+  &.disabled {
+    cursor: default;
+    opacity: 0.6;
+  }
+}
+
+// The native input stays in the accessibility tree but is drawn by .checkbox-box
+.checkbox-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.checkbox-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background-color: var(--surface-2);
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+
+  &.checked {
+    background-color: var(--primary);
+    border-color: var(--primary);
+  }
+
+  .checkmark {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--on-primary, #ffffff);
+  }
+}
+
+.checkbox-label {
+  font-family: var(--font-family, inherit);
+  font-size: var(--font-size-sm, 0.875rem);
+  color: var(--text);
+  overflow-wrap: anywhere;
+}

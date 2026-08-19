@@ -1,0 +1,59 @@
+<div class="carousel-container">
+  @if (showNavigation() && canGoBack()) {
+    <button
+      type="button"
+      class="carousel-nav carousel-nav-prev"
+      (click)="previous()"
+      aria-label="Previous slide"
+    >
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <path
+          d="M15 18L9 12L15 6"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+    </button>
+  }
+
+  <div class="carousel-viewport">
+    <div class="carousel-slides">
+      <ng-content></ng-content>
+    </div>
+  </div>
+
+  @if (showNavigation() && canGoForward()) {
+    <button
+      type="button"
+      class="carousel-nav carousel-nav-next"
+      (click)="next()"
+      aria-label="Next slide"
+    >
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <path
+          d="M9 18L15 12L9 6"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+    </button>
+  }
+
+  @if (showIndicators() && totalSlides() > 1) {
+    <div class="carousel-indicators">
+      @for (index of slideIndicators(); track index) {
+        <button
+          type="button"
+          class="carousel-indicator"
+          [class.active]="index === internalSlide()"
+          (click)="goToSlide(index)"
+          [attr.aria-label]="'Go to slide ' + (index + 1)"
+        ></button>
+      }
+    </div>
+  }
+</div>

@@ -1,0 +1,25 @@
+.confirm-dialog-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg, 20px);
+  padding: var(--spacing-md, 16px);
+  min-width: 400px;
+}
+
+.confirm-message {
+  font-family: var(--font-family, inherit);
+  font-size: var(--font-size-sm, 0.875rem);
+  color: var(--text);
+  line-height: 1.5;
+  margin: 0;
+  white-space: pre-line;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-md, 16px);
+  margin-top: var(--spacing-md, 16px);
+  padding-top: var(--spacing-md, 16px);
+  border-top: 1px solid var(--border);
+}

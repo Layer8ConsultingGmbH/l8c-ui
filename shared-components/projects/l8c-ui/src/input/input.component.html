@@ -1,0 +1,56 @@
+<div class="input-container">
+  @if (label()) {
+    <label class="input-label" [class.required]="required()">
+      {{ label() }}
+      @if (required()) {
+        <span class="required-indicator">*</span>
+      }
+    </label>
+  }
+
+  <div
+    class="input-wrapper"
+    [class.focused]="isFocused()"
+    [class.error]="error()"
+    [class.disabled]="disabled()"
+  >
+    @if (multiline()) {
+      <textarea
+        [placeholder]="placeholder()"
+        [disabled]="disabled()"
+        [required]="required()"
+        [attr.aria-label]="ariaLabel() || label()"
+        [attr.maxlength]="maxLength()"
+        [attr.minlength]="minLength()"
+        [attr.rows]="rows()"
+        [value]="value()"
+        (input)="onInput($event)"
+        (focus)="onFocus()"
+        (blur)="onBlur()"
+        class="input-field textarea-field"
+      >
+      </textarea>
+    } @else {
+      <input
+        [type]="type()"
+        [placeholder]="placeholder()"
+        [disabled]="disabled()"
+        [required]="required()"
+        [attr.aria-label]="ariaLabel() || label()"
+        [attr.maxlength]="maxLength()"
+        [attr.minlength]="minLength()"
+        [attr.min]="min()"
+        [attr.max]="max()"
+        [value]="value()"
+        (input)="onInput($event)"
+        (focus)="onFocus()"
+        (blur)="onBlur()"
+        class="input-field"
+      />
+    }
+  </div>
+
+  @if (error()) {
+    <span class="error-message">{{ error() }}</span>
+  }
+</div>

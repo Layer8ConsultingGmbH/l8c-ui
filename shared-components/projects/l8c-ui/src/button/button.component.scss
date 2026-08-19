@@ -1,0 +1,181 @@
+// Styling per Layer8 Design System v0.2 (components/core/Button + IconButton).
+// Buttons sit on the dark canvas; hover lifts the border to brand blue with a glow.
+
+button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  box-sizing: border-box;
+  cursor: pointer;
+  transition:
+    border-color var(--transition-base, 0.3s ease),
+    box-shadow var(--transition-base, 0.3s ease),
+    background var(--transition-base, 0.3s ease),
+    color var(--transition-base, 0.3s ease);
+  border-radius: var(--surface-radius, 12px);
+  font-family: var(--font-family, 'Inter', sans-serif);
+  font-size: var(--font-size-base, 1rem);
+  font-weight: var(--font-weight-medium, 500);
+  line-height: var(--line-height-tight, 1.25);
+  white-space: nowrap;
+  outline: none;
+
+  // Default nav button
+  background: var(--surface-2, #0f1726);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  color: var(--text, #e6e9f2);
+  padding: 0.5rem 1rem;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &:not(:disabled):hover {
+    border-color: var(--primary, #2a7ab8);
+    box-shadow: var(--glow-primary, 0 0 8px var(--primary), 0 0 2px var(--primary));
+  }
+}
+
+// Size variants
+.btn-mini {
+  font-size: var(--font-size-sm, 0.875rem);
+  padding: 0.3rem 0.7rem;
+}
+
+// Icon-only variant (no text content) — per DS IconButton: square, small radius.
+// `tone` recolors icon + hover border for semantic actions (danger/success/…).
+.btn-icon-only {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  gap: 0;
+  flex-shrink: 0;
+  border-radius: var(--radius-sm, 6px);
+  background: var(--surface, #121b2d);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  color: var(--text-muted, #98a3b8);
+  transition: all var(--transition-fast, 0.15s ease);
+
+  // hover color defaults to brand blue; tones override below
+  --_hover-color: var(--primary, #2a7ab8);
+
+  &.btn-mini {
+    width: 28px;
+    height: 28px;
+  }
+
+  &.btn-large {
+    width: 44px;
+    height: 44px;
+  }
+
+  &.tone-primary {
+    color: var(--primary, #2a7ab8);
+  }
+
+  &.tone-danger {
+    color: var(--error, #f44336);
+    --_hover-color: var(--error, #f44336);
+  }
+
+  &.tone-success {
+    color: var(--success, #10b981);
+    --_hover-color: var(--success, #10b981);
+  }
+
+  &.tone-warning {
+    color: var(--warning, #ff9500);
+  }
+
+  &:not(:disabled):hover {
+    background: var(--surface-3, #1a2436);
+    border-color: var(--_hover-color);
+    color: var(--_hover-color);
+    box-shadow: 0 0 6px rgba(var(--primary-rgb, 42, 122, 184), 0.25);
+  }
+}
+
+// Action variants
+.btn-primary {
+  background: var(--primary, #2a7ab8);
+  border: 1px solid var(--primary, #2a7ab8);
+  color: var(--on-primary, #ffffff);
+
+  &:not(:disabled):hover {
+    background: var(--primary-dark, #1d5d92);
+    border-color: var(--primary-dark, #1d5d92);
+    box-shadow: none;
+  }
+}
+
+.btn-secondary {
+  background: var(--surface, #121b2d);
+  border: 1px solid var(--primary, #2a7ab8);
+  color: var(--text, #e6e9f2);
+}
+
+.btn-nav {
+  background: var(--surface-2, #0f1726);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  color: var(--text, #e6e9f2);
+}
+
+.btn-ghost {
+  background: transparent;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  color: var(--text, #e6e9f2);
+}
+
+.btn-tab {
+  background: none;
+  border: none;
+  padding: 0;
+  height: auto;
+  width: auto;
+  font-size: var(--font-size-xl, 1.25rem);
+  font-weight: var(--font-weight-normal, 400);
+  color: var(--text, #e6e9f2);
+  text-decoration: none;
+  white-space: nowrap;
+
+  &:hover {
+    opacity: 0.8;
+    border: none;
+    box-shadow: none;
+  }
+
+  &.btn-active {
+    text-decoration: underline;
+    text-decoration-skip-ink: none;
+    text-underline-position: from-font;
+    border: none;
+    box-shadow: none;
+  }
+}
+
+.btn-danger {
+  background: var(--surface, #121b2d);
+  border: 1px solid var(--error, #f44336);
+  color: var(--error, #f44336);
+
+  &:not(:disabled):hover {
+    border-color: var(--error, #f44336);
+    box-shadow:
+      0 0 8px var(--error, #f44336),
+      0 0 2px var(--error, #f44336);
+  }
+
+  &.btn-icon-only:not(:disabled):hover {
+    background: var(--surface-3, #1a2436);
+    color: var(--error, #f44336);
+    box-shadow: 0 0 6px var(--error-bg, rgba(244, 67, 54, 0.14));
+  }
+}
+
+// Active state
+.btn-active:not(.btn-tab) {
+  border: 2px solid var(--primary, #2a7ab8);
+  box-shadow: 0 0 2px var(--primary, #2a7ab8);
+}

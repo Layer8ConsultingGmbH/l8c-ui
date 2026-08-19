@@ -1,0 +1,52 @@
+<div class="account-menu">
+  <button class="account-toggle" [class.open]="isOpen()" (click)="toggle()" type="button">
+    <l8c-icon name="circle-user" [size]="22" class="account-icon" />
+    <span class="account-name">{{ userName() }}</span>
+    <l8c-icon name="chevron-down" [size]="16" class="chevron-icon" />
+  </button>
+
+  @if (isOpen()) {
+    <div class="account-menu-dropdown">
+      <ul class="account-menu-list">
+        @for (option of menuOptions(); track option.value) {
+          @if (option.type === 'header') {
+            <li class="menu-header">{{ option.label }}</li>
+          } @else if (option.type === 'divider') {
+            <li class="menu-divider"></li>
+          } @else if (option.type === 'button-group') {
+            <li class="menu-button-group">
+              <span class="button-group-label">{{ option.label }}</span>
+              <div class="button-group-buttons">
+                @for (button of option.buttons; track button.value) {
+                  <button
+                    class="group-button"
+                    [class.active]="button.isActive"
+                    (click)="selectOption(button.value)"
+                  >
+                    @if (button.icon) {
+                      <l8c-icon [name]="button.icon" [size]="16" />
+                    }
+                    <span>{{ button.label }}</span>
+                  </button>
+                }
+              </div>
+            </li>
+          } @else {
+            <li
+              class="account-menu-item"
+              [class.hovered]="hoveredOption() === option.value"
+              (click)="selectOption(option.value)"
+              (mouseenter)="onOptionHover(option.value)"
+              (mouseleave)="onOptionHover(null)"
+            >
+              @if (option.icon) {
+                <l8c-icon [name]="option.icon" [size]="18" class="menu-item-icon" />
+              }
+              <span>{{ option.label }}</span>
+            </li>
+          }
+        }
+      </ul>
+    </div>
+  }
+</div>

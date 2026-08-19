@@ -1,0 +1,49 @@
+<div class="number-input-container">
+  <div class="number-input-row">
+    <div class="number-input" [class.disabled]="disabled()" [class.focused]="isFocused()">
+      <input
+        type="number"
+        class="number-field"
+        [attr.step]="inputStep()"
+        [attr.min]="min()"
+        [attr.max]="max()"
+        [attr.aria-label]="ariaLabel()"
+        [disabled]="disabled()"
+        [value]="displayValue()"
+        (input)="onInput($event)"
+        (focus)="onFocus()"
+        (blur)="onBlur()"
+      />
+      <!-- The arrows are the only stepper; arrow keys already work on the
+           native input, so the buttons stay out of the tab order -->
+      <div class="number-arrows">
+        <button
+          type="button"
+          class="arrow-btn up"
+          tabindex="-1"
+          aria-hidden="true"
+          [disabled]="disabled()"
+          (click)="increment()"
+        >
+          <l8c-icon [name]="'chevron-up'" [size]="12" />
+        </button>
+        <button
+          type="button"
+          class="arrow-btn down"
+          tabindex="-1"
+          aria-hidden="true"
+          [disabled]="disabled()"
+          (click)="decrement()"
+        >
+          <l8c-icon [name]="'chevron-down'" [size]="12" />
+        </button>
+      </div>
+    </div>
+    @if (suffix()) {
+      <span class="number-suffix">{{ suffix() }}</span>
+    }
+  </div>
+  @if (hint()) {
+    <p class="number-hint">{{ hint() }}</p>
+  }
+</div>

@@ -1,0 +1,61 @@
+.lib-dialog {
+  width: 100%;
+  min-width: 400px;
+  max-width: 520px;
+  max-height: 90vh;
+  padding: var(--space-lg);
+  background: var(--surface);
+  border-radius: var(--surface-radius);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-high);
+
+  &::backdrop {
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+  }
+
+  .lib-dialog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0;
+    margin-bottom: var(--space-md);
+    gap: var(--space-md);
+
+    h2 {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: var(--font-size-xl);
+      font-weight: var(--font-weight-medium);
+      color: var(--text);
+    }
+
+    .close-button {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      width: 36px;
+      height: 36px;
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-sm);
+      transition: all var(--transition-fast);
+      color: var(--text-muted);
+
+      &:hover {
+        background: var(--surface-2);
+        color: var(--text);
+      }
+    }
+  }
+
+  .lib-dialog-content {
+    padding: 0;
+    margin: 0;
+    overflow-y: auto;
+    max-height: calc(90vh - 120px);
+  }
+}

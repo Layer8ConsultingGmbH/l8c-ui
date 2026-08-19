@@ -1,0 +1,97 @@
+<div class="navigation-bar">
+  <!-- Top Row: back link left, done button right -->
+  @if (backLabel() || doneLabel()) {
+    <div class="navigation-topbar">
+      @if (backLabel()) {
+        <button type="button" class="back-link" (click)="backClicked.emit()">
+          <l8c-icon [name]="'chevron-left'" [size]="16" />
+          {{ backLabel() }}
+        </button>
+      }
+      @if (doneLabel()) {
+        <l8c-button [action]="'primary'" [icon]="'check'" (clicked)="doneClicked.emit()">
+          {{ doneLabel() }}
+        </l8c-button>
+      }
+    </div>
+  }
+
+  <!-- Bottom Row: item navigation -->
+  <div class="navigation-row">
+    <!-- Previous Button -->
+    <l8c-button
+      [action]="'secondary'"
+      [size]="'default'"
+      [disabled]="!canGoPrevious()"
+      (clicked)="onPrevious()"
+    >
+      <l8c-icon [name]="'chevron-left'"></l8c-icon>
+    </l8c-button>
+
+    <!-- Item Numbers -->
+    <div class="navigation-content">
+      @if (label()) {
+        <div class="navigation-label">
+          <span>{{ label() }}</span>
+        </div>
+      }
+      <div class="navigation-items">
+        @for (num of visibleNumbers(); track num) {
+          <button
+            class="nav-item"
+            [class.active]="num === activeItem()"
+            [class.completed]="isCompleted(num)"
+            (click)="onItemClick(num)"
+            type="button"
+            [attr.aria-label]="(isInfo(num) ? infoItemAriaLabel() : itemAriaLabel()) + ' ' + num"
+          >
+            @if (isInfo(num)) {
+              <l8c-icon [name]="'info'" [size]="16" />
+            } @else {
+              {{ num }}
+            }
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Jump To -->
+    <div class="jump-to">
+      @if (jumpLabel()) {
+        <span class="jump-label">{{ jumpLabel() }}</span>
+      }
+      <input
+        type="number"
+        class="jump-input"
+        [min]="1"
+        [max]="totalItems()"
+        [(ngModel)]="jumpToValue"
+        (keyup.enter)="onJumpTo()"
+        [placeholder]="jumpPlaceholder()"
+        [attr.aria-label]="jumpLabel() || null"
+      />
+      <!-- Visibility toggle: hide completed items to reach open ones quickly -->
+      @if (showVisibilityToggle()) {
+        <l8c-button
+          [action]="'secondary'"
+          [size]="'default'"
+          (clicked)="onToggleCompleted()"
+          [title]="hideCompleted() ? showCompletedLabel() : hideCompletedLabel()"
+          [ariaLabel]="hideCompleted() ? showCompletedLabel() : hideCompletedLabel()"
+        >
+          <l8c-icon [name]="hideCompleted() ? 'eye' : 'eye-off'"></l8c-icon>
+        </l8c-button>
+      }
+    </div>
+
+    <!-- Next Button -->
+    <l8c-button
+      [action]="'secondary'"
+      [size]="'default'"
+      [disabled]="!canGoNext()"
+      (clicked)="onNext()"
+    >
+      <l8c-icon [name]="'chevron-right'"></l8c-icon>
+    </l8c-button>
+  </div>
+</div>

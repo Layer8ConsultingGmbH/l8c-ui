@@ -1,0 +1,88 @@
+<div class="dropdown" tabindex="0" (blur)="open.set(false)">
+  <button
+    class="dropdown-toggle"
+    [class.dropdown-toggle-hovered]="hoveredToggle()"
+    [class.dropdown-toggle-selected]="isActiveSelection()"
+    [style.background]="backgroundColor() || null"
+    [style.border]="border() || null"
+    [style.border-radius]="borderRadius() || null"
+    [style.color]="color() || null"
+    [style.min-width]="minWidth() || null"
+    (click)="toggle()"
+    (mouseenter)="onButtonEnter()"
+    (mouseleave)="onButtonLeave()"
+  >
+    @if (iconPosition() === 'left' && icon()) {
+      <l8c-icon [name]="icon()!" />
+    }
+    {{ displayValue() }}
+    @if (iconPosition() === 'right' && icon()) {
+      <l8c-icon [name]="icon()!" />
+    }
+  </button>
+  <ul
+    class="dropdown-menu"
+    [class.open]="open()"
+    [style.background]="menuBackgroundColor() || null"
+    [style.border]="menuBorder() || null"
+    [style.border-radius]="menuBorderRadius() || null"
+    [style.color]="menuColor() || null"
+    [style.min-width]="menuMinWidth() || null"
+    (mouseenter)="onMenuEnter()"
+    (mouseleave)="onMenuLeave()"
+  >
+    @if (!hasSubmenus()) {
+      @for (option of options(); track $index) {
+        <li
+          (mousedown)="select(option)"
+          (mouseenter)="hovered.set(option)"
+          [class.dropdown-menu-item-hovered]="hovered() === option"
+        >
+          {{ option }}
+        </li>
+      }
+    } @else {
+      @for (option of optionsWithSubmenus(); track option.value || option.label) {
+        <li
+          class="dropdown-item"
+          [class.has-submenu]="option.submenu"
+          [class.dropdown-menu-item-hovered]="hovered() === option.label"
+          (mouseenter)="onItemMouseEnter(option.label, !!option.submenu)"
+        >
+          @if (option.submenu) {
+            <div class="dropdown-item-content" (mousedown)="toggleSubmenu(option.label, $event)">
+              <span>{{ option.label }}</span>
+              <l8c-icon name="chevron-right" class="submenu-arrow" />
+            </div>
+            <ul
+              class="dropdown-submenu"
+              [class.open]="openSubmenu() === option.label"
+              [style.background]="menuBackgroundColor() || null"
+              [style.border]="menuBorder() || null"
+              [style.border-radius]="menuBorderRadius() || null"
+              [style.color]="menuColor() || null"
+            >
+              @for (subOption of option.submenu; track subOption.value || subOption.label) {
+                <li
+                  (mousedown)="selectFromSubmenu(subOption.value || subOption.label)"
+                  (mouseenter)="hovered.set(subOption.label)"
+                  [class.active]="subOption.isActive"
+                  [class.dropdown-menu-item-hovered]="hovered() === subOption.label"
+                >
+                  @if (subOption.icon) {
+                    <l8c-icon [name]="subOption.icon" class="submenu-item-icon" />
+                  }
+                  {{ subOption.label }}
+                </li>
+              }
+            </ul>
+          } @else {
+            <div class="dropdown-item-content" (mousedown)="select(option.value || option.label)">
+              <span>{{ option.label }}</span>
+            </div>
+          }
+        </li>
+      }
+    }
+  </ul>
+</div>

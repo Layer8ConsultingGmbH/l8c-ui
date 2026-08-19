@@ -1,0 +1,26 @@
+<label
+  class="radio-option"
+  [class.row]="appearance() === 'row'"
+  [class.checked]="checked()"
+  [class.disabled]="disabled()"
+>
+  <input
+    type="radio"
+    class="radio-input"
+    [attr.name]="name() || null"
+    [checked]="checked()"
+    [disabled]="disabled()"
+    [attr.aria-label]="ariaLabel()"
+    (change)="onSelect()"
+  />
+  @if (appearance() === 'plain') {
+    <span class="radio-circle" [class.checked]="checked()">
+      @if (checked()) {
+        <span class="radio-dot"></span>
+      }
+    </span>
+  } @else {
+    <span class="radio-ring" [class.checked]="checked()"></span>
+  }
+  <span class="radio-label"><ng-content></ng-content></span>
+</label>

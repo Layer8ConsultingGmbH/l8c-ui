@@ -1,0 +1,14 @@
+<l8c-dialog [title]="title()" [showCloseButton]="false">
+  <div class="confirm-dialog-content">
+    <p class="confirm-message">{{ message() }}</p>
+
+    <div class="dialog-actions">
+      <l8c-button [action]="'nav'" (clicked)="close()">
+        {{ cancelLabel() }}
+      </l8c-button>
+      <l8c-button [action]="'primary'" (clicked)="onConfirm()">
+        {{ displayConfirmLabel() }}
+      </l8c-button>
+    </div>
+  </div>
+</l8c-dialog>

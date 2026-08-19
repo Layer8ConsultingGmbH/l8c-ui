@@ -1,0 +1,200 @@
+<div class="l8c-table">
+  <div class="table-container">
+    <table
+      [class.striped]="striped()"
+      [class.hoverable]="hoverable()"
+      [class.bordered]="bordered()"
+      [class.compact]="compact()"
+    >
+      <!-- Header Row -->
+      <thead>
+        <tr class="heading-row">
+          @for (column of columns(); track column.key) {
+            <th
+              [style.width]="column.width"
+              [class.align-left]="column.align === 'left'"
+              [class.align-center]="column.align === 'center'"
+              [class.align-right]="column.align === 'right'"
+              class="heading-cell"
+            >
+              <!-- Column Header Content -->
+              <div class="heading-content">
+                <!-- Heading Row with Label and Icons -->
+                <div class="heading-row-content">
+                  <div class="heading-text">
+                    <span class="heading-label">{{ column.label }}</span>
+                    @if (column.subtitle) {
+                      <span class="heading-subtitle">{{ column.subtitle }}</span>
+                    }
+                  </div>
+
+                  <!-- Custom Header Content (e.g. filter toggles) for Action Columns -->
+                  @if (getCellType(column) === 'action' && headerTemplate) {
+                    <ng-container
+                      *ngTemplateOutlet="headerTemplate; context: { column: column }"
+                    ></ng-container>
+                  }
+
+                  <!-- Sort & Filter Controls -->
+                  @if (column.sortable || column.filterable) {
+                    <div class="column-actions">
+                      <!-- Sort Icons -->
+                      @if (column.sortable) {
+                        <button
+                          type="button"
+                          class="sort-button"
+                          (click)="toggleSort(column)"
+                          [attr.aria-label]="'Sort by ' + column.label"
+                        >
+                          @if ((sortState()[column.key] || 'none') === 'none') {
+                            <l8c-icon name="chevrons-up-down" [size]="14" />
+                          }
+                          @if ((sortState()[column.key] || 'none') === 'asc') {
+                            <l8c-icon name="chevron-up" [size]="14" />
+                          }
+                          @if ((sortState()[column.key] || 'none') === 'desc') {
+                            <l8c-icon name="chevron-down" [size]="14" />
+                          }
+                        </button>
+                      }
+                      <!-- Clear Filter Button -->
+                      @if (column.filterable) {
+                        <button
+                          type="button"
+                          class="filter-clear-button"
+                          (click)="clearFilter(column)"
+                          [attr.aria-label]="'Clear filter for ' + column.label"
+                        >
+                          <l8c-icon name="funnel-x" [size]="13" />
+                        </button>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+
+              <!-- Filter Input -->
+              @if (column.filterable) {
+                <div class="filter-input-container">
+                  <input
+                    type="text"
+                    class="filter-input"
+                    placeholder="Enter value..."
+                    [value]="filterValues()[column.key] || ''"
+                    (input)="onFilterInput(column, $any($event.target).value)"
+                    [attr.aria-label]="'Filter ' + column.label"
+                  />
+                </div>
+              }
+            </th>
+          }
+        </tr>
+      </thead>
+
+      <!-- Body Rows -->
+      <tbody>
+        @if (displayData().length === 0) {
+          <tr class="no-data-row">
+            <td [attr.colspan]="columns().length">
+              <ng-content select="[empty]"></ng-content>
+            </td>
+          </tr>
+        } @else {
+          @for (row of displayData(); track trackByFn($index, row); let i = $index) {
+            <tr class="body-row" (click)="onRowClick(row)" [attr.data-index]="i">
+              @for (column of columns(); track column.key) {
+                <td
+                  [class.align-left]="column.align === 'left'"
+                  [class.align-center]="column.align === 'center'"
+                  [class.align-right]="column.align === 'right'"
+                  [attr.data-cell-type]="getCellType(column)"
+                  class="body-cell"
+                >
+                  <!-- Text Cell -->
+                  @if (getCellType(column) === 'text') {
+                    @if (getCellIcon(row, column) || getCellBadge(row, column)) {
+                      <span class="icon-text-cell">
+                        @if (getCellIcon(row, column); as cellIcon) {
+                          <span class="cell-icon" [title]="getCellIconLabel(row, column)">
+                            <l8c-icon [name]="cellIcon" [size]="14" />
+                          </span>
+                        }
+                        @if (getCellBadge(row, column); as cellBadge) {
+                          <span class="cell-badge" [title]="cellBadge.title || ''">
+                            @if (cellBadge.icon) {
+                              <l8c-icon [name]="cellBadge.icon" [size]="12" />
+                            }
+                            {{ cellBadge.label }}
+                          </span>
+                        }
+                        <span>{{ getValue(row, column) }}</span>
+                      </span>
+                    } @else {
+                      {{ getValue(row, column) }}
+                    }
+                  }
+
+                  <!-- Number Cell -->
+                  @if (getCellType(column) === 'number') {
+                    {{ getValue(row, column) }}
+                  }
+
+                  <!-- Status Cell -->
+                  @if (getCellType(column) === 'status') {
+                    <span
+                      class="status-badge"
+                      [attr.data-tone]="getStatusTone(getValue(row, column))"
+                    >
+                      <span class="status-dot"></span>
+                      {{ getValue(row, column) }}
+                    </span>
+                  }
+
+                  <!-- Text with Copy Button -->
+                  @if (getCellType(column) === 'textCopy') {
+                    <div class="text-copy-cell">
+                      <span>{{ getValue(row, column) }}</span>
+                      <div (click)="$event.stopPropagation()">
+                        <l8c-button
+                          [action]="'nav'"
+                          [icon]="'copy'"
+                          [size]="'default'"
+                          [attr.aria-label]="'Copy ' + getValue(row, column)"
+                        >
+                        </l8c-button>
+                      </div>
+                    </div>
+                  }
+
+                  <!-- Action Cell with Custom Template -->
+                  @if (getCellType(column) === 'action' && cellTemplate) {
+                    <ng-container
+                      *ngTemplateOutlet="
+                        cellTemplate;
+                        context: { row: row, column: column, value: getValue(row, column) }
+                      "
+                    ></ng-container>
+                  }
+                </td>
+              }
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  @if (showPagination() && pageableData(); as pageable) {
+    <l8c-pagination
+      [currentPage]="pageable.page"
+      [totalPages]="pageable.pages"
+      [pageSize]="pageable.size"
+      [totalItems]="pageable.total"
+      [itemsPerPageLabel]="paginationItemsPerPageLabel()"
+      [pageInfoTemplate]="paginationShowingEntriesTemplate()"
+      (pageChange)="onPageChange($event)"
+    >
+    </l8c-pagination>
+  }
+</div>

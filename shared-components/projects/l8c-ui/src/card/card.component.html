@@ -1,0 +1,47 @@
+<div
+  class="card"
+  [class]="elevationClass() + ' ' + paddingClass()"
+  [class.clickable]="clickable()"
+  [class.hovered]="isHovered()"
+  [class.collapsed]="collapsed()"
+  (mouseenter)="isHovered.set(true)"
+  (mouseleave)="isHovered.set(false)"
+  (click)="onClick($event)"
+>
+  @if (title() || subtitle()) {
+    <div class="card-header">
+      <div class="card-header-content">
+        @if (title()) {
+          <h3 class="card-title">{{ title() }}</h3>
+        }
+        @if (subtitle()) {
+          <p class="card-subtitle">{{ subtitle() }}</p>
+        }
+      </div>
+      @if (collapsible()) {
+        <button
+          class="collapse-button"
+          (click)="toggleCollapse($event)"
+          type="button"
+          [attr.aria-label]="collapsed() ? 'Expand card' : 'Collapse card'"
+        >
+          <span
+            class="arrow"
+            [class.arrow-down]="collapsed()"
+            [class.arrow-up]="!collapsed()"
+          ></span>
+        </button>
+      }
+    </div>
+  }
+
+  @if (!collapsed()) {
+    <div class="card-content">
+      <ng-content></ng-content>
+    </div>
+
+    <div class="card-footer">
+      <ng-content select="[slot='footer']"></ng-content>
+    </div>
+  }
+</div>

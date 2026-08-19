@@ -1,0 +1,126 @@
+.carousel-container {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.carousel-viewport {
+  flex: 1;
+  width: 100%;
+  border-radius: 12px;
+  background: transparent;
+}
+
+.carousel-slides {
+  width: 100%;
+}
+
+.carousel-nav {
+  flex-shrink: 0;
+  background: var(--surface, #121b2d);
+  border: 2px solid var(--border, rgba(255, 255, 255, 0.08));
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text, #e6e9f2);
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  &:hover {
+    background: var(--surface-3, #1a2436);
+    border-color: var(--primary, #2a7ab8);
+    transform: scale(1.05);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  svg {
+    transition: transform 0.2s;
+  }
+
+  &.carousel-nav-prev:hover svg {
+    transform: translateX(-2px);
+  }
+
+  &.carousel-nav-next:hover svg {
+    transform: translateX(2px);
+  }
+}
+
+.carousel-indicators {
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 20px;
+  backdrop-filter: blur(4px);
+}
+
+.carousel-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: all 0.3s;
+  padding: 0;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.7);
+    transform: scale(1.2);
+  }
+
+  &.active {
+    background: #ffffff;
+    width: 24px;
+    border-radius: 4px;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .carousel-container {
+    --carousel-bg: #1a1a1a;
+    --nav-bg: #2a2a2a;
+    --nav-hover-bg: #333333;
+    --border-color: #404040;
+    --text-primary: #ffffff;
+    --indicators-bg: rgba(255, 255, 255, 0.1);
+    --indicator-color: rgba(255, 255, 255, 0.3);
+    --indicator-hover: rgba(255, 255, 255, 0.5);
+    --indicator-active: #ffffff;
+  }
+}
+
+@media (max-width: 768px) {
+  .carousel-container {
+    gap: 0.5rem;
+  }
+
+  .carousel-nav {
+    width: 40px;
+    height: 40px;
+
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  .carousel-indicators {
+    bottom: 0.5rem;
+    padding: 0.375rem 0.75rem;
+  }
+}

@@ -1,0 +1,46 @@
+<div class="autocomplete-field">
+  <div class="input-wrapper">
+    <input
+      type="text"
+      class="input"
+      [placeholder]="placeholder()"
+      [disabled]="disabled() || loading()"
+      [value]="queryValue()"
+      (input)="onInput($event)"
+      autocomplete="off"
+    />
+    @if (loading()) {
+      <div class="loader">
+        <div class="spinner"></div>
+      </div>
+    }
+  </div>
+
+  <div class="results-dropdown" [hidden]="!queryValue() || loading() || results().length === 0">
+    @for (result of results(); track $index) {
+      <button type="button" class="result-item" (click)="onResultClick(result)">
+        @if (resultItemTemplate) {
+          <ng-container
+            *ngTemplateOutlet="resultItemTemplate; context: { $implicit: result }"
+          ></ng-container>
+        } @else {
+          <div class="result-content">{{ result }}</div>
+        }
+        <svg class="result-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path
+            d="M7.5 15L12.5 10L7.5 5"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </button>
+    }
+  </div>
+
+  <div class="no-results" [hidden]="!queryValue() || loading() || results().length > 0">
+    <p>{{ noResultsText() }}</p>
+    <span class="no-results-hint">{{ noResultsHint() }}</span>
+  </div>
+</div>
