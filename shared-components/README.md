@@ -1,6 +1,6 @@
-# SharedComponents - toolbox-lib
+# SharedComponents - l8c-ui
 
-This project contains the shared Angular component library for l8c-toolbox applications.
+This project contains the shared Angular component library for l8c applications.
 
 ## Development
 

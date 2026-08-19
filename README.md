@@ -1,6 +1,6 @@
 # l8c-ui
 
-Shared Angular UI component library for Layer8 Consulting applications (e.g. l8c-survey, l8c-toolbox).
+Shared Angular UI component library for Layer8 Consulting applications (e.g. l8c-survey).
 
 The library is built with Angular 22, ships standalone components under the `l8c-` selector prefix, and is published to npm as [`@l8c/ui`](https://www.npmjs.com/package/@l8c/ui).
 
