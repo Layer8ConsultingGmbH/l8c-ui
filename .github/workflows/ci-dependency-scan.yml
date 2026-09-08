@@ -1,4 +1,4 @@
-name: CI - Dependency Security Scan
+name: CI - Dependency Scan
 
 on:
   workflow_dispatch:

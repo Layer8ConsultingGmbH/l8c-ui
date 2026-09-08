@@ -4,7 +4,7 @@ A small, standalone Angular UI component library by [Layer8 Consulting](https://
 
 [![npm version](https://img.shields.io/npm/v/%40l8c%2Fui?logo=npm)](https://www.npmjs.com/package/@l8c/ui)
 [![CI](https://github.com/Layer8ConsultingGmbH/l8c-ui/actions/workflows/ci-run-tests.yml/badge.svg)](https://github.com/Layer8ConsultingGmbH/l8c-ui/actions/workflows/ci-run-tests.yml)
-[![Dependency Security Scan](https://github.com/Layer8ConsultingGmbH/l8c-ui/actions/workflows/ci-dependency-security-scan.yml/badge.svg)](https://github.com/Layer8ConsultingGmbH/l8c-ui/actions/workflows/ci-dependency-security-scan.yml)
+[![Dependency Scan](https://github.com/Layer8ConsultingGmbH/l8c-ui/actions/workflows/ci-dependency-scan.yml/badge.svg)](https://github.com/Layer8ConsultingGmbH/l8c-ui/actions/workflows/ci-dependency-scan.yml)
 [![Lint](https://github.com/Layer8ConsultingGmbH/l8c-ui/actions/workflows/ci-lint.yml/badge.svg)](https://github.com/Layer8ConsultingGmbH/l8c-ui/actions/workflows/ci-lint.yml)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
