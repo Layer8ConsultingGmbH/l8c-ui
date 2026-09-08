@@ -1,10 +1,21 @@
 # l8c-ui
 
-[![npm version](https://img.shields.io/npm/v/%40l8c%2Fui)](https://www.npmjs.com/package/@l8c/ui)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Angular](https://img.shields.io/badge/Angular-22-dd0031)](https://angular.dev)
-
 A small, standalone Angular UI component library by [Layer8 Consulting](https://l8c.io). It powers our own products such as [l8c-survey](https://github.com/Layer8ConsultingGmbH/l8c-survey) and is published to npm as [`@l8c/ui`](https://www.npmjs.com/package/@l8c/ui).
+
+[![npm version](https://img.shields.io/npm/v/%40l8c%2Fui?logo=npm)](https://www.npmjs.com/package/@l8c/ui)
+[![CI](https://github.com/Layer8ConsultingGmbH/l8c-ui/actions/workflows/ci-run-tests.yml/badge.svg)](https://github.com/Layer8ConsultingGmbH/l8c-ui/actions/workflows/ci-run-tests.yml)
+[![Dependency Security Scan](https://github.com/Layer8ConsultingGmbH/l8c-ui/actions/workflows/ci-dependency-security-scan.yml/badge.svg)](https://github.com/Layer8ConsultingGmbH/l8c-ui/actions/workflows/ci-dependency-security-scan.yml)
+[![Lint](https://github.com/Layer8ConsultingGmbH/l8c-ui/actions/workflows/ci-lint.yml/badge.svg)](https://github.com/Layer8ConsultingGmbH/l8c-ui/actions/workflows/ci-lint.yml)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
+**Built with:**
+
+![AI-assisted](https://img.shields.io/badge/AI--assisted-8A2BE2)
+![Angular](https://img.shields.io/badge/Angular%2022-DD0031?logo=angular&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
+![Sass](https://img.shields.io/badge/Sass-CC6699?logo=sass&logoColor=white)
+![Vitest](https://img.shields.io/badge/Vitest-6E9F18?logo=vitest&logoColor=white)
+![npm](https://img.shields.io/badge/npm-CB3837?logo=npm&logoColor=white)
 
 - **Standalone components** under the `l8c-` selector prefix, no NgModules required
 - **Signal-based API** (`input()` / `output()`), tree-shakeable and `sideEffects: false`

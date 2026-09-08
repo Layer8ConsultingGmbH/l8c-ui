@@ -40,7 +40,7 @@ For larger changes or new components, open an issue first so we can agree on the
 - **Selector prefix** is `l8c-`. Component files follow the Angular CLI layout (`name/name.component.{ts,html,scss,spec.ts}`).
 - **Public API.** Anything consumers should import must be exported from `src/public-api.ts`. Export supporting types with `export type`.
 - **Styling.** Use CSS custom properties with a fallback (`var(--primary, #2a7ab8)`) so components work without a theme and pick up the host application's tokens when present. Avoid global styles.
-- **Formatting.** Prettier is configured in `shared-components/package.json` (single quotes, 100 columns). Run `npx prettier --write .` before committing.
+- **Formatting.** Prettier is configured in `shared-components/package.json` (single quotes, 100 columns). Run `npx prettier --write "projects/**/*.{ts,html,scss}"` in `shared-components/` before committing; CI rejects unformatted code.
 - **Accessibility.** Interactive components need keyboard support and appropriate ARIA attributes.
 - **No new runtime dependencies** without discussion. The library intentionally depends only on Angular.
 
