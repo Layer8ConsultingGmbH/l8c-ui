@@ -3,10 +3,6 @@ name: CD - Publish to npm
 # Publishes @l8c/ui when a commit on main changes the library version
 # (shared-components/projects/l8c-ui/package.json) to one that is not yet on npm.
 # Merges that keep the version unchanged are a no-op.
-#
-# Authentication uses npm Trusted Publishing (OIDC): configure this repository
-# and workflow file as a trusted publisher for @l8c/ui on npmjs.com. No token
-# secret is required and every release carries a provenance attestation.
 
 on:
   workflow_dispatch:
