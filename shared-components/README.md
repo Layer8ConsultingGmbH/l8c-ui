@@ -1,30 +1,5 @@
-# SharedComponents - l8c-ui
+# shared-components
 
-This project contains the shared Angular component library for l8c applications.
+Angular CLI workspace containing the `@l8c/ui` library (`projects/l8c-ui`).
 
-## Development
-
-### Install dependencies
-
-```bash
-npm install
-```
-
-### Build the library
-
-```bash
-npm run build
-```
-
-For development with watch mode:
-
-```bash
-npm run watch
-```
-## Using in other projects
-
-### Install the library
-
-```bash
-npm install @l8c/ui
-```
+See the [repository README](../README.md) for installation, usage, theming, development scripts and the release process.

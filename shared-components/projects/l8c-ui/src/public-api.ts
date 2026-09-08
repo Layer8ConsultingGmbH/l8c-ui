@@ -1,5 +1,5 @@
 /*
- * Public API Surface of toolbox-lib
+ * Public API Surface of @l8c/ui
  */
 
 export * from './button/button.component';

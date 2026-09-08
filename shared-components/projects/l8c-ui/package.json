@@ -1,12 +1,28 @@
-﻿{
+{
   "name": "@l8c/ui",
-  "version": "1.0.1",
-  "description": "Shared Angular ui components library",
+  "version": "1.0.2",
+  "description": "Standalone, signal-based Angular UI components by Layer8 Consulting. Themeable via CSS custom properties.",
+  "license": "MIT",
+  "author": "Layer8 Consulting GmbH (https://l8c.io)",
+  "homepage": "https://github.com/Layer8ConsultingGmbH/l8c-ui#readme",
   "repository": {
     "type": "git",
     "url": "https://github.com/Layer8ConsultingGmbH/l8c-ui.git",
     "directory": "shared-components/projects/l8c-ui"
   },
+  "bugs": {
+    "url": "https://github.com/Layer8ConsultingGmbH/l8c-ui/issues"
+  },
+  "keywords": [
+    "angular",
+    "angular-components",
+    "ui",
+    "component-library",
+    "standalone-components",
+    "signals",
+    "design-system",
+    "l8c"
+  ],
   "publishConfig": {
     "access": "public"
   },

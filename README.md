@@ -1,14 +1,53 @@
 # l8c-ui
 
-Shared Angular UI component library for Layer8 Consulting applications (e.g. l8c-survey).
+[![npm version](https://img.shields.io/npm/v/%40l8c%2Fui)](https://www.npmjs.com/package/@l8c/ui)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Angular](https://img.shields.io/badge/Angular-22-dd0031)](https://angular.dev)
 
-The library is built with Angular 22, ships standalone components under the `l8c-` selector prefix, and is published to npm as [`@l8c/ui`](https://www.npmjs.com/package/@l8c/ui).
+A small, standalone Angular UI component library by [Layer8 Consulting](https://l8c.io). It powers our own products such as [l8c-survey](https://github.com/Layer8ConsultingGmbH/l8c-survey) and is published to npm as [`@l8c/ui`](https://www.npmjs.com/package/@l8c/ui).
+
+- **Standalone components** under the `l8c-` selector prefix, no NgModules required
+- **Signal-based API** (`input()` / `output()`), tree-shakeable and `sideEffects: false`
+- **Themeable via CSS custom properties** with sensible built-in fallbacks, so it works out of the box and adapts to your design tokens
+- **No runtime dependencies** besides Angular itself
+
+## Installation
+
+```bash
+npm install @l8c/ui
+```
+
+Peer dependencies: `@angular/common` and `@angular/core` `^22.0.0`.
+
+## Usage
+
+Every component is standalone. Import it directly into the component that uses it:
+
+```ts
+import { Component } from '@angular/core';
+import { ButtonComponent } from '@l8c/ui';
+
+@Component({
+  selector: 'app-save-bar',
+  imports: [ButtonComponent],
+  template: `
+    <l8c-button action="primary" icon="save" (clicked)="save()">Save</l8c-button>
+    <l8c-button action="ghost" (clicked)="cancel()">Cancel</l8c-button>
+  `,
+})
+export class SaveBarComponent {
+  save() {}
+  cancel() {}
+}
+```
+
+Supporting types such as `TableColumn`, `SelectOption` or `SideNavItem` are exported from the package root as well. The full public surface is listed in [public-api.ts](shared-components/projects/l8c-ui/src/public-api.ts).
 
 ## Components
 
 | Component | Description |
 | --- | --- |
-| `l8c-button` | Button with actions, sizes, tones and optional icon |
+| `l8c-button` | Button with actions (`primary`, `secondary`, `ghost`, `danger`, …), sizes, tones and optional icon |
 | `l8c-card` | Content card container |
 | `l8c-input` / `l8c-number-input` | Text and number form fields |
 | `l8c-checkbox` / `l8c-radio` | Selection controls |
@@ -24,33 +63,69 @@ The library is built with Angular 22, ships standalone components under the `l8c
 | `l8c-icon` | Icon component with bundled icon registry |
 | `l8c-spinner` | Loading indicator |
 
-All components and their supporting types (e.g. `TableColumn`, `SelectOption`, `SideNavItem`) are exported from the package root — see [public-api.ts](shared-components/projects/l8c-ui/src/public-api.ts).
+## Theming
 
-## Installation
+Components style themselves through CSS custom properties and ship with fallback values, so nothing needs to be configured to get started. To match your brand, define the tokens on `:root` (or any ancestor element) in your global stylesheet:
 
-```bash
-npm install @l8c/ui
+```css
+:root {
+  /* Colors */
+  --primary: #2a7ab8;
+  --primary-hover: #3d8ecb;
+  --primary-dark: #1d5d92;
+  --primary-rgb: 42, 122, 184;
+  --on-primary: #ffffff;
+  --bg: #0b1220;
+  --surface: #121b2d;
+  --surface-2: #0f1726;
+  --surface-3: #1a2436;
+  --text: #e6e9f2;
+  --text-muted: #98a3b8;
+  --text-faint: #5b6678;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.16);
+  --error: #e5484d;
+  --success: #30a46c;
+  --warning: #f5a524;
+
+  /* Typography */
+  --font-family: 'Inter', system-ui, sans-serif;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+
+  /* Shape & spacing */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-pill: 999px;
+  --space-2xs: 0.25rem;
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+
+  /* Motion */
+  --transition-fast: 120ms ease;
+  --transition-base: 200ms ease;
+}
 ```
 
-Peer dependencies: `@angular/common` and `@angular/core` (>= 22).
+Only override what you need. Search the component stylesheets under [shared-components/projects/l8c-ui/src](shared-components/projects/l8c-ui/src) for `var(--` to see every token a component reads.
 
-## Usage
+## Compatibility
 
-Components are standalone — import them directly where needed:
-
-```ts
-import { ButtonComponent } from '@l8c/ui';
-
-@Component({
-  imports: [ButtonComponent],
-  template: `<l8c-button (click)="save()">Save</l8c-button>`,
-})
-export class MyComponent {}
-```
+| `@l8c/ui` | Angular |
+| --- | --- |
+| 1.x | 22.x |
 
 ## Development
 
-The Angular workspace lives in [shared-components/](shared-components/):
+The Angular CLI workspace lives in [shared-components/](shared-components/):
 
 ```bash
 cd shared-components
@@ -62,13 +137,13 @@ npm install
 | `npm run build` | Production build of the library (output in `dist/l8c-ui`) |
 | `npm run build:dev` | Development build |
 | `npm run watch` | Rebuild on change (for local linking) |
-| `npm run test` | Run unit tests (Vitest) |
+| `npm test` | Run unit tests (Vitest) |
 | `npm run pack` | Create a tarball from `dist/l8c-ui` |
 | `npm run publish:local` | Build and pack in one step |
 
-### Local testing in a consuming app
+### Testing changes in a consuming app
 
-Build and pack the library, then install the tarball in the consuming project:
+Build and pack the library, then install the tarball in your app:
 
 ```bash
 npm run publish:local
@@ -76,9 +151,9 @@ npm run publish:local
 npm install ../l8c-ui/shared-components/dist/l8c-ui/l8c-ui-<version>.tgz
 ```
 
-## Publishing
+## Releasing
 
-Publishing goes through the built output, not the workspace root:
+Releases are published from the built output, not from the workspace root:
 
 ```bash
 cd shared-components
@@ -87,4 +162,14 @@ cd dist/l8c-ui
 npm publish --access public
 ```
 
-Bump the `version` in [projects/l8c-ui/package.json](shared-components/projects/l8c-ui/package.json) before publishing — npm rejects re-publishing an existing version.
+Before publishing, bump `version` in [projects/l8c-ui/package.json](shared-components/projects/l8c-ui/package.json) and add an entry to [CHANGELOG.md](CHANGELOG.md). npm rejects re-publishing an existing version.
+
+## Contributing
+
+Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) for the workflow and coding conventions, and note that this project follows a [Code of Conduct](CODE_OF_CONDUCT.md).
+
+Found a security issue? Please follow the process in [SECURITY.md](SECURITY.md) instead of opening a public issue.
+
+## License
+
+[MIT](LICENSE) © 2026 Layer8 Consulting GmbH
