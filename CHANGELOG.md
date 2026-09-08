@@ -13,13 +13,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Project published as open source under the MIT license; added README, CONTRIBUTING, CODE_OF_CONDUCT, SECURITY and this changelog.
 - npm package now ships LICENSE, a consumer-facing README and full package metadata (`license`, `homepage`, `bugs`, `keywords`).
 
-## [1.0.1] - 2026
+## [1.0.1] - 2026-08-19
 
 ### Fixed
 
 - Peer dependency ranges for `@angular/common` and `@angular/core` (`^22.0.0`).
 
-## [1.0.0] - 2026
+## [1.0.0] - 2026-08-19 [DEPRECATED]
+
+Deprecated on npm in favour of 1.0.1 because of incorrect peer dependency ranges.
 
 ### Added
 
