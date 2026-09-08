@@ -52,8 +52,9 @@ Use short, imperative subjects (`add tone input to button`, `fix table sort on n
 
 1. Bump `version` in `shared-components/projects/l8c-ui/package.json` following [Semantic Versioning](https://semver.org/).
 2. Move the **Unreleased** entries in `CHANGELOG.md` under the new version and date.
-3. `cd shared-components && npm run build && cd dist/l8c-ui && npm publish --access public`
-4. Tag the commit (`v1.2.3`) and push the tag.
+3. Merge the pull request into `main`.
+
+The publish workflow (`.github/workflows/cd-publish-npm.yml`) detects the new version, builds and tests the library, publishes it to npm and creates the `vX.Y.Z` tag and GitHub release automatically.
 
 ## License
 

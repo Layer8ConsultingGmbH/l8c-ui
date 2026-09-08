@@ -164,16 +164,15 @@ npm install ../l8c-ui/shared-components/dist/l8c-ui/l8c-ui-<version>.tgz
 
 ## Releasing
 
-Releases are published from the built output, not from the workspace root:
+Releases are automated. Merging a commit into `main` that bumps `version` in [projects/l8c-ui/package.json](shared-components/projects/l8c-ui/package.json) triggers the [publish workflow](.github/workflows/cd-publish-npm.yml), which builds, runs the tests, publishes the new version to npm with a provenance attestation, tags the commit (`vX.Y.Z`) and creates a GitHub release with the matching [CHANGELOG.md](CHANGELOG.md) section as notes. Merges that leave the version unchanged do nothing.
 
-```bash
-cd shared-components
-npm run build
-cd dist/l8c-ui
-npm publish --access public
-```
+To release:
 
-Before publishing, bump `version` in [projects/l8c-ui/package.json](shared-components/projects/l8c-ui/package.json) and add an entry to [CHANGELOG.md](CHANGELOG.md). npm rejects re-publishing an existing version.
+1. Bump `version` in `projects/l8c-ui/package.json` following [Semantic Versioning](https://semver.org/).
+2. Move the **Unreleased** entries in `CHANGELOG.md` under the new version and date.
+3. Open a pull request and merge it into `main`.
+
+Publishing manually from the built output still works for emergencies (`cd shared-components && npm run build && cd dist/l8c-ui && npm publish --access public`), but npm rejects re-publishing an existing version either way.
 
 ## Contributing
 
