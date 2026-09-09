@@ -164,15 +164,23 @@ npm install ../l8c-ui/shared-components/dist/l8c-ui/l8c-ui-<version>.tgz
 
 ## Releasing
 
-Releases are automated. Merging a commit into `main` that bumps `version` in [projects/l8c-ui/package.json](shared-components/projects/l8c-ui/package.json) triggers the [publish workflow](.github/workflows/cd-publish-npm.yml), which builds, runs the tests, publishes the new version to npm with a provenance attestation, tags the commit (`vX.Y.Z`) and creates a GitHub release with the matching [CHANGELOG.md](CHANGELOG.md) section as notes. Merges that leave the version unchanged do nothing.
+Releases use npm [staged publishing](https://docs.npmjs.com/staged-publishing/) with [trusted publishing](https://docs.npmjs.com/trusted-publishers/) (OIDC, no tokens). Merging a commit into `main` that bumps `version` in [projects/l8c-ui/package.json](shared-components/projects/l8c-ui/package.json) triggers the [publish workflow](.github/workflows/cd-publish-npm.yml), which builds and tests the library, uploads it to npm's staging queue with a provenance attestation, tags the commit (`vX.Y.Z`) and creates a GitHub release with the matching [CHANGELOG.md](CHANGELOG.md) section as notes. Merges that leave the version unchanged do nothing.
+
+The staged version is **not installable** until a maintainer approves it with two-factor authentication. This keeps a compromised CI run or GitHub account from shipping a release on its own.
 
 To release:
 
 1. Bump `version` in `projects/l8c-ui/package.json` following [Semantic Versioning](https://semver.org/).
 2. Move the **Unreleased** entries in `CHANGELOG.md` under the new version and date.
 3. Open a pull request and merge it into `main`.
+4. Approve the staged version on [npmjs.com](https://www.npmjs.com/package/@l8c/ui) or from a terminal:
 
-Publishing manually from the built output still works for emergencies (`cd shared-components && npm run build && cd dist/l8c-ui && npm publish --access public`), but npm rejects re-publishing an existing version either way.
+   ```bash
+   npm stage list @l8c/ui
+   npm stage approve <stage-id>
+   ```
+
+   Optional integrity check before approving: `npm stage download <stage-id>`, build the tagged commit locally with `npm run publish:local` and diff the two tarballs.
 
 ## Contributing
 
