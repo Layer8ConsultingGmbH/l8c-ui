@@ -180,7 +180,13 @@ To release:
    npm stage approve <stage-id>
    ```
 
-   Optional integrity check before approving: `npm stage download <stage-id>`, build the tagged commit locally with `npm run publish:local` and diff the two tarballs.
+   Before approving, verify that the staged tarball matches a clean build of the tagged commit:
+
+   ```bash
+   scripts/verify-stage.sh <stage-id>
+   ```
+
+   The script downloads the staged tarball, rebuilds the version from its git tag in a temporary worktree and compares the two. It ends green when they are identical and red when the content differs, in which case reject the stage with `npm stage reject <stage-id>` and investigate the workflow run.
 
 ## Contributing
 

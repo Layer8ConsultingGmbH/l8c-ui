@@ -170,6 +170,6 @@ jobs:
             if [ -n "$STAGE_ID" ]; then echo "- Stage id: \`$STAGE_ID\`"; fi
             echo "- Git tag and release: ${{ github.server_url }}/${{ github.repository }}/releases/tag/v$VERSION"
             echo ""
-            echo "Optional integrity check before approving: \`npm stage download <stage-id>\`, build the"
-            echo "tagged commit locally with \`npm run publish:local\` and diff the two tarballs."
+            echo "Before approving, verify the staged tarball against a clean build of the tag:"
+            echo "\`scripts/verify-stage.sh <stage-id>\`"
           } >> $GITHUB_STEP_SUMMARY
