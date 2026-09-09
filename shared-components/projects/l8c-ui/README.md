@@ -1,63 +1,43 @@
-# l8c-ui
+# @l8c/ui
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.1.0.
+Standalone Angular UI components by [Layer8 Consulting](https://l8c.io). Signal-based, tree-shakeable and themeable through CSS custom properties.
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Installation
 
 ```bash
-ng generate component component-name
+npm install @l8c/ui
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Peer dependencies: `@angular/common` and `@angular/core` `^22.0.0`.
 
-```bash
-ng generate --help
+## Usage
+
+```ts
+import { Component } from '@angular/core';
+import { ButtonComponent } from '@l8c/ui';
+
+@Component({
+  selector: 'app-save-bar',
+  imports: [ButtonComponent],
+  template: `<l8c-button action="primary" (clicked)="save()">Save</l8c-button>`,
+})
+export class SaveBarComponent {
+  save() {}
+}
 ```
 
-## Building
+## Components
 
-To build the library, run:
+`l8c-button`, `l8c-card`, `l8c-input`, `l8c-number-input`, `l8c-checkbox`, `l8c-radio`, `l8c-select`, `l8c-dropdown`, `l8c-search-field`, `l8c-table`, `l8c-pagination`, `l8c-carousel`, `l8c-dialog`, `l8c-confirm-dialog`, `l8c-navigation-bar`, `l8c-side-nav`, `l8c-account-menu`, `l8c-product-switcher`, `l8c-icon`, `l8c-spinner`
 
-```bash
-ng build l8c-ui
-```
+## Theming
 
-This command will compile your project, and the build artifacts will be placed in the `dist/` directory.
+Components read CSS custom properties such as `--primary`, `--surface`, `--text`, `--border`, `--font-family` and `--radius-md`, each with a built-in fallback. Define them on `:root` in your global stylesheet to apply your own design tokens.
 
-### Publishing the Library
+## Documentation
 
-Once the project is built, you can publish your library by following these steps:
+Full documentation, the token reference and the development guide live in the [GitHub repository](https://github.com/Layer8ConsultingGmbH/l8c-ui).
 
-1. Navigate to the `dist` directory:
-   ```bash
-   cd dist/l8c-ui
-   ```
+## License
 
-2. Run the `npm publish` command to publish your library to the npm registry:
-   ```bash
-   npm publish
-   ```
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+[MIT](https://github.com/Layer8ConsultingGmbH/l8c-ui/blob/main/LICENSE) © 2026 Layer8 Consulting GmbH

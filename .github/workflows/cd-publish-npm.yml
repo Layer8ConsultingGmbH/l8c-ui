@@ -1,0 +1,129 @@
+name: CD - Publish to npm
+
+# Publishes @l8c/ui when a commit on main changes the library version
+# (shared-components/projects/l8c-ui/package.json) to one that is not yet on npm.
+# Merges that keep the version unchanged are a no-op.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["main"]
+    paths:
+      - "shared-components/projects/l8c-ui/package.json"
+      - ".github/workflows/cd-publish-npm.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-npm
+  cancel-in-progress: false
+
+jobs:
+  check-version:
+    name: Compare version with npm
+    runs-on: ubuntu-latest
+    outputs:
+      should-publish: ${{ steps.compare.outputs.should-publish }}
+      version: ${{ steps.compare.outputs.version }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: "26"
+
+      - name: Compare local and published version
+        id: compare
+        run: |
+          LOCAL=$(node -p "require('./shared-components/projects/l8c-ui/package.json').version")
+          PUBLISHED=$(npm view @l8c/ui version 2>/dev/null || echo "none")
+          echo "local=$LOCAL published=$PUBLISHED"
+          echo "version=$LOCAL" >> $GITHUB_OUTPUT
+          if npm view "@l8c/ui@$LOCAL" version >/dev/null 2>&1; then
+            echo "Version $LOCAL is already on npm, nothing to publish."
+            echo "should-publish=false" >> $GITHUB_OUTPUT
+          else
+            echo "Version $LOCAL is new, will publish."
+            echo "should-publish=true" >> $GITHUB_OUTPUT
+          fi
+
+  publish:
+    name: Build, test and publish
+    runs-on: ubuntu-latest
+    needs: check-version
+    if: needs.check-version.outputs.should-publish == 'true'
+    environment: npm
+    permissions:
+      contents: write # create the release tag
+      id-token: write # npm trusted publishing / provenance
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: "26"
+          registry-url: "https://registry.npmjs.org"
+          cache: npm
+          cache-dependency-path: shared-components/package-lock.json
+
+      - name: Install dependencies
+        working-directory: shared-components
+        run: npm ci
+
+      - name: Build library
+        working-directory: shared-components
+        run: npm run build
+
+      - name: Run unit tests
+        working-directory: shared-components
+        run: npm test
+
+      - name: Publish to npm
+        working-directory: shared-components/dist/l8c-ui
+        run: npm publish --access public --provenance
+
+      - name: Tag release
+        env:
+          VERSION: ${{ needs.check-version.outputs.version }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "v$VERSION" -m "v$VERSION"
+          git push origin "v$VERSION"
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ needs.check-version.outputs.version }}
+        run: |
+          # Release notes: the CHANGELOG section for this version, if present
+          NOTES=$(awk -v v="## [$VERSION]" '
+            index($0, v) == 1 { on = 1; next }
+            on && /^## \[/ { exit }
+            on { print }
+          ' CHANGELOG.md)
+          if [ -z "$NOTES" ]; then
+            NOTES="Published @l8c/ui $VERSION to npm."
+          fi
+          gh release create "v$VERSION" \
+            --title "v$VERSION" \
+            --notes "$NOTES" \
+            --verify-tag
+
+      - name: Write summary
+        env:
+          VERSION: ${{ needs.check-version.outputs.version }}
+        run: |
+          {
+            echo "## Published @l8c/ui $VERSION"
+            echo ""
+            echo "- npm: https://www.npmjs.com/package/@l8c/ui/v/$VERSION"
+            echo "- release: ${{ github.server_url }}/${{ github.repository }}/releases/tag/v$VERSION"
+          } >> $GITHUB_STEP_SUMMARY
