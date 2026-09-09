@@ -53,8 +53,9 @@ Use short, imperative subjects (`add tone input to button`, `fix table sort on n
 1. Bump `version` in `shared-components/projects/l8c-ui/package.json` following [Semantic Versioning](https://semver.org/).
 2. Move the **Unreleased** entries in `CHANGELOG.md` under the new version and date.
 3. Merge the pull request into `main`.
+4. Approve the staged version on npmjs.com or with `npm stage approve <stage-id>` (2FA required).
 
-The publish workflow (`.github/workflows/cd-publish-npm.yml`) detects the new version, builds and tests the library, publishes it to npm and creates the `vX.Y.Z` tag and GitHub release automatically.
+The publish workflow (`.github/workflows/cd-publish-npm.yml`) detects the new version, builds and tests the library, stages it on npm and creates the `vX.Y.Z` tag and GitHub release automatically. The version only becomes installable after step 4.
 
 ## License
 
