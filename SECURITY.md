@@ -21,7 +21,6 @@ Please include:
 - the affected `@l8c/ui` version(s),
 - steps or a minimal example to reproduce it.
 
-We aim to acknowledge reports within 3 working days and to provide a fix or mitigation plan within 30 days, depending on severity. We will credit reporters in the release notes unless they prefer to stay anonymous.
 
 ## Scope
 
