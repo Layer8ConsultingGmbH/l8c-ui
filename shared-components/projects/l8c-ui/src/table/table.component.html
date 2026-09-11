@@ -120,17 +120,21 @@
                           </span>
                         }
                         @if (getCellBadge(row, column); as cellBadge) {
-                          <span class="cell-badge" [title]="cellBadge.title || ''">
+                          <span
+                            class="badge cell-badge"
+                            [attr.data-tone]="cellBadge.tone || 'neutral'"
+                            [title]="cellBadge.title || ''"
+                          >
                             @if (cellBadge.icon) {
                               <l8c-icon [name]="cellBadge.icon" [size]="12" />
                             }
                             {{ cellBadge.label }}
                           </span>
                         }
-                        <span>{{ getValue(row, column) }}</span>
+                        <ng-container *ngTemplateOutlet="textValue; context: { row, column }" />
                       </span>
                     } @else {
-                      {{ getValue(row, column) }}
+                      <ng-container *ngTemplateOutlet="textValue; context: { row, column }" />
                     }
                   }
 
@@ -142,7 +146,7 @@
                   <!-- Status Cell -->
                   @if (getCellType(column) === 'status') {
                     <span
-                      class="status-badge"
+                      class="badge status-badge"
                       [attr.data-tone]="getStatusTone(getValue(row, column))"
                     >
                       <span class="status-dot"></span>
@@ -198,3 +202,12 @@
     </l8c-pagination>
   }
 </div>
+
+<!-- Text cell value: plain, or as toned pill when the column provides a valueTone -->
+<ng-template #textValue let-row="row" let-column="column">
+  @if (getValueTone(row, column); as tone) {
+    <span class="badge value-badge" [attr.data-tone]="tone">{{ getValue(row, column) }}</span>
+  } @else {
+    <span>{{ getValue(row, column) }}</span>
+  }
+</ng-template>

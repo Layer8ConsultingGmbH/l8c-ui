@@ -57,6 +57,8 @@ export interface CellBadge {
   icon?: IconName;
   /** Tooltip explaining the badge */
   title?: string;
+  /** DS Badge tone, defaults to neutral */
+  tone?: StatusTone;
 }
 
 export interface TableColumn {
@@ -75,6 +77,11 @@ export interface TableColumn {
   iconLabel?: (row: any) => string;
   /** Pill badge rendered before the cell value of text cells */
   badge?: (row: any) => CellBadge | null;
+  /**
+   * Render the value of a text cell as a toned pill (DS Badge, no status dot).
+   * Return null to render the value as plain text for that row.
+   */
+  valueTone?: (row: any) => StatusTone | null;
 }
 
 export interface PageableData<T> {
@@ -143,6 +150,10 @@ export class L8cTableComponent<T = any> {
 
   getCellBadge(row: T, column: TableColumn): CellBadge | null {
     return column.badge ? column.badge(row) : null;
+  }
+
+  getValueTone(row: T, column: TableColumn): StatusTone | null {
+    return column.valueTone ? column.valueTone(row) : null;
   }
 
   getCellType(column: TableColumn): CellType {
