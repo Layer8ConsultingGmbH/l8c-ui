@@ -51,7 +51,7 @@ const STATUS_TONES: Record<string, StatusTone> = {
   expired: 'error',
 };
 
-/** Small pill rendered before a text cell value (e.g. a "scheduled" hint) */
+/** Small pill rendered after a text cell value (e.g. a "scheduled" hint) */
 export interface CellBadge {
   label: string;
   icon?: IconName;
@@ -75,7 +75,7 @@ export interface TableColumn {
   icon?: (row: any) => IconName | null;
   /** Tooltip for the cell icon */
   iconLabel?: (row: any) => string;
-  /** Pill badge rendered before the cell value of text cells */
+  /** Pill badge rendered after the cell value of text cells */
   badge?: (row: any) => CellBadge | null;
   /**
    * Render the value of a text cell as a toned pill (DS Badge, no status dot).

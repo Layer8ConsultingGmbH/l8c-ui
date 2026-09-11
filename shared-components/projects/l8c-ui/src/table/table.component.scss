@@ -179,7 +179,7 @@
           }
 
           // One pill per DS Badge (components/core/Badge): semantic tone, pill shape.
-          // Variants: `.cell-badge` (hint before the value), `.value-badge` (the value
+          // Variants: `.cell-badge` (hint after the value), `.value-badge` (the value
           // itself), `.status-badge` (DS StatusBadge: adds the tone dot).
           .badge {
             display: inline-flex;

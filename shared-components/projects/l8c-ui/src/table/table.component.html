@@ -119,6 +119,7 @@
                             <l8c-icon [name]="cellIcon" [size]="14" />
                           </span>
                         }
+                        <ng-container *ngTemplateOutlet="textValue; context: { row, column }" />
                         @if (getCellBadge(row, column); as cellBadge) {
                           <span
                             class="badge cell-badge"
@@ -131,7 +132,6 @@
                             {{ cellBadge.label }}
                           </span>
                         }
-                        <ng-container *ngTemplateOutlet="textValue; context: { row, column }" />
                       </span>
                     } @else {
                       <ng-container *ngTemplateOutlet="textValue; context: { row, column }" />
