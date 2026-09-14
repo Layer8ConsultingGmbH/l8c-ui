@@ -119,6 +119,72 @@ describe('L8cNavigationBarComponent', () => {
     expect(items[0].getAttribute('aria-label')).toBe('Question 1');
   });
 
+  describe('windowing', () => {
+    const texts = () =>
+      Array.from(fixture.nativeElement.querySelectorAll('.nav-item')).map((item: any) =>
+        item.textContent.trim(),
+      );
+
+    beforeEach(() => {
+      fixture.componentRef.setInput('totalItems', 42);
+      fixture.componentRef.setInput('maxVisibleItems', 10);
+    });
+
+    it('should render at most maxVisibleItems numbers, starting at the beginning', () => {
+      fixture.componentRef.setInput('activeItem', 1);
+      fixture.detectChanges();
+
+      expect(texts()).toEqual(['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']);
+      expect(fixture.nativeElement.querySelectorAll('.nav-ellipsis').length).toBe(1);
+    });
+
+    it('should center the window on the active item', () => {
+      fixture.componentRef.setInput('activeItem', 20);
+      fixture.detectChanges();
+
+      expect(texts()[0]).toBe('15');
+      expect(texts()[9]).toBe('24');
+      expect(fixture.nativeElement.querySelectorAll('.nav-ellipsis').length).toBe(2);
+    });
+
+    it('should clamp the window at the end', () => {
+      fixture.componentRef.setInput('activeItem', 42);
+      fixture.detectChanges();
+
+      expect(texts()[0]).toBe('33');
+      expect(texts()[9]).toBe('42');
+    });
+
+    it('should page the window via the ellipsis buttons', () => {
+      fixture.componentRef.setInput('activeItem', 20);
+      fixture.detectChanges();
+
+      const ellipses = fixture.nativeElement.querySelectorAll('.nav-ellipsis');
+      ellipses[0].click();
+      ellipses[1].click();
+
+      expect(selected).toEqual([5, 34]);
+    });
+
+    it('should show "active / total"', () => {
+      fixture.componentRef.setInput('activeItem', 7);
+      fixture.detectChanges();
+
+      expect(fixture.nativeElement.querySelector('.navigation-count').textContent.trim()).toBe(
+        '7 / 42',
+      );
+    });
+
+    it('should window the remaining items when completed ones are hidden', () => {
+      fixture.componentRef.setInput('completedPositions', [1, 2, 3]);
+      fixture.componentRef.setInput('activeItem', 4);
+      component.onToggleCompleted();
+      fixture.detectChanges();
+
+      expect(texts()).toEqual(['4', '5', '6', '7', '8', '9', '10', '11', '12', '13']);
+    });
+  });
+
   it('should render back link and done button only when labels are set', () => {
     expect(fixture.nativeElement.querySelector('.navigation-topbar')).toBeFalsy();
 

@@ -38,6 +38,7 @@ export type IconName =
   | 'funnel-x'
   | 'github'
   | 'globe'
+  | 'grip-vertical'
   | 'hash'
   | 'house'
   | 'info'

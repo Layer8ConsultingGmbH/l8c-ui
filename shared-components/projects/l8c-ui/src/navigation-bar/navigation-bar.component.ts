@@ -12,6 +12,10 @@ import { L8cIconComponent } from '../icon/icon.component';
  * The component only works with 1-based position numbers; what an item is,
  * what "completed" means and what happens on selection is up to the parent.
  * All texts are inputs so the host app can pass translations.
+ *
+ * Custom actions (e.g. several save buttons) can be projected into the top
+ * row next to the done button: `<div navActions>...</div>`. The top row is
+ * rendered whenever a back or done label is set.
  */
 @Component({
   selector: 'l8c-navigation-bar',
@@ -44,6 +48,15 @@ export class L8cNavigationBarComponent {
 
   // Shows the eye toggle that hides completed positions
   showVisibilityToggle = input<boolean>(false);
+
+  // At most this many numbered buttons are rendered at once, as a window
+  // that follows the active item; the rest is reachable via previous/next,
+  // the jump field or by paging at the window edges
+  maxVisibleItems = input<number>(10);
+
+  // Shows "active / total" next to the numbers so the overall length is
+  // visible even when the window hides most of them
+  showCount = input<boolean>(true);
 
   // Texts (hidden when empty); pass translated values from the host app
   label = input<string>('');
@@ -91,11 +104,58 @@ export class L8cNavigationBarComponent {
     this.hideCompleted.update((value) => !value);
   }
 
-  visibleNumbers = computed<number[]>(() =>
+  // Every number that is currently selectable (completed ones may be hidden)
+  selectableNumbers = computed<number[]>(() =>
     this.hideCompleted()
       ? this.itemNumbers().filter((num) => !this.completedPositionSet().has(num))
       : this.itemNumbers(),
   );
+
+  // The window of selectable numbers around the active item, clamped to the
+  // list bounds so the bar never shows fewer than maxVisibleItems when
+  // enough items exist
+  visibleNumbers = computed<number[]>(() => {
+    const numbers = this.selectableNumbers();
+    const max = Math.max(1, this.maxVisibleItems());
+    if (numbers.length <= max) {
+      return numbers;
+    }
+    const activeIndex = Math.max(
+      0,
+      numbers.findIndex((num) => num >= this.activeItem()),
+    );
+    const start = Math.min(Math.max(0, activeIndex - Math.floor(max / 2)), numbers.length - max);
+    return numbers.slice(start, start + max);
+  });
+
+  // Whether numbers exist before/after the window - shown as "…" that pages
+  // the window by clicking
+  hasHiddenBefore = computed<boolean>(() => {
+    const visible = this.visibleNumbers();
+    return visible.length > 0 && visible[0] !== this.selectableNumbers()[0];
+  });
+
+  hasHiddenAfter = computed<boolean>(() => {
+    const visible = this.visibleNumbers();
+    const all = this.selectableNumbers();
+    return visible.length > 0 && visible[visible.length - 1] !== all[all.length - 1];
+  });
+
+  // Page the window: select the item one window before/after the current edge
+  onPageBefore(): void {
+    const all = this.selectableNumbers();
+    const firstVisibleIndex = all.indexOf(this.visibleNumbers()[0]);
+    const target = all[Math.max(0, firstVisibleIndex - this.maxVisibleItems())];
+    this.itemSelected.emit(target);
+  }
+
+  onPageAfter(): void {
+    const all = this.selectableNumbers();
+    const visible = this.visibleNumbers();
+    const lastVisibleIndex = all.indexOf(visible[visible.length - 1]);
+    const target = all[Math.min(all.length - 1, lastVisibleIndex + this.maxVisibleItems())];
+    this.itemSelected.emit(target);
+  }
 
   onItemClick(itemNumber: number): void {
     this.itemSelected.emit(itemNumber);

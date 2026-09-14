@@ -222,6 +222,14 @@ import { IconName } from './icon-registry';
           <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
           <path d="M2 12h20" />
         }
+        @case ('grip-vertical') {
+          <circle cx="9" cy="12" r="1" />
+          <circle cx="9" cy="5" r="1" />
+          <circle cx="9" cy="19" r="1" />
+          <circle cx="15" cy="12" r="1" />
+          <circle cx="15" cy="5" r="1" />
+          <circle cx="15" cy="19" r="1" />
+        }
         @case ('hash') {
           <line x1="4" x2="20" y1="9" y2="9" />
           <line x1="4" x2="20" y1="15" y2="15" />

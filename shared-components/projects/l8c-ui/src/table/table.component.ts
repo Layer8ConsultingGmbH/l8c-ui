@@ -21,8 +21,9 @@ export type StatusTone = 'neutral' | 'primary' | 'success' | 'warning' | 'error'
 // Status → tone mapping per Layer8 Design System v0.2 (components/data/StatusBadge).
 // Unknown values fall back to neutral.
 const STATUS_TONES: Record<string, StatusTone> = {
-  // ready / open / active
+  // ready / scheduled / open / active
   ready: 'primary',
+  scheduled: 'primary',
   open: 'primary',
   sent: 'primary',
   active: 'primary',
@@ -51,12 +52,14 @@ const STATUS_TONES: Record<string, StatusTone> = {
   expired: 'error',
 };
 
-/** Small pill rendered before a text cell value (e.g. a "scheduled" hint) */
+/** Small pill rendered after a text cell value (e.g. a "scheduled" hint) */
 export interface CellBadge {
   label: string;
   icon?: IconName;
   /** Tooltip explaining the badge */
   title?: string;
+  /** DS Badge tone, defaults to neutral */
+  tone?: StatusTone;
 }
 
 export interface TableColumn {
@@ -73,8 +76,13 @@ export interface TableColumn {
   icon?: (row: any) => IconName | null;
   /** Tooltip for the cell icon */
   iconLabel?: (row: any) => string;
-  /** Pill badge rendered before the cell value of text cells */
+  /** Pill badge rendered after the cell value of text cells */
   badge?: (row: any) => CellBadge | null;
+  /**
+   * Render the value of a text cell as a toned pill (DS Badge, no status dot).
+   * Return null to render the value as plain text for that row.
+   */
+  valueTone?: (row: any) => StatusTone | null;
 }
 
 export interface PageableData<T> {
@@ -143,6 +151,10 @@ export class L8cTableComponent<T = any> {
 
   getCellBadge(row: T, column: TableColumn): CellBadge | null {
     return column.badge ? column.badge(row) : null;
+  }
+
+  getValueTone(row: T, column: TableColumn): StatusTone | null {
+    return column.valueTone ? column.valueTone(row) : null;
   }
 
   getCellType(column: TableColumn): CellType {
