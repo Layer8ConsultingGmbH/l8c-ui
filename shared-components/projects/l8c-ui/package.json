@@ -1,6 +1,6 @@
 {
   "name": "@l8c/ui",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "Standalone, signal-based Angular UI components by Layer8 Consulting. Themeable via CSS custom properties.",
   "license": "MIT",
   "author": "Layer8 Consulting GmbH (https://l8c.io)",
