@@ -21,8 +21,9 @@ export type StatusTone = 'neutral' | 'primary' | 'success' | 'warning' | 'error'
 // Status → tone mapping per Layer8 Design System v0.2 (components/data/StatusBadge).
 // Unknown values fall back to neutral.
 const STATUS_TONES: Record<string, StatusTone> = {
-  // ready / open / active
+  // ready / scheduled / open / active
   ready: 'primary',
+  scheduled: 'primary',
   open: 'primary',
   sent: 'primary',
   active: 'primary',
