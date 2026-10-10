@@ -2,7 +2,7 @@
 name: Task
 about: Technical work without a user story of its own, e.g. a part of a feature, refactoring, infrastructure, dependency update, research, an architecture decision or content work.
 title: "[Task] "
-labels: ["task"]
+labels: []
 type: Task
 assignees: ""
 ---

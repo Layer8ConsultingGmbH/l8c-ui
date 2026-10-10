@@ -2,7 +2,7 @@
 name: Feature
 about: A new or changed capability, written as a user story and refined until it can be implemented and tested end to end.
 title: "[Feature] "
-labels: ["feature"]
+labels: []
 type: Feature
 assignees: ""
 ---

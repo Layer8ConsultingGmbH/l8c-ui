@@ -2,7 +2,7 @@
 name: Epic
 about: A goal that spans several issues and possibly several repositories. Break it down into sub-issues.
 title: "[Epic] "
-labels: ["epic"]
+labels: []
 type: Epic
 assignees: ""
 ---

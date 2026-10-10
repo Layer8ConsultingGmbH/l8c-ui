@@ -2,7 +2,7 @@
 name: Bug
 about: Something does not work as specified. Security vulnerabilities are not reported here.
 title: "[Bug] "
-labels: ["bug"]
+labels: []
 type: Bug
 assignees: ""
 ---
@@ -13,7 +13,8 @@ How to use this template
 - One defect per issue; improvements and questions become features, tasks or comments, not bugs.
 - Security vulnerabilities: do not use this template; report them via the security advisory link on the template chooser.
 - "Analysis" and the sections below are completed during refinement.
-- Severity is set as label (severity:critical, severity:high, severity:medium, severity:low).
+- The issue type is set by the template; there are no type labels. Severity is set as label
+  (severity:critical, severity:high, severity:medium, severity:low).
 - All relationships live only in the sidebar (parent, sub-issues, blocked by / blocking); the text has no
   dependency section. Where an issue comes from (e.g. split from a collection) belongs in the background.
 - Redact secrets and personal data in logs and screenshots.
