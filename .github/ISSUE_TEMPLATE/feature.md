@@ -12,7 +12,8 @@ How to use this template
 - Anyone can open a feature. Fill in "Request" at minimum.
 - All sections below the line are completed during refinement (manually or with the refinement skill).
 - Set the project status to "Ready" only when the Definition of Ready at the bottom is fully checked.
-- Parent epic and blocked-by are set only via GitHub relationships (sidebar), not repeated in the text.
+- All relationships live only in the sidebar (parent, sub-issues, blocked by / blocking); the text has no
+  dependency section. Where an issue comes from (e.g. split from a collection) belongs in the background.
 - Add area labels (area:components, area:styles, area:docs, area:ci).
 -->
 
@@ -128,13 +129,6 @@ Example: "Copied templates start with status READY – users should be able to s
 - 
 
 ---
-
-## Dependencies
-<!--
-Parent epic and blocked-by live only in the GitHub relationships. List here only what GitHub cannot express.
--->
-- Related: 
-- Why blocked: <!-- only if the reason is not obvious from the blocking issue's title -->
 
 ## Implementation notes
 <!-- For the implementing agent or developer. -->

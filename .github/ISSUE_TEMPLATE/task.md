@@ -15,7 +15,8 @@ How to use this template
   - adr: architecture decision, result is an accepted ADR
   - content: content delivered by a domain expert (texts, templates, translations), not code
   - design: design of components in the design system, before implementation
-- Parent and blocked-by are set only via GitHub relationships (sidebar), not repeated in the text.
+- All relationships live only in the sidebar (parent, sub-issues, blocked by / blocking); the text has no
+  dependency section. Where an issue comes from (e.g. split from a collection) belongs in the background.
 - Add area labels (area:components, area:styles, area:docs, area:ci).
 -->
 
@@ -85,11 +86,6 @@ How to use this template
 - Licence and copyright: <!-- e.g. icon licence -->
 
 ---
-
-## Dependencies
-<!-- Parent and blocked-by live only in the GitHub relationships. List here only what GitHub cannot express. -->
-- Related: 
-- Why blocked: 
 
 ## Definition of Ready
 - [ ] Goal, scope and out of scope are agreed

@@ -14,7 +14,8 @@ How to use this template
 - Security vulnerabilities: do not use this template; report them via the security advisory link on the template chooser.
 - "Analysis" and the sections below are completed during refinement.
 - Severity is set as label (severity:critical, severity:high, severity:medium, severity:low).
-- Parent and blocked-by are set only via GitHub relationships (sidebar), not repeated in the text.
+- All relationships live only in the sidebar (parent, sub-issues, blocked by / blocking); the text has no
+  dependency section. Where an issue comes from (e.g. split from a collection) belongs in the background.
 - Redact secrets and personal data in logs and screenshots.
 -->
 
@@ -93,12 +94,6 @@ How to use this template
 - Steps:
   1. 
 - Expected result: 
-
----
-
-## Dependencies
-<!-- Parent and blocked-by live only in the GitHub relationships. List here only what GitHub cannot express. -->
-- Related: 
 
 ---
 

@@ -12,7 +12,8 @@ How to use this template
 - An epic describes an outcome, not an implementation. The work itself lives in sub-issues
   (Features, Bugs, Tasks).
 - Add the work via "Create sub-issue" / "Add existing issue" in the sub-issues section below the description.
-  That section and the "blocked by" relationships are the source of truth for structure and order.
+- All relationships live only in the sidebar (parent, sub-issues, blocked by / blocking); the text has no
+  dependency section. Where an issue comes from (e.g. split from a collection) belongs in the background.
 - This repository is public: no internal dates, names, repositories or plans.
 -->
 
@@ -55,8 +56,7 @@ How to use this template
 
 ---
 
-## Dependencies and risks
-- Related epics: 
+## Risks
 - 
 
 ## Stakeholders
