@@ -28,7 +28,7 @@ export class SaveBarComponent {
 
 ## Components
 
-`l8c-button`, `l8c-card`, `l8c-input`, `l8c-number-input`, `l8c-checkbox`, `l8c-radio`, `l8c-select`, `l8c-dropdown`, `l8c-search-field`, `l8c-table`, `l8c-pagination`, `l8c-carousel`, `l8c-dialog`, `l8c-confirm-dialog`, `l8c-navigation-bar`, `l8c-side-nav`, `l8c-account-menu`, `l8c-product-switcher`, `l8c-icon`, `l8c-spinner`
+`l8c-button`, `l8c-card`, `l8c-input`, `l8c-number-input`, `l8c-checkbox`, `l8c-radio`, `l8c-select`, `l8c-dropdown`, `l8c-search-field`, `l8c-table`, `l8c-pagination`, `l8c-carousel`, `l8c-dialog`, `l8c-confirm-dialog`, `l8c-navigation-bar`, `l8c-side-nav`, `l8c-account-menu`, `l8c-product-switcher`, `l8c-icon`, `l8c-spinner`, `l8c-toast` / `l8c-toast-container` (with `L8cToastService`)
 
 ## Theming
 

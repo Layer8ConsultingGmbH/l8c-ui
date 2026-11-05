@@ -73,6 +73,38 @@ Supporting types such as `TableColumn`, `SelectOption` or `SideNavItem` are expo
 | `l8c-product-switcher` | Switch between platform products |
 | `l8c-icon` | Icon component with bundled icon registry |
 | `l8c-spinner` | Loading indicator |
+| `l8c-toast` / `l8c-toast-container` | Short feedback after an action (info, success, error), fed by `L8cToastService` |
+
+### Toasts
+
+`L8cToastService` (provided in root) holds the toasts; `l8c-toast-container` renders them fixed top right below the top navigation, oldest first. Place the container once in the app shell, outside any layout switch, so toasts show on every page and survive navigation.
+
+```ts
+import { L8cToastContainerComponent, L8cToastService } from '@l8c/ui';
+
+@Component({
+  selector: 'app-root',
+  imports: [L8cToastContainerComponent],
+  template: `
+    <router-outlet />
+    <l8c-toast-container [dismissLabel]="'Close'" />
+  `,
+})
+export class App {}
+
+@Component({ /* … */ })
+export class SaveBarComponent {
+  private toasts = inject(L8cToastService);
+  save() {
+    this.toasts.success('Draft saved.');
+  }
+}
+```
+
+- `info(message, duration?)` and `success(message, duration?)` close after `DEFAULT_TOAST_DURATION` (2600 ms); `setDuration(ms)` changes the default for the app, e.g. from its runtime configuration.
+- `error(message)` stays until the user dismisses it, so it cannot vanish unread; only error toasts have a dismiss button, whose accessible name and tooltip is the container's `dismissLabel`.
+- `role="status"` for info and success, `role="alert"` for errors. Toasts let clicks through to the page; only the dismiss button takes them.
+- Messages are finished strings: pass translated values from the host app.
 
 ## Theming
 

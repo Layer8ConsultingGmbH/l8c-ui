@@ -1,0 +1,88 @@
+:host {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-sizing: border-box;
+  min-width: min(240px, 100%);
+  max-width: 420px;
+  padding: 0.7rem 1rem;
+  font-family: var(--font-family);
+  color: var(--text);
+  background: var(--surface-3, #1a2436);
+  border: 1px solid var(--border-action, rgba(42, 122, 184, 0.6));
+  border-radius: var(--radius-md, 8px);
+  box-shadow: var(--shadow-high);
+  animation: l8c-toast-in 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+  // Clicks go through to the page below; only the dismiss button takes them
+  pointer-events: none;
+}
+
+.toast-dismiss {
+  pointer-events: auto;
+}
+
+// The tone background lies over the opaque surface, as in the design
+:host([data-tone='success']) {
+  background-image: linear-gradient(
+    var(--success-bg, rgba(16, 185, 129, 0.14)),
+    var(--success-bg, rgba(16, 185, 129, 0.14))
+  );
+  border-color: var(--success);
+}
+
+:host([data-tone='error']) {
+  background-image: linear-gradient(
+    var(--error-bg, rgba(244, 67, 54, 0.14)),
+    var(--error-bg, rgba(244, 67, 54, 0.14))
+  );
+  border-color: var(--error);
+}
+
+.toast-icon {
+  display: flex;
+  flex-shrink: 0;
+  color: var(--primary);
+}
+
+:host([data-tone='success']) .toast-icon {
+  color: var(--success);
+}
+
+:host([data-tone='error']) .toast-icon {
+  color: var(--error);
+}
+
+// Long names wrap inside the toast instead of widening it
+.toast-message {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--font-size-sm);
+  overflow-wrap: anywhere;
+}
+
+// The library button removes the native focus outline
+:host ::ng-deep .toast-dismiss button:focus-visible {
+  color: var(--primary);
+  box-shadow: var(--shadow-focus);
+}
+
+// Slides in from below, as in the design
+@keyframes l8c-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(60vh);
+  }
+  60% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host {
+    animation: none;
+  }
+}

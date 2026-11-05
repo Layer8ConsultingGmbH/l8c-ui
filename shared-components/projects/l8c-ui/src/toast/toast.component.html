@@ -1,0 +1,15 @@
+<span class="toast-icon">
+  <l8c-icon [name]="tone() === 'error' ? 'circle-alert' : 'circle-check'" [size]="18" />
+</span>
+<span class="toast-message">{{ message() }}</span>
+@if (tone() === 'error') {
+  <l8c-button
+    class="toast-dismiss"
+    [action]="'ghost'"
+    [size]="'mini'"
+    [icon]="'x'"
+    [ariaLabel]="dismissLabel()"
+    [title]="dismissLabel()"
+    (clicked)="dismissed.emit()"
+  />
+}

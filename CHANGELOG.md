@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
+- `l8c-toast`, `l8c-toast-container` and `L8cToastService` (Design System v0.5.1 Toast, ported from l8c-survey): info, success and error toasts top right below the top navigation; info and success close after `DEFAULT_TOAST_DURATION` (2600 ms, changeable via `setDuration()` or per call), error toasts stay until dismissed and are the only ones with a dismiss button (`dismissLabel` on the container). `role="status"` / `role="alert"`, clicks pass through to the page, no motion with `prefers-reduced-motion`.
 - `l8c-icon`: new icons from Design System v0.5.1: `upload`, `save`, `server`, `ban`, `map-pin` and `circle-question-mark` with its alias `circle-help` (the older Lucide name, used by the side-nav help link).
 
 ### Fixed
