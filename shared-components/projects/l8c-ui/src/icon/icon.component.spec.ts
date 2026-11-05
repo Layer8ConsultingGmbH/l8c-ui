@@ -41,6 +41,31 @@ describe('L8cIconComponent', () => {
     expect(path.getAttribute('d')).toBe('M20 6 9 17l-5-5');
   });
 
+  it('should render the icons added for the design system v0.5.1', () => {
+    const expected: Record<string, number> = {
+      upload: 3,
+      save: 3,
+      server: 4,
+      ban: 2,
+      'map-pin': 2,
+      'circle-question-mark': 3,
+    };
+    for (const [name, shapes] of Object.entries(expected)) {
+      fixture.componentRef.setInput('name', name);
+      fixture.detectChanges();
+      expect(fixture.nativeElement.querySelectorAll('svg > *').length, name).toBe(shapes);
+    }
+  });
+
+  it('should render circle-help as the same glyph as circle-question-mark', () => {
+    const markup = (name: string) => {
+      fixture.componentRef.setInput('name', name);
+      fixture.detectChanges();
+      return fixture.nativeElement.querySelector('svg').innerHTML.replace(/<!--.*?-->/g, '');
+    };
+    expect(markup('circle-help')).toBe(markup('circle-question-mark'));
+  });
+
   it('should switch the rendered icon when the name changes', () => {
     fixture.componentRef.setInput('name', 'x');
     fixture.detectChanges();
