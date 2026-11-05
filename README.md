@@ -1,6 +1,6 @@
 # l8c-ui
 
-A small, standalone Angular UI component library by [Layer8 Consulting](https://l8c.io). It powers our own products such as [l8c-survey](https://github.com/Layer8ConsultingGmbH/l8c-survey) and is published to npm as [`@l8c/ui`](https://www.npmjs.com/package/@l8c/ui).
+A small, standalone Angular UI component library by [Layer8 Consulting](https://l8c.io). It powers our own products and is published to npm as [`@l8c/ui`](https://www.npmjs.com/package/@l8c/ui).
 
 [![npm version](https://img.shields.io/npm/v/%40l8c%2Fui?logo=npm)](https://www.npmjs.com/package/@l8c/ui)
 [![CI](https://github.com/Layer8ConsultingGmbH/l8c-ui/actions/workflows/ci-run-tests.yml/badge.svg)](https://github.com/Layer8ConsultingGmbH/l8c-ui/actions/workflows/ci-run-tests.yml)
