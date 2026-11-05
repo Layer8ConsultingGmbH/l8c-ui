@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Security
+
+- Resolved all 11 advisories reported by `npm audit` (2 critical, 6 high, 3 moderate) by updating the build and test toolchain: Angular packages `22.1.1`/`22.1.3` to `22.2.3`/`22.2.5`, `ng-packagr` to `^22.2.5`, and `vitest` and `@vitest/coverage-v8` to `^4.1.12`. This covers the `@angular/router` SSR denial-of-service issues, the `piscina` prototype-pollution RCE, the `vite`/`launch-editor` command-execution and path-disclosure issues, `@modelcontextprotocol/sdk` and `zod` (via `@angular/cli`), `@hono/node-server` and `@vitest/mocker`. The published peer dependency ranges are unchanged, so consumers are not affected.
+
 ## [1.1.0] - 2026-09-14
 
 ### Added
