@@ -33,6 +33,40 @@ export * from './dialog/dialog.component';
 export * from './confirm-dialog/confirm-dialog.component';
 export * from './icon/icon.component';
 export type { IconName } from './icon/icon-registry';
+export * from './color-input/color-input.component';
+export * from './brand-editor/brand-editor.component';
+export type { BrandImageSlot } from './brand-editor/brand-editor.component';
+export {
+  BRAND_COLOR_TOKENS,
+  BRAND_COLOR_GROUPS,
+  DERIVED_TINTS,
+  FONT_WEIGHT_KEYS,
+  LINE_HEIGHT_KEYS,
+  RADIUS_KEYS,
+  MAX_LOGO_BYTES,
+  LOGO_MIME_TYPES,
+  FAVICON_MIME_TYPES,
+  hexToRgb,
+  mergeBrandConfig,
+  compactBrandConfig,
+  readBrandDefaults,
+  applyBrand,
+} from './brand/brand.model';
+export type {
+  BrandColorToken,
+  BrandThemeColors,
+  BrandTheme,
+  FontWeightKey,
+  LineHeightKey,
+  RadiusKey,
+  BrandTypography,
+  BrandDesignTokens,
+  BrandLogos,
+  BrandConfig,
+  BrandConfigItem,
+} from './brand/brand.model';
+export { BRAND_EDITOR_LABELS, mergeBrandEditorLabels } from './brand/brand-labels';
+export type { BrandEditorLabels, BrandEditorLabelsInput } from './brand/brand-labels';
 export * from './toast/toast.component';
 export * from './toast/toast-container.component';
 export { L8cToastService, DEFAULT_TOAST_DURATION } from './toast/toast.service';

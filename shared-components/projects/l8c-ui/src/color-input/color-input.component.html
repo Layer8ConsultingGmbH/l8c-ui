@@ -1,0 +1,66 @@
+<div class="color-container" [style.width]="cssWidth()">
+  @if (label()) {
+    <label class="color-label">
+      {{ label() }}
+      @if (required()) {
+        <span class="required-indicator">*</span>
+      }
+    </label>
+  }
+
+  <div
+    class="color-wrapper"
+    [class.focused]="isFocused()"
+    [class.error]="shownError()"
+    [class.disabled]="disabled()"
+  >
+    <button
+      type="button"
+      class="color-swatch"
+      [disabled]="disabled()"
+      [attr.aria-label]="swatchLabel()"
+      [attr.title]="value() || null"
+      (click)="openPicker()"
+      (focus)="onFocus()"
+      (blur)="onBlur()"
+    >
+      <span
+        class="color-swatch-fill"
+        [class.invalid]="!valid()"
+        [style.background]="valid() ? value() : null"
+        aria-hidden="true"
+      ></span>
+    </button>
+    <!-- System picker, driven by the swatch; it only knows #rrggbb -->
+    <input
+      #picker
+      type="color"
+      class="color-picker"
+      tabindex="-1"
+      aria-hidden="true"
+      [disabled]="disabled()"
+      [value]="pickerValue()"
+      (input)="onPicked($event)"
+    />
+    <input
+      type="text"
+      class="color-text"
+      spellcheck="false"
+      [value]="value()"
+      [placeholder]="placeholder()"
+      [disabled]="disabled()"
+      [required]="required()"
+      [attr.aria-label]="name()"
+      [attr.aria-invalid]="shownError() ? true : null"
+      (input)="onInput($event)"
+      (focus)="onFocus()"
+      (blur)="onBlur()"
+    />
+  </div>
+
+  @if (shownError(); as error) {
+    <span class="error-message">{{ error }}</span>
+  } @else if (hint()) {
+    <span class="hint-message">{{ hint() }}</span>
+  }
+</div>

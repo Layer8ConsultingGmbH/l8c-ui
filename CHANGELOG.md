@@ -9,6 +9,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Added
 
 - `l8c-toast`, `l8c-toast-container` and `L8cToastService` (Design System v0.5.1 Toast, ported from l8c-survey): info, success and error toasts top right below the top navigation; info and success close after `DEFAULT_TOAST_DURATION` (2600 ms, changeable via `setDuration()` or per call), error toasts stay until dismissed and are the only ones with a dismiss button (`dismissLabel` on the container). `role="status"` / `role="alert"`, clicks pass through to the page, no motion with `prefers-reduced-motion`.
+- `l8c-color-input` (Design System v0.5.1 ColorInput): a swatch on a checkerboard that opens the system color picker plus a text field for any CSS color; `invalidMessage` while the browser cannot read the value; `ControlValueAccessor`.
+- `l8c-brand-editor` (Design System v0.5.1 BrandEditor, ported from l8c-survey): configurations (select, new, activate, delete with confirmation), name and description, logos and favicon (200 KB, type check), 19 color tokens per theme via `l8c-color-input`, typography and design tokens. Host-controlled: `selected`, `created`, `saved`, `activated`, `deleted` and `preview` outputs; `labels` takes the Survey `brandEditor` translation object. With the brand model (`BrandConfig`, `BrandConfigItem`, token lists) and the helpers `applyBrand`, `readBrandDefaults`, `mergeBrandConfig`, `compactBrandConfig`, `hexToRgb`.
 - `l8c-icon`: new icons from Design System v0.5.1: `upload`, `save`, `server`, `ban`, `map-pin` and `circle-question-mark` with its alias `circle-help` (the older Lucide name, used by the side-nav help link).
 
 ### Fixed

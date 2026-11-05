@@ -74,6 +74,36 @@ Supporting types such as `TableColumn`, `SelectOption` or `SideNavItem` are expo
 | `l8c-icon` | Icon component with bundled icon registry |
 | `l8c-spinner` | Loading indicator |
 | `l8c-toast` / `l8c-toast-container` | Short feedback after an action (info, success, error), fed by `L8cToastService` |
+| `l8c-color-input` | Color field: swatch with the system picker plus a text field for any CSS color |
+| `l8c-brand-editor` | Organization branding: configurations, logos, theme colors, typography and design tokens; host-controlled |
+
+### Brand editor
+
+`l8c-brand-editor` edits a `BrandConfig` (name, description, logos and favicon, 19 color tokens per theme, typography, design tokens). **The host owns the data**: the editor keeps only the draft and reports intents, the host loads and stores and then passes the new `configs` / `config` back in.
+
+```ts
+<l8c-brand-editor
+  [configs]="items"                 // BrandConfigItem[]: { id, name, isCurrent }
+  [selectedId]="selectedId"
+  [config]="storedConfigOfSelection"
+  [defaults]="defaults"             // readBrandDefaults(): the stylesheet values in use
+  [activeTheme]="theme"
+  [saving]="busy"
+  [labels]="translate.instant('brandEditor')"
+  [cancelLabel]="'Cancel'" [deleteLabel]="'Delete'"
+  (selected)="open($event)"         // after the discard check; null = nothing selected
+  (created)="create($event)"        // with the default name
+  (saved)="save($event)"            // the compact draft (only filled values)
+  (activated)="activate($event)"
+  (deleted)="remove($event)"        // after the delete confirmation
+  (preview)="applyBrand($event, theme)"  // every change; null while nothing is selected
+/>
+```
+
+- Switching or creating while the draft is dirty asks first; delete always asks, with a stronger message for the active configuration. "Unsaved changes" badge; Save needs a selection, a change and a name; Activate only for a saved, inactive configuration. `draft` resumes an unsaved draft after navigating back.
+- Helpers: `applyBrand(config, theme, root?)` writes the config as CSS custom properties (status colors bring their pill tint and border, `primary` sets `--primary-rgb`, radius `lg` sets `--surface-radius`; `null` removes them), `readBrandDefaults()` reads the stylesheet values of both themes, `mergeBrandConfig()` and `compactBrandConfig()` combine and trim configs.
+- Logos PNG, JPEG, WebP or SVG, favicon PNG, SVG or ICO, each up to 200 KB, stored as data URLs.
+- `labels` takes the l8c-survey `brandEditor` translation object as it is (English defaults built in, see `BRAND_EDITOR_LABELS`); `{{name}}` is replaced with the configuration name.
 
 ### Toasts
 

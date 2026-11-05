@@ -1,0 +1,299 @@
+@let labels = L();
+<div class="brand-editor-body" [formGroup]="form">
+  <!-- Header: title, status, the configuration dropdown and the actions -->
+  <l8c-card [elevation]="'medium'" [padding]="'large'">
+    <div class="card-header">
+      <div class="card-heading">
+        <h2>{{ labels.title }}</h2>
+        @if (dirty() && hasSelection()) {
+          <span class="unsaved-badge">{{ labels.actions.unsaved }}</span>
+        }
+      </div>
+      <div class="action-buttons">
+        <l8c-button [action]="'nav'" [disabled]="!dirty() || saving()" (clicked)="reset()">
+          {{ labels.actions.reset }}
+        </l8c-button>
+        <l8c-button [action]="'primary'" [disabled]="!canSave()" (clicked)="save()">
+          {{ saving() ? labels.actions.saving : labels.actions.save }}
+        </l8c-button>
+      </div>
+    </div>
+    <p class="intro">{{ labels.intro }}</p>
+
+    <div class="selection-row">
+      <div class="selection-select">
+        <!-- No placeholder on purpose: l8c-select falls back to it after every pick -->
+        <l8c-select
+          [label]="labels.selection.label"
+          [options]="selectionOptions()"
+          [disabled]="saving()"
+          [formControl]="selectionControl"
+        />
+      </div>
+      <div class="selection-actions">
+        <l8c-button [size]="'mini'" [icon]="'plus'" [disabled]="saving()" (clicked)="newConfig()">
+          {{ labels.configs.new }}
+        </l8c-button>
+        @if (selectedItem(); as item) {
+          <l8c-button
+            [size]="'mini'"
+            [action]="'secondary'"
+            [disabled]="!canActivate()"
+            (clicked)="activateSelected()"
+          >
+            {{ item.isCurrent ? labels.configs.isActive : labels.configs.activate }}
+          </l8c-button>
+          <l8c-button
+            [action]="'nav'"
+            [size]="'mini'"
+            [icon]="'trash-2'"
+            [ariaLabel]="labels.configs.delete"
+            [title]="labels.configs.delete"
+            [disabled]="!canDelete()"
+            (clicked)="deleteSelected()"
+          />
+        }
+      </div>
+    </div>
+    <p class="hint">{{ labels.selection.hint }}</p>
+  </l8c-card>
+
+  @if (hasSelection()) {
+    <!-- Name and description -->
+    <l8c-card [title]="labels.general.title" [elevation]="'medium'" [padding]="'large'">
+      <div class="field-grid general-grid">
+        <div class="field">
+          <l8c-input
+            [label]="labels.general.name.label"
+            [placeholder]="labels.general.name.placeholder"
+            [type]="'text'"
+            [required]="true"
+            [maxLength]="255"
+            [error]="!currentDraft().name ? labels.general.name.required : undefined"
+            formControlName="name"
+          />
+        </div>
+        <div class="field description-field">
+          <l8c-input
+            [label]="labels.description.label"
+            [placeholder]="labels.description.placeholder"
+            [type]="'text'"
+            [multiline]="true"
+            [rows]="2"
+            [maxLength]="1000"
+            formControlName="description"
+          />
+        </div>
+      </div>
+    </l8c-card>
+
+    <!-- Logos -->
+    <l8c-card
+      [title]="labels.logos.title"
+      [elevation]="'medium'"
+      [padding]="'large'"
+      [collapsible]="true"
+    >
+      <p class="hint">{{ labels.logos.hint }}</p>
+      <div class="logo-grid">
+        @for (slot of imageSlots; track slot) {
+          <div
+            class="logo-tile"
+            [class.logo-tile-dark]="slot === 'dark'"
+            [class.logo-tile-favicon]="slot === 'favicon'"
+          >
+            <span class="field-label">{{ labels.logos[slot] }}</span>
+            <div class="logo-preview">
+              @if (image(slot); as src) {
+                <img [src]="src" [alt]="labels.logos[slot]" />
+              } @else {
+                <span class="logo-empty">{{ labels.logos.empty }}</span>
+              }
+            </div>
+            <div class="logo-actions">
+              <label class="file-button">
+                {{ labels.logos.choose }}
+                <input
+                  type="file"
+                  [accept]="accept(slot)"
+                  (change)="onImageSelected(slot, $event)"
+                />
+              </label>
+              @if (image(slot)) {
+                <l8c-button [action]="'ghost'" [size]="'mini'" (clicked)="removeImage(slot)">
+                  {{ labels.logos.remove }}
+                </l8c-button>
+              }
+            </div>
+            @if (imageErrors()[slot]; as error) {
+              <span class="field-error">{{ error }}</span>
+            }
+          </div>
+        }
+      </div>
+    </l8c-card>
+
+    <!-- Theme colors -->
+    <l8c-card
+      [title]="labels.colors.title"
+      [elevation]="'medium'"
+      [padding]="'large'"
+      [collapsible]="true"
+    >
+      <div class="theme-grid">
+        @for (theme of themes; track theme) {
+          <div class="theme-column" [formGroup]="colorGroup(theme)">
+            <h3 class="theme-title">
+              {{ labels.colors[theme] }}
+              @if (activeTheme() === theme) {
+                <span class="active-indicator">{{ labels.colors.active }}</span>
+              }
+            </h3>
+            @for (group of colorGroups; track group.key) {
+              <h4 class="group-title">{{ labels.colors.group[group.key] }}</h4>
+              @for (token of group.tokens; track token) {
+                <div class="color-row">
+                  <div class="color-label">
+                    <span class="field-label">{{
+                      labels.colors.token[token]?.label ?? token
+                    }}</span>
+                    <span class="field-description">
+                      {{ labels.colors.token[token]?.description }}
+                    </span>
+                  </div>
+                  <l8c-color-input
+                    class="color-field"
+                    [ariaLabel]="colorLabel(theme, token)"
+                    [width]="220"
+                    [formControlName]="token"
+                  />
+                </div>
+              }
+            }
+          </div>
+        }
+      </div>
+    </l8c-card>
+
+    <!-- Typography -->
+    <l8c-card
+      [title]="labels.typography.title"
+      [elevation]="'medium'"
+      [padding]="'large'"
+      [collapsible]="true"
+    >
+      <div formGroupName="typography">
+        <div class="field">
+          <l8c-input
+            [label]="labels.typography.fontFamily.label"
+            [type]="'text'"
+            formControlName="fontFamily"
+          />
+          <span class="field-description">{{ labels.typography.fontFamily.description }}</span>
+        </div>
+
+        <div class="field">
+          <l8c-input
+            [label]="labels.typography.fontDisplay.label"
+            [type]="'text'"
+            formControlName="fontDisplay"
+          />
+          <span class="field-description">{{ labels.typography.fontDisplay.description }}</span>
+        </div>
+
+        <h4 class="group-title">{{ labels.typography.fontWeight['title'] }}</h4>
+        <div class="field-grid">
+          @for (key of fontWeightKeys; track key) {
+            <div class="field">
+              <span class="field-label">{{ labels.typography.fontWeight[key] }}</span>
+              <span class="field-description">
+                {{ labels.typography.fontWeight[key + 'Desc'] }}
+              </span>
+              <l8c-number-input
+                [step]="100"
+                [min]="100"
+                [max]="900"
+                [ariaLabel]="labels.typography.fontWeight[key]"
+                [formControl]="fontWeightControl(key)"
+              />
+            </div>
+          }
+        </div>
+
+        <h4 class="group-title">{{ labels.typography.lineHeight['title'] }}</h4>
+        <div class="field-grid">
+          @for (key of lineHeightKeys; track key) {
+            <div class="field">
+              <span class="field-label">{{ labels.typography.lineHeight[key] }}</span>
+              <span class="field-description">
+                {{ labels.typography.lineHeight[key + 'Desc'] }}
+              </span>
+              <l8c-number-input
+                [step]="0.05"
+                [decimals]="2"
+                [min]="1"
+                [max]="3"
+                [ariaLabel]="labels.typography.lineHeight[key]"
+                [formControl]="lineHeightControl(key)"
+              />
+            </div>
+          }
+        </div>
+      </div>
+    </l8c-card>
+
+    <!-- Design tokens -->
+    <l8c-card
+      [title]="labels.designTokens.title"
+      [elevation]="'medium'"
+      [padding]="'large'"
+      [collapsible]="true"
+    >
+      <div formGroupName="designTokens">
+        <h4 class="group-title first">{{ labels.designTokens.radius['title'] }}</h4>
+        <div class="field-grid">
+          @for (key of radiusKeys; track key) {
+            <div class="field">
+              <l8c-input
+                [label]="labels.designTokens.radius[key]"
+                [type]="'text'"
+                [placeholder]="'8px'"
+                [formControl]="radiusControl(key)"
+              />
+            </div>
+          }
+        </div>
+
+        <h4 class="group-title">{{ labels.designTokens.layout.title }}</h4>
+        <div class="field-grid">
+          <div class="field" formGroupName="topNav">
+            <l8c-input
+              [label]="labels.designTokens.topNav.minHeight"
+              [type]="'text'"
+              [placeholder]="'64px'"
+              formControlName="minHeight"
+            />
+          </div>
+          <div class="field" formGroupName="dropdown">
+            <l8c-input
+              [label]="labels.designTokens.dropdown.minWidth"
+              [type]="'text'"
+              [placeholder]="'200px'"
+              formControlName="minWidth"
+            />
+          </div>
+        </div>
+      </div>
+    </l8c-card>
+  } @else {
+    <l8c-card [elevation]="'medium'" [padding]="'large'">
+      <p class="field-description">{{ labels.empty }}</p>
+    </l8c-card>
+  }
+
+  <l8c-confirm-dialog
+    [cancelLabel]="cancelLabel()"
+    (confirmed)="onConfirmed()"
+    (cancelled)="onCancelled()"
+  />
+</div>
