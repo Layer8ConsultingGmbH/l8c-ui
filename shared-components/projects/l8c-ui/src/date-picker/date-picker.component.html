@@ -1,0 +1,109 @@
+<div class="picker-container" [style.width]="cssWidth()">
+  @if (label()) {
+    <label class="picker-label" [for]="id">
+      {{ label() }}
+      @if (required()) {
+        <span class="required-indicator">*</span>
+      }
+    </label>
+  }
+
+  <div class="picker-anchor">
+    <button
+      #trigger
+      type="button"
+      class="picker-field"
+      [id]="id"
+      [disabled]="disabled()"
+      [class.open]="open()"
+      [class.error]="error()"
+      [class.empty]="!value()"
+      aria-haspopup="dialog"
+      [attr.aria-expanded]="open()"
+      [attr.aria-label]="label() ? undefined : openLabel()"
+      [attr.min]="min()"
+      [attr.max]="max()"
+      [attr.data-value]="value()"
+      (click)="toggle()"
+    >
+      <span class="picker-value">{{ displayValue() || placeholder() }}</span>
+      <span class="picker-icon" [title]="openLabel()">
+        <l8c-icon [name]="'calendar-days'" [size]="16" />
+      </span>
+    </button>
+
+    @if (open()) {
+      <div
+        class="picker-panel"
+        role="dialog"
+        [attr.aria-label]="label() || openLabel()"
+        (keydown)="onPanelKeydown($event)"
+      >
+        <div class="calendar-header">
+          <button
+            type="button"
+            class="nav-button"
+            [attr.aria-label]="prevLabel()"
+            [title]="prevLabel()"
+            (click)="moveMonths(-1)"
+          >
+            <l8c-icon [name]="'chevron-left'" [size]="16" />
+          </button>
+          <span class="month-title" aria-live="polite">{{ monthTitle() }}</span>
+          <button
+            type="button"
+            class="nav-button"
+            [attr.aria-label]="nextLabel()"
+            [title]="nextLabel()"
+            (click)="moveMonths(1)"
+          >
+            <l8c-icon [name]="'chevron-right'" [size]="16" />
+          </button>
+        </div>
+
+        <div #grid class="calendar-grid" role="grid" (keydown)="onGridKeydown($event)">
+          @for (weekday of weekdays(); track weekday) {
+            <span class="weekday" role="columnheader">{{ weekday }}</span>
+          }
+          @for (day of days(); track day.iso) {
+            <button
+              type="button"
+              class="day"
+              role="gridcell"
+              [class.in-month]="day.inMonth"
+              [class.selected]="day.selected"
+              [class.today]="day.today"
+              [attr.data-date]="day.iso"
+              [attr.tabindex]="day.cursor ? 0 : -1"
+              [attr.aria-selected]="day.selected"
+              [attr.aria-current]="day.today ? 'date' : null"
+              [attr.aria-label]="day.iso | l8cFormatDate: language()"
+              [disabled]="day.disabled"
+              (click)="pick(day.date)"
+            >
+              {{ day.label }}
+            </button>
+          }
+        </div>
+
+        <div class="calendar-footer">
+          <button type="button" class="text-action" (click)="clear()">{{ clearLabel() }}</button>
+          <button
+            type="button"
+            class="text-action"
+            [disabled]="todayDisabled()"
+            (click)="pickToday()"
+          >
+            {{ todayLabel() }}
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+
+  @if (error(); as message) {
+    <span class="error-message">{{ message }}</span>
+  } @else if (hint()) {
+    <span class="hint-message">{{ hint() }}</span>
+  }
+</div>

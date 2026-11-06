@@ -1,0 +1,43 @@
+@if (readOnly()) {
+  <!-- Nothing left to type, so the value is only read out -->
+  <div class="duration-input" role="group" [attr.aria-label]="ariaLabel()">
+    @for (segment of segments; track segment.unit; let index = $index) {
+      <span class="field">
+        {{ segmentTexts()[index] || emptySegment }}<span class="unit">{{ segment.unit }}</span>
+      </span>
+    }
+  </div>
+} @else {
+  <div
+    class="duration-input"
+    role="group"
+    [class.error]="error()"
+    [class.disabled]="disabled()"
+    [attr.aria-label]="ariaLabel()"
+  >
+    @for (segment of segments; track segment.unit; let index = $index) {
+      <span class="field">
+        <input
+          #segmentInput
+          type="text"
+          class="segment"
+          inputmode="numeric"
+          autocomplete="off"
+          [disabled]="disabled()"
+          [attr.maxlength]="segment.digits"
+          [style.width]="segment.digits + 0.6 + 'ch'"
+          [placeholder]="emptySegment"
+          [attr.aria-label]="segmentLabels()[index]"
+          [value]="segmentTexts()[index]"
+          (input)="onInput(index, $event)"
+          (keydown)="onKeydown(index, $event)"
+          (paste)="onPaste(index, $event)"
+          (blur)="onBlur(index)"
+        /><span class="unit" aria-hidden="true">{{ segment.unit }}</span>
+      </span>
+    }
+  </div>
+}
+@if (legacyText(); as text) {
+  <p class="legacy-hint">{{ text }}</p>
+}

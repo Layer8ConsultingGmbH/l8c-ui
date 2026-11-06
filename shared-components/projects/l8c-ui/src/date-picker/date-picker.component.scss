@@ -1,0 +1,158 @@
+@use '../picker/picker-shared' as picker;
+
+:host {
+  display: inline-block;
+  max-width: 100%;
+}
+
+.picker-container {
+  @include picker.container;
+}
+
+.picker-label {
+  @include picker.label;
+}
+
+.picker-anchor {
+  position: relative;
+  width: 100%;
+}
+
+// The field is a button: 36px high like the question-card date fields it replaces
+.picker-field {
+  @include picker.box;
+  width: 100%;
+  padding-right: 12px;
+  cursor: pointer;
+  text-align: left;
+
+  &.empty .picker-value {
+    color: var(--text-muted);
+  }
+
+  &:disabled {
+    cursor: default;
+  }
+}
+
+.picker-value {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.picker-icon {
+  display: flex;
+  color: var(--text-muted);
+
+  .picker-field.open & {
+    color: var(--primary);
+  }
+}
+
+.picker-panel {
+  @include picker.panel;
+  width: 284px;
+  padding: 12px;
+}
+
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.month-title {
+  font-size: var(--font-size-sm, 0.875rem);
+  font-weight: var(--font-weight-semibold, 600);
+}
+
+.nav-button {
+  @include picker.trigger;
+  width: 30px;
+  height: 30px;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.weekday {
+  text-align: center;
+  font-size: var(--font-size-xs, 0.75rem);
+  color: var(--text-muted);
+  padding: 4px 0;
+}
+
+.day {
+  height: 34px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm, 4px);
+  background: transparent;
+  color: var(--text-faint);
+  font-family: var(--font-family);
+  font-size: var(--font-size-sm, 0.875rem);
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  outline: none;
+  transition:
+    background-color var(--transition-fast, 0.15s),
+    border-color var(--transition-fast, 0.15s);
+
+  &.in-month {
+    color: var(--text);
+  }
+
+  &:hover:not(:disabled) {
+    background: var(--surface-2);
+  }
+
+  &:focus-visible {
+    border-color: var(--primary);
+    box-shadow: var(--shadow-focus, 0 0 0 3px rgba(var(--primary-rgb, 42, 122, 184), 0.25));
+  }
+
+  // Today has a ring, the selected day a fill
+  &.today {
+    border-color: var(--border-action, rgba(42, 122, 184, 0.6));
+    font-weight: var(--font-weight-semibold, 600);
+  }
+
+  &.selected {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: var(--on-primary, #ffffff);
+    font-weight: var(--font-weight-semibold, 600);
+  }
+
+  &:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+}
+
+.calendar-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+.text-action {
+  @include picker.text-action;
+}
+
+.error-message {
+  @include picker.error-message;
+}
+
+.hint-message {
+  @include picker.hint-message;
+}

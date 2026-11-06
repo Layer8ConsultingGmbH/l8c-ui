@@ -75,6 +75,15 @@ Supporting types such as `TableColumn`, `SelectOption` or `SideNavItem` are expo
 | `l8c-spinner` | Loading indicator |
 | `l8c-toast` / `l8c-toast-container` | Short feedback after an action (info, success, error), fed by `L8cToastService` |
 | `l8c-color-input` | Color field: swatch with the system picker plus a text field for any CSS color |
+| `l8c-date-picker` | Date field with a calendar popover, value ISO `YYYY-MM-DD`, shown as `07 Mar 2026` |
+| `l8c-time-picker` | 24-hour time entry `HH:MM` with a list of times |
+| `l8c-duration-input` | Duration as four segments D · H · M · S, value `DD:HH:MM:SS` |
+
+### Date, time and duration
+
+- `l8c-date-picker` replaces the browser's native `type="date"`: the field is a button that opens a calendar (weeks start on Monday, arrows move by day and week, PageUp/PageDown by month, Enter picks, Escape closes). `min` / `max` are ISO dates and also appear as attributes on the field, `lang` (`en`, `de`) picks the month names, `todayLabel`, `clearLabel`, `openLabel`, `prevLabel`, `nextLabel` are the translated texts. Works with `[(value)]` and as a form control. `formatDate(iso, lang)` and the `l8cFormatDate` pipe render the platform notation.
+- `l8c-time-picker`: two typed segments (hours stop at 23, minutes at 59, `:` and the arrows jump) plus a clock button that lists every `step` minutes (default 30). Emits `HH:MM`, or `""` while both segments are empty.
+- `l8c-duration-input`: four segments that fill from the left and hand over on their own; days up to 365. Emits `DD:HH:MM:SS` with empty segments as zero, `""` while nothing is filled; `readOnly` renders the value as text; `legacyHint` shows a stored value that is no duration. `parseDuration`, `formatDuration`, `durationToSegments` and `durationFromSegments` are exported.
 | `l8c-brand-editor` | Organization branding: configurations, logos, theme colors, typography and design tokens; host-controlled |
 
 ### Brand editor
