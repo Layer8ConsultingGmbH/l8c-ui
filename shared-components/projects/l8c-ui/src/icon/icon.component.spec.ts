@@ -58,12 +58,14 @@ describe('L8cIconComponent', () => {
   });
 
   it('should render circle-help as the same glyph as circle-question-mark', () => {
-    const markup = (name: string) => {
+    // Compare the shapes themselves; Angular's template comments are no elements
+    const shapes = (name: string): string[] => {
       fixture.componentRef.setInput('name', name);
       fixture.detectChanges();
-      return fixture.nativeElement.querySelector('svg').innerHTML.replace(/<!--.*?-->/g, '');
+      const svg: SVGElement = fixture.nativeElement.querySelector('svg');
+      return Array.from(svg.children).map((shape) => shape.outerHTML);
     };
-    expect(markup('circle-help')).toBe(markup('circle-question-mark'));
+    expect(shapes('circle-help')).toEqual(shapes('circle-question-mark'));
   });
 
   it('should switch the rendered icon when the name changes', () => {
