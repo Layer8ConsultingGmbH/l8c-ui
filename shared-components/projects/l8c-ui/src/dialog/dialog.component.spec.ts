@@ -64,6 +64,32 @@ describe('L8cDialogComponent', () => {
     expect(closedEmitted).toBe(true);
   });
 
+  it('should inherit the width by default and set --dialog-width from the input', () => {
+    const dialog = component.dialogElement.nativeElement;
+    expect(dialog.style.getPropertyValue('--dialog-width')).toBe('');
+
+    fixture.componentRef.setInput('width', 720);
+    fixture.detectChanges();
+    expect(dialog.style.getPropertyValue('--dialog-width')).toBe('720px');
+
+    fixture.componentRef.setInput('width', 'min(90vw, 60rem)');
+    fixture.detectChanges();
+    expect(dialog.style.getPropertyValue('--dialog-width')).toBe('min(90vw, 60rem)');
+
+    fixture.componentRef.setInput('width', undefined);
+    fixture.detectChanges();
+    expect(dialog.style.getPropertyValue('--dialog-width')).toBe('');
+  });
+
+  it('should mark the flex content layout', () => {
+    const dialog = component.dialogElement.nativeElement;
+    expect(dialog.classList.contains('content-flex')).toBe(false);
+
+    fixture.componentRef.setInput('contentLayout', 'flex');
+    fixture.detectChanges();
+    expect(dialog.classList.contains('content-flex')).toBe(true);
+  });
+
   it('should close when the close button is clicked', () => {
     let closedEmitted = false;
     component.closed.subscribe(() => (closedEmitted = true));

@@ -20,6 +20,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `l8c-brand-editor` (Design System v0.5.1 BrandEditor, ported from l8c-survey): configurations (select, new, activate, delete with confirmation), name and description, logos and favicon (200 KB, type check), 19 color tokens per theme via `l8c-color-input`, typography and design tokens. Host-controlled: `selected`, `created`, `saved`, `activated`, `deleted` and `preview` outputs; `labels` takes the Survey `brandEditor` translation object. With the brand model (`BrandConfig`, `BrandConfigItem`, token lists) and the helpers `applyBrand`, `readBrandDefaults`, `mergeBrandConfig`, `compactBrandConfig`, `hexToRgb`.
 - `l8c-icon`: new icons from Design System v0.5.1: `upload`, `save`, `server`, `ban`, `map-pin` and `circle-question-mark` with its alias `circle-help` (the older Lucide name, used by the side-nav help link).
 
+### Changed
+
+- `l8c-dialog`: the width comes from the new `width` input (px number or CSS length) or the custom property `--dialog-width` on any ancestor (default 520px), never wider than the viewport; apps no longer need `::ng-deep` overrides. The open dialog is a flex column capped at 90vh in which only the content scrolls (no more fixed `calc(90vh - 120px)` content height), and `contentLayout="flex"` turns the content area into a non-scrolling flex column for content that pins its own footer. The content keeps an 8px inner gutter so focus rings and hover glows at its edge are no longer clipped.
+
 ### Fixed
 
 - `l8c-icon`: `file-output` now uses the current Lucide path data (the previous glyph was a broken mix of two revisions).

@@ -1,4 +1,9 @@
-<dialog #dialog class="lib-dialog">
+<dialog
+  #dialog
+  class="lib-dialog"
+  [class.content-flex]="contentLayout() === 'flex'"
+  [style.--dialog-width]="cssWidth()"
+>
   <div class="lib-dialog-header">
     <h2>{{ title() }}</h2>
     @if (showCloseButton()) {

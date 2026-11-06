@@ -83,6 +83,16 @@ Supporting types such as `TableColumn`, `SelectOption` or `SideNavItem` are expo
 | `l8c-status` | Workflow / row status chip with a tone dot; known statuses map to a color |
 | `l8cTooltip` | Directive: text hint on hover and keyboard focus, replaces native `title` attributes |
 
+### Dialog width and layout
+
+`l8c-dialog` takes its width from the `width` input (px number or CSS length) or from `--dialog-width` on any ancestor, default 520px, never wider than the viewport. Set the property in the app instead of overriding the component's styles:
+
+```css
+.import-dialog { --dialog-width: 780px; }
+```
+
+The open dialog is a flex column capped at 90vh: the header keeps its height, only the content scrolls, and the content keeps an 8px gutter so focus rings and hover glows at its edge are not clipped. `contentLayout="flex"` makes the content area a non-scrolling flex column, for projected content that scrolls a part of itself and pins the rest.
+
 ### Tooltips
 
 `[l8cTooltip]="'Edit questionnaire'"` on any element shows the text after `tooltipDelay` (300 ms) on hover or focus and hides on leave, blur or Escape. `tooltipPlacement` is `top` (default), `bottom`, `left` or `right`; there is no automatic flipping, but the tooltip stays inside the viewport. It is rendered into `<body>` with a fixed position, so tables and dialogs never clip it, and it adds `aria-describedby` to the element while it shows: keep the element's own accessible name (`ariaLabel`), the tooltip only describes. Text only, at most a short sentence.
