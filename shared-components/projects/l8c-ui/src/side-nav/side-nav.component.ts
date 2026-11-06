@@ -12,6 +12,7 @@ import { NgTemplateOutlet } from '@angular/common';
 import { SideNavItem } from './side-nav.model';
 import { L8cIconComponent } from '../icon/icon.component';
 import { IconName } from '../icon/icon-registry';
+import { L8cTooltipDirective } from '../tooltip/tooltip.directive';
 
 /**
  * Collapsible side navigation rail with optional sub-items per section.
@@ -20,11 +21,18 @@ import { IconName } from '../icon/icon-registry';
  *
  * The component only emits the selected item key - routing is up to the
  * host app. Template slots (`topTemplate`, `headerTemplate`,
- * `footerTemplate`) take host content such as a product switcher.
+ * `footerTemplate`) take host content such as a product switcher; `top`
+ * and `footer` render on both rails and get the collapsed state as their
+ * implicit context (`let-collapsed`), `header` only on the expanded rail.
+ *
+ * An item or sub-item with `helpLink` gets a help link (circle-help) next
+ * to its button that opens the page in a new tab - never inside the button,
+ * so a click on the link never selects the item. Its accessible name is
+ * `<helpLabel>: <item label>`. Help links show on the expanded rail only.
  */
 @Component({
   selector: 'l8c-side-nav',
-  imports: [NgTemplateOutlet, L8cIconComponent],
+  imports: [NgTemplateOutlet, L8cIconComponent, L8cTooltipDirective],
   templateUrl: './side-nav.component.html',
   styleUrls: ['./side-nav.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -46,6 +54,8 @@ export class L8cSideNavComponent {
   // Labels of the collapse toggle; pass translated values from the host app
   collapseLabel = input<string>('Collapse');
   expandLabel = input<string>('Expand');
+  /** Tooltip of the help links; their accessible name is `<helpLabel>: <item label>` */
+  helpLabel = input<string>('Open user guide');
 
   // Template inputs for slots
   topTemplate = input<TemplateRef<any> | null>(null);
@@ -127,5 +137,9 @@ export class L8cSideNavComponent {
 
   getIconName(icon: string | undefined): IconName {
     return (icon || 'house') as IconName;
+  }
+
+  helpName(label: string): string {
+    return `${this.helpLabel()}: ${label}`;
   }
 }

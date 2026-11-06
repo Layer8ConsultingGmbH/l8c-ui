@@ -22,6 +22,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 
+- `l8c-side-nav`: items and sub-items take an optional `helpLink` (e.g. the matching user guide chapter); a `circle-help` link next to the entry opens it in a new tab, named `<helpLabel>: <item label>` (new `helpLabel` input, default "Open user guide"). Shown on the expanded rail only. The `footerTemplate` now renders on the collapsed rail as well and gets the collapsed state as its implicit context (`let-collapsed`), so an app can show its footer entry as an icon there. **Breaking for footers that ignore the state:** they now also show on the collapsed rail.
 - `l8c-dialog`: the width comes from the new `width` input (px number or CSS length) or the custom property `--dialog-width` on any ancestor (default 520px), never wider than the viewport; apps no longer need `::ng-deep` overrides. The open dialog is a flex column capped at 90vh in which only the content scrolls (no more fixed `calc(90vh - 120px)` content height), and `contentLayout="flex"` turns the content area into a non-scrolling flex column for content that pins its own footer. The content keeps an 8px inner gutter so focus rings and hover glows at its edge are no longer clipped.
 
 ### Fixed

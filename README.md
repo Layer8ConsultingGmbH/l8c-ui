@@ -83,6 +83,20 @@ Supporting types such as `TableColumn`, `SelectOption` or `SideNavItem` are expo
 | `l8c-status` | Workflow / row status chip with a tone dot; known statuses map to a color |
 | `l8cTooltip` | Directive: text hint on hover and keyboard focus, replaces native `title` attributes |
 
+### Side nav help links and footer
+
+Give a `SideNavItem` or `SideNavSubItem` a `helpLink` (such as the matching user guide chapter) and `l8c-side-nav` renders a `circle-help` link next to the entry that opens the page in a new tab (`target="_blank" rel="noopener"`, a plain `href`: routing stays with the host). Its accessible name is `<helpLabel>: <item label>`; pass a translated `helpLabel` like `collapseLabel` and `expandLabel`. Help links show on the expanded rail only. The `footerTemplate` renders on both rails and receives the collapsed state as its implicit context:
+
+```html
+<l8c-side-nav [items]="items" [helpLabel]="'Open user guide'" [footerTemplate]="guide" />
+<ng-template #guide let-collapsed>
+  <a href="guide" target="_blank" [l8cTooltip]="collapsed ? 'User guide' : ''">
+    <l8c-icon [name]="'circle-help'" />
+    @if (!collapsed) { User guide }
+  </a>
+</ng-template>
+```
+
 ### Dialog width and layout
 
 `l8c-dialog` takes its width from the `width` input (px number or CSS length) or from `--dialog-width` on any ancestor, default 520px, never wider than the viewport. Set the property in the app instead of overriding the component's styles:
