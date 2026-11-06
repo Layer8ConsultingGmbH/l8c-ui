@@ -111,14 +111,13 @@
               }
             </div>
             <div class="logo-actions">
-              <label class="file-button">
-                {{ labels.logos.choose }}
-                <input
-                  type="file"
-                  [accept]="accept(slot)"
-                  (change)="onImageSelected(slot, $event)"
-                />
-              </label>
+              <l8c-file-input
+                [variant]="'button'"
+                [buttonAction]="'nav'"
+                [accept]="accept(slot)"
+                [buttonLabel]="labels.logos.choose"
+                (filesChange)="onImageChosen(slot, $event)"
+              />
               @if (image(slot)) {
                 <l8c-button [action]="'ghost'" [size]="'mini'" (clicked)="removeImage(slot)">
                   {{ labels.logos.remove }}

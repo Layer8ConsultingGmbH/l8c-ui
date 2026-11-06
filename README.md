@@ -78,6 +78,15 @@ Supporting types such as `TableColumn`, `SelectOption` or `SideNavItem` are expo
 | `l8c-date-picker` | Date field with a calendar popover, value ISO `YYYY-MM-DD`, shown as `07 Mar 2026` |
 | `l8c-time-picker` | 24-hour time entry `HH:MM` with a list of times |
 | `l8c-duration-input` | Duration as four segments D · H · M · S, value `DD:HH:MM:SS` |
+| `l8c-file-input` | File selection as a drop zone with a file list, or as a plain button |
+| `l8c-copy-field` | Read-only value with a copy button; announces the copy |
+| `l8c-status` | Workflow / row status chip with a tone dot; known statuses map to a color |
+
+### File input, copy field and status
+
+- `l8c-file-input`: `variant="dropzone"` (default) is a dashed area with the `upload` icon, `dropLabel`, a secondary mini `buttonLabel` and the `files` listed below with size and a remove button; `variant="button"` is just a button (`buttonAction`, `buttonIcon`) that opens the file dialog. `(filesChange)` gets `File[]` (one unless `multiple`); `accept` only filters the dialog, so validate type and size in the host and show the result through `error`. The native input stays hidden in the DOM.
+- `l8c-copy-field`: a read-only value (ID, link, token) styled like a disabled input with a copy button at its right end. Only the button copies and is a tab stop; after copying the icon shows a check for 2 s and `copiedMessage` is announced through a live region. `(copiedValue)` reports the copy.
+- `l8c-status`: workflow statuses Draft, Ready, Open, In Progress, Completed, Done and Archived use the `--status-<name>` and `--status-<name>-bg` tokens with `--status-border`; other known statuses (Scheduled, Sent, Approved, Pending, Overdue, …) map to a tone; `tone` overrides. The element carries `data-status` or `data-tone`. Every token has a fallback, so the chip works without the status tokens.
 
 ### Date, time and duration
 

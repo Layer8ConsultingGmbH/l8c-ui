@@ -182,26 +182,6 @@
   gap: var(--spacing-sm, 8px);
 }
 
-.file-button {
-  display: inline-flex;
-  align-items: center;
-  padding: var(--spacing-xs, 4px) var(--spacing-md, 16px);
-  border: 1px solid var(--border-strong, rgba(255, 255, 255, 0.16));
-  border-radius: var(--radius-sm, 4px);
-  font-size: var(--font-size-sm, 0.875rem);
-  color: var(--text);
-  cursor: pointer;
-  transition: border-color var(--transition-fast, 0.15s);
-
-  &:hover {
-    border-color: var(--primary);
-  }
-
-  input {
-    display: none;
-  }
-}
-
 // Theme colors
 .theme-grid {
   display: grid;

@@ -17,6 +17,7 @@ import { L8cButtonComponent } from '../button/button.component';
 import { L8cCardComponent } from '../card/card.component';
 import { L8cColorInputComponent } from '../color-input/color-input.component';
 import { L8cConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
+import { L8cFileInputComponent } from '../file-input/file-input.component';
 import { L8cInputComponent } from '../input/input.component';
 import { L8cNumberInputComponent } from '../number-input/number-input.component';
 import { L8cSelectComponent, SelectOption } from '../select/select.component';
@@ -108,6 +109,7 @@ function fill(text: string, name: string | null | undefined): string {
     L8cCardComponent,
     L8cColorInputComponent,
     L8cConfirmDialogComponent,
+    L8cFileInputComponent,
     L8cInputComponent,
     L8cNumberInputComponent,
     L8cSelectComponent,
@@ -394,10 +396,8 @@ export class L8cBrandEditorComponent {
     return (slot === 'favicon' ? FAVICON_MIME_TYPES : LOGO_MIME_TYPES).join(',');
   }
 
-  protected onImageSelected(slot: BrandImageSlot, event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-    input.value = '';
+  protected onImageChosen(slot: BrandImageSlot, files: File[]): void {
+    const file = files[0];
     if (!file) {
       return;
     }

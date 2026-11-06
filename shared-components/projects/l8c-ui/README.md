@@ -28,7 +28,7 @@ export class SaveBarComponent {
 
 ## Components
 
-`l8c-button`, `l8c-card`, `l8c-input`, `l8c-number-input`, `l8c-checkbox`, `l8c-radio`, `l8c-select`, `l8c-dropdown`, `l8c-search-field`, `l8c-table`, `l8c-pagination`, `l8c-carousel`, `l8c-dialog`, `l8c-confirm-dialog`, `l8c-navigation-bar`, `l8c-side-nav`, `l8c-account-menu`, `l8c-product-switcher`, `l8c-icon`, `l8c-spinner`, `l8c-toast` / `l8c-toast-container` (with `L8cToastService`), `l8c-color-input`, `l8c-brand-editor` (with `applyBrand`, `readBrandDefaults`), `l8c-date-picker` (with `formatDate`), `l8c-time-picker`, `l8c-duration-input` (with `parseDuration`)
+`l8c-button`, `l8c-card`, `l8c-input`, `l8c-number-input`, `l8c-checkbox`, `l8c-radio`, `l8c-select`, `l8c-dropdown`, `l8c-search-field`, `l8c-table`, `l8c-pagination`, `l8c-carousel`, `l8c-dialog`, `l8c-confirm-dialog`, `l8c-navigation-bar`, `l8c-side-nav`, `l8c-account-menu`, `l8c-product-switcher`, `l8c-icon`, `l8c-spinner`, `l8c-toast` / `l8c-toast-container` (with `L8cToastService`), `l8c-color-input`, `l8c-brand-editor` (with `applyBrand`, `readBrandDefaults`), `l8c-date-picker` (with `formatDate`), `l8c-time-picker`, `l8c-duration-input` (with `parseDuration`), `l8c-file-input`, `l8c-copy-field`, `l8c-status`
 
 ## Theming
 

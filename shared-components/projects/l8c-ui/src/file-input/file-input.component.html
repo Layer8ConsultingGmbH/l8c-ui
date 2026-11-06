@@ -1,0 +1,88 @@
+<input
+  #native
+  type="file"
+  class="native-input"
+  [accept]="accept() ?? null"
+  [multiple]="multiple()"
+  [disabled]="disabled()"
+  hidden
+  (change)="onNativeChange($event)"
+/>
+
+@if (variant() === 'button') {
+  <l8c-button
+    class="choose-button"
+    [action]="buttonAction()"
+    [icon]="buttonIcon()"
+    [disabled]="disabled()"
+    (clicked)="choose()"
+  >
+    {{ buttonLabel() }}
+  </l8c-button>
+} @else {
+  <div class="file-container">
+    @if (label()) {
+      <span class="file-label">
+        {{ label() }}
+        @if (required()) {
+          <span class="required-indicator">*</span>
+        }
+      </span>
+    }
+
+    <div
+      class="dropzone"
+      [class.dragging]="dragging()"
+      [class.error]="error()"
+      [class.disabled]="disabled()"
+      (dragover)="onDragOver($event)"
+      (dragleave)="onDragLeave()"
+      (drop)="onDrop($event)"
+    >
+      <span class="dropzone-icon">
+        <l8c-icon [name]="'upload'" [size]="24" />
+      </span>
+      <span class="dropzone-text">{{ dropLabel() }}</span>
+      <l8c-button
+        class="choose-button"
+        [action]="'secondary'"
+        [size]="'mini'"
+        [disabled]="disabled()"
+        (clicked)="choose()"
+      >
+        {{ buttonLabel() }}
+      </l8c-button>
+    </div>
+
+    @if (files().length > 0) {
+      <ul class="file-list">
+        @for (item of files(); track item.name + $index; let index = $index) {
+          <li class="file-item">
+            <span class="file-icon">
+              <l8c-icon [name]="'circle-check'" [size]="16" />
+            </span>
+            <span class="file-name">{{ item.name }}</span>
+            @if (size(item); as size) {
+              <span class="file-size">{{ size }}</span>
+            }
+            <button
+              type="button"
+              class="remove-button"
+              [attr.aria-label]="removeLabel() + ': ' + item.name"
+              [title]="removeLabel()"
+              (click)="remove(index)"
+            >
+              <l8c-icon [name]="'x'" [size]="14" />
+            </button>
+          </li>
+        }
+      </ul>
+    }
+
+    @if (error(); as message) {
+      <span class="error-message">{{ message }}</span>
+    } @else if (hint()) {
+      <span class="hint-message">{{ hint() }}</span>
+    }
+  </div>
+}
