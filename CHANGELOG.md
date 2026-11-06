@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-11-06
+
+Everything the story "Next version of @l8c/ui: new components, icons and fixes" needs, so the apps can drop their local workarounds (Design System v0.5.1).
+
 ### Added
 
 - `l8c-toast`, `l8c-toast-container` and `L8cToastService` (Design System v0.5.1 Toast, ported from l8c-survey): info, success and error toasts top right below the top navigation; info and success close after `DEFAULT_TOAST_DURATION` (2600 ms, changeable via `setDuration()` or per call), error toasts stay until dismissed and are the only ones with a dismiss button (`dismissLabel` on the container). `role="status"` / `role="alert"`, clicks pass through to the page, no motion with `prefers-reduced-motion`.
@@ -23,6 +27,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Changed
 
 - `l8c-side-nav`: items and sub-items take an optional `helpLink` (e.g. the matching user guide chapter); a `circle-help` link next to the entry opens it in a new tab, named `<helpLabel>: <item label>` (new `helpLabel` input, default "Open user guide"). Shown on the expanded rail only. The `footerTemplate` now renders on the collapsed rail as well and gets the collapsed state as its implicit context (`let-collapsed`), so an app can show its footer entry as an icon there. **Breaking for footers that ignore the state:** they now also show on the collapsed rail.
+- `l8c-pagination`: the page-size select uses a minimum height instead of a fixed 28px, so its value is not clipped on wide screens where the fluid font sizes grow.
+- `l8c-button`: icon-only buttons show a visible focus ring on keyboard focus (`primary` border plus `shadow-focus`), as the Design System IconButton.
+- `l8c-table`: the cell, value and status pills use the pill tokens (`neutral`, `info`, `success`, `warning`, `error` with `-bg` and `-border`) instead of literal colors; the literal values remain as fallbacks only.
 - `l8c-dialog`: the width comes from the new `width` input (px number or CSS length) or the custom property `--dialog-width` on any ancestor (default 520px), never wider than the viewport; apps no longer need `::ng-deep` overrides. The open dialog is a flex column capped at 90vh in which only the content scrolls (no more fixed `calc(90vh - 120px)` content height), and `contentLayout="flex"` turns the content area into a non-scrolling flex column for content that pins its own footer. The content keeps an 8px inner gutter so focus rings and hover glows at its edge are no longer clipped.
 
 ### Fixed
@@ -71,7 +78,8 @@ Deprecated on npm in favour of 1.0.1 because of incorrect peer dependency ranges
 
 - Initial public release with standalone components: button, card, input, number-input, checkbox, radio, select, dropdown, search-field, table, pagination, carousel, dialog, confirm-dialog, navigation-bar, side-nav, account-menu, product-switcher, icon and spinner.
 
-[Unreleased]: https://github.com/Layer8ConsultingGmbH/l8c-ui/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/Layer8ConsultingGmbH/l8c-ui/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/Layer8ConsultingGmbH/l8c-ui/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/Layer8ConsultingGmbH/l8c-ui/compare/v1.0.2...v1.1.0
 [1.0.2]: https://github.com/Layer8ConsultingGmbH/l8c-ui/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/Layer8ConsultingGmbH/l8c-ui/compare/v1.0.0...v1.0.1
