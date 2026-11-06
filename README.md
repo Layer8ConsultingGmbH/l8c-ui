@@ -81,6 +81,11 @@ Supporting types such as `TableColumn`, `SelectOption` or `SideNavItem` are expo
 | `l8c-file-input` | File selection as a drop zone with a file list, or as a plain button |
 | `l8c-copy-field` | Read-only value with a copy button; announces the copy |
 | `l8c-status` | Workflow / row status chip with a tone dot; known statuses map to a color |
+| `l8cTooltip` | Directive: text hint on hover and keyboard focus, replaces native `title` attributes |
+
+### Tooltips
+
+`[l8cTooltip]="'Edit questionnaire'"` on any element shows the text after `tooltipDelay` (300 ms) on hover or focus and hides on leave, blur or Escape. `tooltipPlacement` is `top` (default), `bottom`, `left` or `right`; there is no automatic flipping, but the tooltip stays inside the viewport. It is rendered into `<body>` with a fixed position, so tables and dialogs never clip it, and it adds `aria-describedby` to the element while it shows: keep the element's own accessible name (`ariaLabel`), the tooltip only describes. Text only, at most a short sentence.
 
 ### File input, copy field and status
 

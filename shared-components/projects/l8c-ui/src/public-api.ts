@@ -34,6 +34,8 @@ export * from './confirm-dialog/confirm-dialog.component';
 export * from './icon/icon.component';
 export type { IconName } from './icon/icon-registry';
 export * from './color-input/color-input.component';
+export * from './tooltip/tooltip.directive';
+export type { TooltipPlacement } from './tooltip/tooltip.directive';
 export * from './status/status.component';
 export type { WorkflowStatus } from './status/status.component';
 export * from './copy-field/copy-field.component';
