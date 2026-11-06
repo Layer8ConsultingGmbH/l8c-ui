@@ -41,6 +41,10 @@ import { IconName } from './icon-registry';
           <path d="m5 12 7-7 7 7" />
           <path d="M12 19V5" />
         }
+        @case ('ban') {
+          <circle cx="12" cy="12" r="10" />
+          <path d="m4.9 4.9 14.2 14.2" />
+        }
         @case ('bell') {
           <path d="M10.268 21a2 2 0 0 0 3.464 0" />
           <path
@@ -128,6 +132,17 @@ import { IconName } from './icon-registry';
           <circle cx="12" cy="12" r="10" />
           <path d="m9 12 2 2 4-4" />
         }
+        @case ('circle-help') {
+          <!-- older Lucide name of circle-question-mark, same glyph -->
+          <circle cx="12" cy="12" r="10" />
+          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+          <path d="M12 17h.01" />
+        }
+        @case ('circle-question-mark') {
+          <circle cx="12" cy="12" r="10" />
+          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+          <path d="M12 17h.01" />
+        }
         @case ('circle-user') {
           <circle cx="12" cy="12" r="10" />
           <circle cx="12" cy="10" r="3" />
@@ -190,11 +205,9 @@ import { IconName } from './icon-registry';
         }
         @case ('file-output') {
           <path d="M14 2v4a2 2 0 0 0 2 2h4" />
-          <path d="M4 7V4a2 2 0 0 1 2-2 2 2 0 0 0-2 2" />
-          <path d="M4.063 20.999a2 2 0 0 0 2 0" />
-          <path d="m18 22-3-3 3-3" />
-          <path d="M8 5H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h7.5" />
-          <path d="M15 22h5.5a2 2 0 0 0 2-2V8l-6-6H6a2 2 0 0 0-2 2v3" />
+          <path d="M4 7V4a2 2 0 0 1 2-2h9l5 5v13a2 2 0 0 1-2 2H8" />
+          <path d="M2 15h7" />
+          <path d="m5 12-3 3 3 3" />
         }
         @case ('filter') {
           <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
@@ -287,6 +300,12 @@ import { IconName } from './icon-registry';
           <rect width="20" height="16" x="2" y="4" rx="2" />
           <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
         }
+        @case ('map-pin') {
+          <path
+            d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"
+          />
+          <circle cx="12" cy="10" r="3" />
+        }
         @case ('message-square') {
           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
         }
@@ -346,9 +365,22 @@ import { IconName } from './icon-registry';
           <path d="M5 12h14" />
           <path d="M12 5v14" />
         }
+        @case ('save') {
+          <path
+            d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"
+          />
+          <path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7" />
+          <path d="M7 3v4a1 1 0 0 0 1 1h7" />
+        }
         @case ('search') {
           <circle cx="11" cy="11" r="8" />
           <path d="m21 21-4.3-4.3" />
+        }
+        @case ('server') {
+          <rect width="20" height="8" x="2" y="2" rx="2" ry="2" />
+          <rect width="20" height="8" x="2" y="14" rx="2" ry="2" />
+          <line x1="6" x2="6.01" y1="6" y2="6" />
+          <line x1="6" x2="6.01" y1="18" y2="18" />
         }
         @case ('send') {
           <path
@@ -382,6 +414,11 @@ import { IconName } from './icon-registry';
           <rect width="18" height="18" x="3" y="3" rx="2" />
           <path d="M3 9h18" />
           <path d="M3 15h18" />
+        }
+        @case ('upload') {
+          <path d="M12 3v12" />
+          <path d="m17 8-5-5-5 5" />
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
         }
         @case ('user') {
           <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />

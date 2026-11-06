@@ -1,6 +1,36 @@
+import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { L8cSideNavComponent } from './side-nav.component';
 import { SideNavItem } from './side-nav.model';
+
+@Component({
+  imports: [L8cSideNavComponent],
+  template: `
+    <l8c-side-nav [items]="[]" [footerTemplate]="footer" />
+    <ng-template #footer let-collapsed>
+      <a class="guide" href="guide">{{ collapsed ? 'icon' : 'User guide' }}</a>
+    </ng-template>
+  `,
+})
+class FooterHostComponent {}
+
+describe('L8cSideNavComponent footer slot', () => {
+  it('renders the footer on both rails and hands it the collapsed state', async () => {
+    await TestBed.configureTestingModule({ imports: [FooterHostComponent] }).compileComponents();
+    const fixture = TestBed.createComponent(FooterHostComponent);
+    fixture.detectChanges();
+    const footer = () => fixture.nativeElement.querySelector('.nav-footer');
+
+    expect(footer().textContent.trim()).toBe('User guide');
+    expect(footer().classList.contains('collapsed')).toBe(false);
+
+    fixture.nativeElement.querySelector('.collapse-toggle').click();
+    fixture.detectChanges();
+
+    expect(footer().textContent.trim()).toBe('icon');
+    expect(footer().classList.contains('collapsed')).toBe(true);
+  });
+});
 
 describe('L8cSideNavComponent', () => {
   let component: L8cSideNavComponent;
@@ -205,6 +235,61 @@ describe('L8cSideNavComponent', () => {
     button.dispatchEvent(new MouseEvent('mouseleave'));
     fixture.detectChanges();
     expect(button.classList.contains('hover')).toBe(false);
+  });
+
+  describe('help links', () => {
+    const withHelp: SideNavItem[] = [
+      { key: 'overview', label: 'Overview', icon: 'list-checks', helpLink: 'guide/questionnaires' },
+      {
+        key: 'manage',
+        label: 'Manage',
+        icon: 'table',
+        children: [
+          { key: 'templates', label: 'Templates', helpLink: 'guide/templates' },
+          { key: 'users', label: 'Users' },
+        ],
+      },
+    ];
+
+    const helpLinks = (): HTMLAnchorElement[] =>
+      Array.from(fixture.nativeElement.querySelectorAll('.nav-help-link'));
+
+    beforeEach(() => {
+      fixture.componentRef.setInput('items', withHelp);
+      fixture.componentRef.setInput('helpLabel', 'Handbuch öffnen');
+      fixture.componentRef.setInput('active', 'templates');
+      fixture.detectChanges();
+    });
+
+    it('renders a help link next to items and sub-items that have one, opening a new tab', () => {
+      const links = helpLinks();
+      expect(links.map((link) => link.getAttribute('href'))).toEqual([
+        'guide/questionnaires',
+        'guide/templates',
+      ]);
+      expect(links.map((link) => link.getAttribute('aria-label'))).toEqual([
+        'Handbuch öffnen: Overview',
+        'Handbuch öffnen: Templates',
+      ]);
+      expect(links[0].target).toBe('_blank');
+      expect(links[0].rel).toBe('noopener');
+      // Next to the button, never inside it
+      expect(links[0].closest('button')).toBeNull();
+      expect(links[0].parentElement?.classList.contains('nav-item-row')).toBe(true);
+    });
+
+    it('does not select the item when its help link is clicked', () => {
+      helpLinks()[0].dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+
+      expect(navigated).toEqual([]);
+    });
+
+    it('hides the help links on the collapsed rail', () => {
+      component.collapsed.set(true);
+      fixture.detectChanges();
+
+      expect(helpLinks()).toEqual([]);
+    });
   });
 
   it('should fall back to the house icon without an item icon', () => {

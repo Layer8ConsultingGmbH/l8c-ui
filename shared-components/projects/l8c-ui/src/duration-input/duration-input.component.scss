@@ -1,0 +1,86 @@
+:host {
+  display: inline-flex;
+  flex-direction: column;
+}
+
+// Framed box holding the four duration segments, in both the editable and
+// the read only rendering
+.duration-input {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  height: 36px;
+  box-sizing: border-box;
+  // Nested surface, so the field stands out against its frame
+  background-color: var(--surface-3, #1a2436);
+  border: 1px solid var(--border-strong, rgba(255, 255, 255, 0.16));
+  border-radius: var(--radius-md, 8px);
+  padding: 0 12px;
+  color: var(--text);
+  font-family: var(--font-family);
+  font-size: var(--font-size-sm, 0.875rem);
+  // Digits of equal width, so nothing shifts while typing
+  font-variant-numeric: tabular-nums;
+  transition: border-color var(--transition-fast, 0.15s);
+
+  &:focus-within {
+    border-color: var(--border-action, rgba(42, 122, 184, 0.6));
+  }
+
+  &.error {
+    border-color: var(--error, #f44336);
+  }
+
+  &.disabled {
+    opacity: 0.6;
+  }
+
+  .field {
+    display: inline-flex;
+    align-items: baseline;
+
+    & + .field {
+      margin-left: 10px;
+    }
+
+    // The unit labels the segment, so it stays quieter than the value
+    .unit {
+      color: var(--text-muted);
+      font-size: var(--font-size-xs, 12px);
+      margin-left: 1px;
+    }
+  }
+
+  // The width comes from the segment digits; the value sits flush against
+  // its unit just like in the read only display
+  .segment {
+    padding: 2px 0;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm, 4px);
+    color: var(--text);
+    font-family: inherit;
+    font-size: inherit;
+    font-variant-numeric: inherit;
+    text-align: right;
+    outline: none;
+
+    &::placeholder {
+      color: var(--text-muted);
+    }
+
+    &:focus {
+      background: var(--info-bg, rgba(42, 122, 184, 0.16));
+    }
+
+    &:disabled {
+      cursor: default;
+    }
+  }
+}
+
+.legacy-hint {
+  margin: 6px 0 0;
+  color: var(--text-muted);
+  font-size: var(--font-size-xs, 12px);
+}

@@ -35,8 +35,11 @@
 
 .page-size-select {
   min-width: 60px;
-  height: 28px;
-  padding: var(--space-2xs, 4px) var(--space-xs, 8px);
+  // A minimum, not a fixed height: on wide screens the fluid font sizes grow
+  // and a fixed 28px clipped the value
+  min-height: 28px;
+  box-sizing: border-box;
+  padding: 4px var(--space-xs, 8px);
   font-size: var(--font-size-xs, 0.75rem);
   font-weight: var(--font-weight-normal, 400);
   color: var(--text, #e6e9f2);

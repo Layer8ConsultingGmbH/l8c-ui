@@ -73,6 +73,50 @@
   }
 }
 
+// A nav button and, on the expanded rail, its help link side by side
+.nav-item-row {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+
+  > .nav-item,
+  > .nav-sub-item {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+// Help link next to an entry: quiet at rest, primary on hover and focus
+.nav-help-link {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: calc(var(--surface-radius) - 4px);
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: all var(--transition-fast);
+
+  &:hover {
+    color: var(--primary);
+    background: var(--text-hover);
+    border-color: var(--text-hover-border);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+
+  l8c-icon {
+    display: flex;
+  }
+}
+
 .nav-item {
   display: flex;
   align-items: center;
@@ -252,6 +296,11 @@
 .nav-footer {
   margin-bottom: var(--space-2xs);
   padding: 0 var(--space-sm);
+
+  // Lines up with the collapse toggle on the icon rail
+  &.collapsed {
+    padding: 0 0.5rem;
+  }
 }
 
 .collapse-toggle {

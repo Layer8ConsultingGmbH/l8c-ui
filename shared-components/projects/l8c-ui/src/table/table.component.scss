@@ -200,35 +200,37 @@
               flex-shrink: 0;
             }
 
+            // Pill tokens (text, -bg, -border) as the DS Badge; the literal
+            // values are only fallbacks for hosts without the tokens
             &,
             &[data-tone='neutral'] {
-              color: var(--text-muted, #98a3b8);
-              background: rgba(152, 163, 184, 0.14);
-              border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+              color: var(--neutral, var(--text-muted, #98a3b8));
+              background: var(--neutral-bg, rgba(152, 163, 184, 0.14));
+              border: 1px solid var(--neutral-border, var(--border, rgba(255, 255, 255, 0.08)));
             }
 
             &[data-tone='primary'] {
-              color: var(--primary, #2a7ab8);
+              color: var(--info, var(--primary, #2a7ab8));
               background: var(--info-bg, rgba(42, 122, 184, 0.16));
-              border-color: var(--border-action, rgba(42, 122, 184, 0.6));
+              border-color: var(--info-border, var(--border-action, rgba(42, 122, 184, 0.6)));
             }
 
             &[data-tone='success'] {
               color: var(--success, #10b981);
               background: var(--success-bg, rgba(16, 185, 129, 0.14));
-              border-color: rgba(16, 185, 129, 0.4);
+              border-color: var(--success-border, rgba(16, 185, 129, 0.4));
             }
 
             &[data-tone='warning'] {
               color: var(--warning, #ff9500);
               background: var(--warning-bg, rgba(255, 149, 0, 0.14));
-              border-color: rgba(255, 149, 0, 0.4);
+              border-color: var(--warning-border, rgba(255, 149, 0, 0.4));
             }
 
             &[data-tone='error'] {
               color: var(--error, #f44336);
               background: var(--error-bg, rgba(244, 67, 54, 0.14));
-              border-color: rgba(244, 67, 54, 0.4);
+              border-color: var(--error-border, rgba(244, 67, 54, 0.4));
             }
           }
 

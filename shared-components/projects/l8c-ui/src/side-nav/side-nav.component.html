@@ -23,26 +23,42 @@
   <!-- Navigation Items -->
   <nav class="nav-items">
     @for (item of items(); track item.key) {
-      <button
-        type="button"
-        class="nav-item"
-        [class.active]="isSectionActive(item)"
-        [class.hover]="isHovered(item.key)"
-        [class.collapsed]="collapsed()"
-        [title]="collapsed() ? item.label : undefined"
-        [attr.aria-current]="isSectionActive(item) ? 'page' : undefined"
-        (mouseenter)="setHoverItem(item.key)"
-        (mouseleave)="setHoverItem(null)"
-        (click)="handleItemClick(item, $event)"
-      >
-        <span class="nav-item-icon" [class.active]="isSectionActive(item)">
-          <l8c-icon [name]="getIconName(item.icon)" />
-        </span>
+      <!-- The help link sits next to the button, never inside it: a click on
+           the link must not select the item -->
+      <div class="nav-item-row">
+        <button
+          type="button"
+          class="nav-item"
+          [class.active]="isSectionActive(item)"
+          [class.hover]="isHovered(item.key)"
+          [class.collapsed]="collapsed()"
+          [title]="collapsed() ? item.label : undefined"
+          [attr.aria-current]="isSectionActive(item) ? 'page' : undefined"
+          (mouseenter)="setHoverItem(item.key)"
+          (mouseleave)="setHoverItem(null)"
+          (click)="handleItemClick(item, $event)"
+        >
+          <span class="nav-item-icon" [class.active]="isSectionActive(item)">
+            <l8c-icon [name]="getIconName(item.icon)" />
+          </span>
 
-        @if (!collapsed()) {
-          <span class="nav-item-label">{{ item.label }}</span>
+          @if (!collapsed()) {
+            <span class="nav-item-label">{{ item.label }}</span>
+          }
+        </button>
+        @if (!collapsed() && item.helpLink) {
+          <a
+            class="nav-help-link"
+            [href]="item.helpLink"
+            target="_blank"
+            rel="noopener"
+            [attr.aria-label]="helpName(item.label)"
+            [l8cTooltip]="helpLabel()"
+          >
+            <l8c-icon [name]="'circle-help'" [size]="16" />
+          </a>
         }
-      </button>
+      </div>
 
       <!-- Collapsed: flyout with sub items next to the rail -->
       @if (collapsed() && flyoutItem() === item.key && item.children && item.children.length > 0) {
@@ -70,27 +86,39 @@
       <!-- Sub Items: only expanded while their section is active -->
       @if (!collapsed() && isSectionActive(item) && item.children && item.children.length > 0) {
         @for (child of item.children; track child.key) {
-          <button
-            type="button"
-            class="nav-sub-item"
-            [class.active]="isActive(child.key)"
-            [attr.aria-current]="isActive(child.key) ? 'page' : undefined"
-            (click)="handleNavigate(child.key)"
-          >
-            <span class="nav-sub-item-label">{{ child.label }}</span>
-          </button>
+          <div class="nav-item-row">
+            <button
+              type="button"
+              class="nav-sub-item"
+              [class.active]="isActive(child.key)"
+              [attr.aria-current]="isActive(child.key) ? 'page' : undefined"
+              (click)="handleNavigate(child.key)"
+            >
+              <span class="nav-sub-item-label">{{ child.label }}</span>
+            </button>
+            @if (child.helpLink) {
+              <a
+                class="nav-help-link"
+                [href]="child.helpLink"
+                target="_blank"
+                rel="noopener"
+                [attr.aria-label]="helpName(child.label)"
+                [l8cTooltip]="helpLabel()"
+              >
+                <l8c-icon [name]="'circle-help'" [size]="16" />
+              </a>
+            }
+          </div>
         }
       }
     }
   </nav>
 
-  <!-- Footer Slot -->
+  <!-- Footer Slot: on both rails, the template adapts to the collapsed state -->
   @if (footerTemplate(); as footer) {
-    @if (!collapsed()) {
-      <div class="nav-footer">
-        <ng-container *ngTemplateOutlet="footer" />
-      </div>
-    }
+    <div class="nav-footer" [class.collapsed]="collapsed()">
+      <ng-container *ngTemplateOutlet="footer; context: { $implicit: collapsed() }" />
+    </div>
   }
 
   <!-- Collapse Toggle -->

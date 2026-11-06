@@ -1,0 +1,224 @@
+:host {
+  display: block;
+  width: 100%;
+  max-width: var(--layout-max-width, 1200px);
+  margin: 0 auto;
+  font-family: var(--font-family);
+  color: var(--text);
+}
+
+.brand-editor-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md, 16px);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-md, 16px);
+  flex-wrap: wrap;
+
+  h2 {
+    margin: 0;
+    font-family: var(--font-display, var(--font-family));
+    font-size: var(--font-size-xl, 1.25rem);
+    font-weight: var(--font-weight-semibold, 600);
+  }
+}
+
+.card-heading {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm, 8px);
+}
+
+// Warning pill, as the design system Badge
+.unsaved-badge {
+  font-size: var(--font-size-xs, 0.75rem);
+  font-weight: var(--font-weight-semibold, 600);
+  color: var(--warning);
+  background: var(--warning-bg, rgba(245, 165, 36, 0.14));
+  border: 1px solid var(--warning-border, rgba(245, 165, 36, 0.4));
+  border-radius: var(--radius-pill, 999px);
+  padding: 2px var(--spacing-sm, 8px);
+}
+
+.action-buttons {
+  display: flex;
+  gap: var(--spacing-sm, 8px);
+}
+
+.intro,
+.hint {
+  margin: var(--spacing-sm, 8px) 0 0;
+  color: var(--text-muted);
+  font-size: var(--font-size-sm, 0.875rem);
+}
+
+// Selection dropdown over the configurations, with its actions
+.selection-row {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--spacing-md, 16px);
+  flex-wrap: wrap;
+  margin-top: var(--spacing-lg, 20px);
+  padding-top: var(--spacing-lg, 20px);
+  border-top: 1px solid var(--border);
+}
+
+.selection-select {
+  flex: 1 1 320px;
+  min-width: 260px;
+}
+
+.selection-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs, 4px);
+  flex-wrap: wrap;
+}
+
+.general-grid {
+  grid-template-columns: minmax(240px, 1fr) minmax(240px, 2fr);
+}
+
+.field-label {
+  font-size: var(--font-size-sm, 0.875rem);
+  font-weight: var(--font-weight-semibold, 600);
+  color: var(--text);
+}
+
+.field-description {
+  font-size: var(--font-size-xs, 0.75rem);
+  color: var(--text-muted);
+  line-height: var(--line-height-tight, 1.25);
+}
+
+.field-error {
+  font-size: var(--font-size-xs, 0.75rem);
+  color: var(--error);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs, 4px);
+}
+
+.field-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--spacing-md, 16px);
+
+  .field > :last-child {
+    margin-top: auto;
+  }
+}
+
+.group-title {
+  margin: var(--spacing-lg, 20px) 0 var(--spacing-sm, 8px);
+  font-size: var(--font-size-sm, 0.875rem);
+  font-weight: var(--font-weight-semibold, 600);
+  color: var(--text);
+
+  &.first {
+    margin-top: 0;
+  }
+}
+
+// Logos
+.logo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--spacing-lg, 20px);
+  margin-top: var(--spacing-md, 16px);
+}
+
+.logo-tile {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm, 8px);
+}
+
+.logo-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 80px;
+  padding: var(--spacing-md, 16px);
+  border: 1px dashed var(--border-strong, rgba(255, 255, 255, 0.16));
+  border-radius: var(--radius-md, 8px);
+  background: var(--surface-2);
+
+  img {
+    max-height: 48px;
+    max-width: 100%;
+    object-fit: contain;
+  }
+}
+
+// The dark logo is previewed on a dark surface regardless of the active theme,
+// the light one on a light surface, so both stay readable while editing
+.logo-tile-dark .logo-preview {
+  background: var(--brand-deep-900, #0b1220);
+  border-color: var(--brand-deep-700, #1a2436);
+}
+
+// A favicon is tiny; show it at tab size instead of stretching it
+.logo-tile-favicon .logo-preview img {
+  max-height: 32px;
+}
+
+.logo-empty {
+  font-size: var(--font-size-xs, 0.75rem);
+  color: var(--text-faint);
+}
+
+.logo-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm, 8px);
+}
+
+// Theme colors
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--space-xl, 32px);
+}
+
+.theme-title {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm, 8px);
+  margin: 0 0 var(--spacing-sm, 8px);
+  font-size: var(--font-size-base, 1rem);
+  font-weight: var(--font-weight-semibold, 600);
+}
+
+.active-indicator {
+  font-size: var(--font-size-xs, 0.75rem);
+  font-weight: var(--font-weight-semibold, 600);
+  color: var(--primary);
+}
+
+.color-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md, 16px);
+  padding: var(--spacing-sm, 8px) 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.color-label {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.color-field {
+  flex-shrink: 0;
+}

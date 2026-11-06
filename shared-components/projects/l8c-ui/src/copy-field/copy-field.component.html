@@ -1,0 +1,20 @@
+@if (label()) {
+  <span class="copy-field-label" [id]="labelId">{{ label() }}</span>
+}
+<div class="copy-field-box" role="group" [attr.aria-labelledby]="label() ? labelId : null">
+  <span class="copy-field-value">{{ value() }}</span>
+  <l8c-button
+    class="copy-field-button"
+    [size]="'mini'"
+    [icon]="copied() ? 'check' : 'copy'"
+    [ariaLabel]="copyLabel()"
+    [title]="copyLabel()"
+    (clicked)="copy()"
+  />
+</div>
+<!-- Always in the DOM, so screen readers announce the text when it appears -->
+<p class="copy-feedback" role="status">
+  @if (copied()) {
+    {{ copiedMessage() }}
+  }
+</p>
