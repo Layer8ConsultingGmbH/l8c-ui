@@ -10,6 +10,7 @@
 
   <div class="picker-anchor">
     <div
+      #field
       class="picker-field"
       role="group"
       [class.open]="open()"
@@ -59,6 +60,7 @@
       <div
         #list
         class="picker-panel time-list"
+        popover="manual"
         role="listbox"
         [attr.aria-label]="listLabel()"
         (keydown)="onListKeydown($event)"

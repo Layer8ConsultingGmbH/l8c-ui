@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   ElementRef,
   HostListener,
   Injector,
@@ -26,6 +27,7 @@ import {
   optionalStringInput,
   stringInput,
 } from '../shared/input-validation';
+import { showPanel } from '../picker/popover';
 import {
   EMPTY_SEGMENT,
   applySegmentDigits,
@@ -137,8 +139,15 @@ export class L8cTimePickerComponent implements ControlValueAccessor {
   private readonly inputs = viewChildren<ElementRef<HTMLInputElement>>('segmentInput');
   private readonly trigger = viewChild<ElementRef<HTMLButtonElement>>('trigger');
   private readonly list = viewChild<ElementRef<HTMLElement>>('list');
+  private readonly field = viewChild<ElementRef<HTMLElement>>('field');
   private readonly host = inject(ElementRef<HTMLElement>);
   private readonly injector = inject(Injector);
+  /** Stops the open list from following scroll and resize; set while it is open */
+  private stopFollowing: (() => void) | null = null;
+
+  constructor() {
+    inject(DestroyRef).onDestroy(() => this.hidePanel());
+  }
 
   private onChange: (value: string) => void = () => {};
   private onTouched: () => void = () => {};
@@ -162,8 +171,15 @@ export class L8cTimePickerComponent implements ControlValueAccessor {
   @HostListener('document:mousedown', ['$event'])
   protected onDocumentMousedown(event: MouseEvent): void {
     if (this.open() && !this.host.nativeElement.contains(event.target as Node)) {
-      this.open.set(false);
+      this.hidePanel();
     }
+  }
+
+  /** Closes the list; removing it from the DOM also takes it out of the top layer */
+  private hidePanel(): void {
+    this.stopFollowing?.();
+    this.stopFollowing = null;
+    this.open.set(false);
   }
 
   // ---- segments ----
@@ -237,6 +253,10 @@ export class L8cTimePickerComponent implements ControlValueAccessor {
     afterNextRender(
       () => {
         const list = this.list()?.nativeElement;
+        const field = this.field()?.nativeElement;
+        if (list && field && this.open()) {
+          this.stopFollowing = showPanel(field, list);
+        }
         const current =
           list?.querySelector<HTMLElement>('[aria-selected="true"]') ??
           list?.querySelector<HTMLElement>('button');
@@ -247,7 +267,7 @@ export class L8cTimePickerComponent implements ControlValueAccessor {
   }
 
   protected close(refocus: boolean): void {
-    this.open.set(false);
+    this.hidePanel();
     if (refocus) {
       this.trigger()?.nativeElement.focus();
     }

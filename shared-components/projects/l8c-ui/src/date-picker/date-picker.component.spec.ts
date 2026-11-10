@@ -59,6 +59,24 @@ describe('L8cDatePickerComponent', () => {
     expect(field().textContent?.trim()).toBe('07 Okt 2026');
   });
 
+  it('lifts the calendar into the top layer and places it in viewport coordinates', async () => {
+    const show = vi.fn();
+    HTMLElement.prototype.showPopover = show;
+    try {
+      field().click();
+      fixture.detectChanges();
+      await fixture.whenStable();
+
+      expect(panel()!.getAttribute('popover')).toBe('manual');
+      expect(show).toHaveBeenCalledTimes(1);
+      expect(panel()!.style.top).toMatch(/px$/);
+      expect(panel()!.style.left).toMatch(/px$/);
+      expect(panel()!.dataset['placement']).toBe('below');
+    } finally {
+      delete (HTMLElement.prototype as Partial<HTMLElement>).showPopover;
+    }
+  });
+
   it('opens the calendar on the selected month with the selected day marked', () => {
     field().click();
     fixture.detectChanges();

@@ -91,6 +91,24 @@ describe('L8cTimePickerComponent', () => {
     expect(texts()).toEqual(['', '']);
   });
 
+  it('lifts the list into the top layer and places it in viewport coordinates', async () => {
+    const show = vi.fn();
+    HTMLElement.prototype.showPopover = show;
+    try {
+      clock().click();
+      fixture.detectChanges();
+      await fixture.whenStable();
+
+      const list: HTMLElement = fixture.nativeElement.querySelector('.time-list');
+      expect(list.getAttribute('popover')).toBe('manual');
+      expect(show).toHaveBeenCalledTimes(1);
+      expect(list.style.top).toMatch(/px$/);
+      expect(list.style.left).toMatch(/px$/);
+    } finally {
+      delete (HTMLElement.prototype as Partial<HTMLElement>).showPopover;
+    }
+  });
+
   it('lists times by step, marks the current one and picks by click', () => {
     host.value.set('14:30');
     fixture.detectChanges();

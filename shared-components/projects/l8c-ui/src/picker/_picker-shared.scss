@@ -65,10 +65,18 @@
   }
 }
 
+// The panel is a `popover="manual"` element placed by picker/popover.ts in
+// viewport coordinates (top/left inline), so it is never clipped by an
+// `overflow: hidden` around the field. The UA popover styles (inset, margin,
+// padding, border, colours, overflow) are overridden here.
 @mixin panel {
-  position: absolute;
-  top: calc(100% + 6px);
+  position: fixed;
+  inset: auto;
+  top: 0;
   left: 0;
+  margin: 0;
+  height: auto;
+  overflow: visible;
   z-index: 1100;
   box-sizing: border-box;
   background: var(--surface);

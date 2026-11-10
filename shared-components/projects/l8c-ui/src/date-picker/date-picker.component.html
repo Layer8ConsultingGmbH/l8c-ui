@@ -34,7 +34,9 @@
 
     @if (open()) {
       <div
+        #panel
         class="picker-panel"
+        popover="manual"
         role="dialog"
         [attr.aria-label]="label() || openLabel()"
         (keydown)="onPanelKeydown($event)"

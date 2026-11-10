@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   ElementRef,
   HostListener,
   Injector,
@@ -26,6 +27,7 @@ import {
   stringInput,
   warnInvalidInput,
 } from '../shared/input-validation';
+import { showPanel } from '../picker/popover';
 import { L8cFormatDatePipe } from './format-date.pipe';
 import {
   MONTHS_LONG,
@@ -199,8 +201,15 @@ export class L8cDatePickerComponent implements ControlValueAccessor {
 
   private readonly trigger = viewChild<ElementRef<HTMLButtonElement>>('trigger');
   private readonly grid = viewChild<ElementRef<HTMLElement>>('grid');
+  private readonly panel = viewChild<ElementRef<HTMLElement>>('panel');
   private readonly host = inject(ElementRef<HTMLElement>);
   private readonly injector = inject(Injector);
+  /** Stops the open panel from following scroll and resize; set while it is open */
+  private stopFollowing: (() => void) | null = null;
+
+  constructor() {
+    inject(DestroyRef).onDestroy(() => this.hidePanel());
+  }
 
   private onChange: (value: string) => void = () => {};
   private onTouched: () => void = () => {};
@@ -224,7 +233,7 @@ export class L8cDatePickerComponent implements ControlValueAccessor {
   @HostListener('document:mousedown', ['$event'])
   protected onDocumentMousedown(event: MouseEvent): void {
     if (this.open() && !this.host.nativeElement.contains(event.target as Node)) {
-      this.open.set(false);
+      this.hidePanel();
       this.onTouched();
     }
   }
@@ -239,15 +248,32 @@ export class L8cDatePickerComponent implements ControlValueAccessor {
     }
     this.cursor.set(this.selectedDate() ?? startOfDay(new Date()));
     this.open.set(true);
+    afterNextRender(
+      () => {
+        const trigger = this.trigger()?.nativeElement;
+        const panel = this.panel()?.nativeElement;
+        if (trigger && panel && this.open()) {
+          this.stopFollowing = showPanel(trigger, panel);
+        }
+      },
+      { injector: this.injector },
+    );
     this.focusCursor();
   }
 
   protected close(refocus: boolean): void {
-    this.open.set(false);
+    this.hidePanel();
     this.onTouched();
     if (refocus) {
       this.trigger()?.nativeElement.focus();
     }
+  }
+
+  /** Closes the panel; removing it from the DOM also takes it out of the top layer */
+  private hidePanel(): void {
+    this.stopFollowing?.();
+    this.stopFollowing = null;
+    this.open.set(false);
   }
 
   protected onPanelKeydown(event: KeyboardEvent): void {
