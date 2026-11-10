@@ -1,5 +1,6 @@
 import { Component, input, ChangeDetectionStrategy } from '@angular/core';
-import { IconName } from './icon-registry';
+import { IconName, isIconName } from './icon-registry';
+import { NumberInput, numberInput, warnInvalidInput } from '../shared/input-validation';
 
 @Component({
   selector: 'l8c-icon',
@@ -471,6 +472,20 @@ import { IconName } from './icon-registry';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class L8cIconComponent {
-  name = input.required<IconName>();
-  size = input<number>(24);
+  /** Icon to render; an unknown name is reported in dev mode and renders an empty svg */
+  name = input.required<IconName | null, IconName | null | undefined>({
+    transform: (value) => {
+      if (value === null || value === undefined) {
+        return null;
+      }
+      if (isIconName(value)) {
+        return value;
+      }
+      warnInvalidInput('l8c-icon', 'name', value, 'unknown icon name, rendering nothing');
+      return null;
+    },
+  });
+  size = input<number, NumberInput>(24, {
+    transform: numberInput('l8c-icon', 'size', 24, { min: 1, integer: true }),
+  });
 }

@@ -41,6 +41,17 @@ import {
   mergeBrandConfig,
 } from '../brand/brand.model';
 import { BrandEditorLabelsInput, mergeBrandEditorLabels } from '../brand/brand-labels';
+import {
+  BooleanInput,
+  NumberInput,
+  StringInput,
+  arrayInput,
+  booleanInput,
+  oneOf,
+  optionalNumberInput,
+  stringInput,
+  warnInvalidInput,
+} from '../shared/input-validation';
 
 /** Image fields of the brand: the two theme logos and the favicon */
 export type BrandImageSlot = BrandTheme | 'favicon';
@@ -86,6 +97,44 @@ function fill(text: string, name: string | null | undefined): string {
   return text.replace(/\{\{\s*name\s*\}\}/g, name ?? '');
 }
 
+const SELECTOR = 'l8c-brand-editor';
+const BRAND_THEMES = ['dark', 'light'] as const satisfies readonly BrandTheme[];
+
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+/** A brand config object; `null`/`undefined` and anything that is no object read as `fallback` */
+function configInput<F extends BrandConfig | null>(
+  name: string,
+  fallback: F,
+): (value: BrandConfig | null | undefined) => BrandConfig | F {
+  return (value) => {
+    if (value === null || value === undefined) {
+      return fallback;
+    }
+    if (!isPlainObject(value)) {
+      warnInvalidInput(SELECTOR, name, value, 'expected a brand config object, using the default');
+      return fallback;
+    }
+    return value;
+  };
+}
+
+/** The labels object; anything that is no object reads as null (English defaults) */
+function labelsInput(
+  value: BrandEditorLabelsInput | Record<string, unknown> | null | undefined,
+): BrandEditorLabelsInput | Record<string, unknown> | null {
+  if (value === null || value === undefined) {
+    return null;
+  }
+  if (!isPlainObject(value)) {
+    warnInvalidInput(SELECTOR, 'labels', value, 'expected a labels object, using the defaults');
+    return null;
+  }
+  return value;
+}
+
 /**
  * Organization branding in one page: configurations (select, new, activate,
  * delete), name and description, logos and favicon, theme colors for dark
@@ -125,26 +174,49 @@ export class L8cBrandEditorComponent {
   private destroyRef = inject(DestroyRef);
 
   /** The configurations on offer */
-  configs = input<BrandConfigItem[]>([]);
+  configs = input<BrandConfigItem[], readonly BrandConfigItem[] | null | undefined>([], {
+    transform: arrayInput(SELECTOR, 'configs'),
+  });
   /** Open configuration, null for none (the active branding applies) */
-  selectedId = input<number | null>(null);
+  selectedId = input<number | null, NumberInput>(null, {
+    transform: (value) =>
+      optionalNumberInput(SELECTOR, 'selectedId', { integer: true })(value) ?? null,
+  });
   /** Stored config of the open configuration */
-  config = input<BrandConfig | null>(null);
+  config = input<BrandConfig | null, BrandConfig | null | undefined>(null, {
+    transform: configInput('config', null),
+  });
   /**
    * An unsaved draft of the open configuration to resume (e.g. the host's
    * preview after navigating back); read whenever the selection changes
    */
-  draft = input<BrandConfig | null>(null);
+  draft = input<BrandConfig | null, BrandConfig | null | undefined>(null, {
+    transform: configInput('draft', null),
+  });
   /** Values in use when a field is empty, usually readBrandDefaults() */
-  defaults = input<BrandConfig>({});
+  defaults = input<BrandConfig, BrandConfig | null | undefined>(
+    {},
+    {
+      transform: configInput('defaults', {}),
+    },
+  );
   /** Marks the column of the theme the app shows */
-  activeTheme = input<BrandTheme>('dark');
+  activeTheme = input<BrandTheme, BrandTheme | null | undefined>('dark', {
+    transform: oneOf(SELECTOR, 'activeTheme', BRAND_THEMES, 'dark'),
+  });
   /** Disables the actions while a request runs */
-  saving = input<boolean>(false);
+  saving = input<boolean, BooleanInput>(false, { transform: booleanInput(SELECTOR, 'saving') });
   /** Texts, shape of the l8c-survey `brandEditor` translation object */
-  labels = input<BrandEditorLabelsInput | Record<string, unknown> | null>(null);
-  cancelLabel = input<string>('Cancel');
-  deleteLabel = input<string>('Delete');
+  labels = input<
+    BrandEditorLabelsInput | Record<string, unknown> | null,
+    BrandEditorLabelsInput | Record<string, unknown> | null | undefined
+  >(null, { transform: labelsInput });
+  cancelLabel = input<string, StringInput>('Cancel', {
+    transform: stringInput(SELECTOR, 'cancelLabel', 'Cancel'),
+  });
+  deleteLabel = input<string, StringInput>('Delete', {
+    transform: stringInput(SELECTOR, 'deleteLabel', 'Delete'),
+  });
 
   /** After the discard check: the configuration to open, null for none */
   selected = output<number | null>();

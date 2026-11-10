@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+﻿import { Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { L8cStatusComponent } from './status.component';
 import { StatusTone } from '../table/table.component';
@@ -67,5 +67,45 @@ describe('L8cStatusComponent', () => {
     fixture.detectChanges();
     expect(badge().getAttribute('data-tone')).toBe('warning');
     expect(badge().hasAttribute('data-status')).toBe(false);
+  });
+
+  describe('input validation', () => {
+    let warn: ReturnType<typeof vi.spyOn>;
+    let plain: ComponentFixture<L8cStatusComponent>;
+
+    beforeEach(() => {
+      warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+      plain = TestBed.createComponent(L8cStatusComponent);
+      plain.componentRef.setInput('status', 'Ready');
+      plain.detectChanges();
+    });
+
+    afterEach(() => {
+      warn.mockRestore();
+    });
+
+    it('ignores an unknown tone, keeps the status mapping and warns', () => {
+      plain.componentRef.setInput('tone', 'purple' as unknown as StatusTone);
+      plain.detectChanges();
+
+      expect(plain.componentInstance.tone()).toBeNull();
+      expect(plain.nativeElement.querySelector('.status-badge').getAttribute('data-status')).toBe(
+        'ready',
+      );
+      expect(warn).toHaveBeenCalledTimes(1);
+    });
+
+    it('reads a null status as an empty neutral chip and stringifies numbers', () => {
+      plain.componentRef.setInput('status', null as unknown as string);
+      plain.detectChanges();
+      expect(plain.nativeElement.querySelector('.status-badge').getAttribute('data-tone')).toBe(
+        'neutral',
+      );
+
+      plain.componentRef.setInput('status', 404 as unknown as string);
+      plain.detectChanges();
+      expect(plain.nativeElement.querySelector('.status-badge').textContent.trim()).toBe('404');
+      expect(warn).not.toHaveBeenCalled();
+    });
   });
 });

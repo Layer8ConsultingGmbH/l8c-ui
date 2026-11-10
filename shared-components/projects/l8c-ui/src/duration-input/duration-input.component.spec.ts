@@ -7,7 +7,7 @@ import { L8cDurationInputComponent } from './duration-input.component';
   template: `<l8c-duration-input
     [value]="value()"
     [readOnly]="readOnly()"
-    [segmentLabels]="['Tage', 'Stunden', 'Minuten', 'Sekunden']"
+    [segmentLabels]="labels()"
     [legacyHint]="'Wert: {{value}}'"
     (valueChange)="emitted.set($event)"
   />`,
@@ -15,6 +15,7 @@ import { L8cDurationInputComponent } from './duration-input.component';
 class HostComponent {
   value = signal('');
   readOnly = signal(false);
+  labels = signal<readonly string[]>(['Tage', 'Stunden', 'Minuten', 'Sekunden']);
   emitted = signal<string | null>(null);
 }
 
@@ -157,5 +158,50 @@ describe('L8cDurationInputComponent', () => {
     expect(fixture.nativeElement.querySelector('.legacy-hint').textContent.trim()).toBe(
       'Wert: 99:99:99',
     );
+  });
+
+  describe('input validation', () => {
+    let warn: ReturnType<typeof vi.spyOn>;
+    const ariaLabels = (): (string | null)[] =>
+      segments().map((input) => input.getAttribute('aria-label'));
+
+    beforeEach(() => {
+      warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    });
+
+    afterEach(() => {
+      warn.mockRestore();
+    });
+
+    it('pads missing segment labels with the defaults', () => {
+      host.labels.set(['Tage', 'Stunden']);
+      fixture.detectChanges();
+
+      expect(ariaLabels()).toEqual(['Tage', 'Stunden', 'Minutes', 'Seconds']);
+      expect(warn).toHaveBeenCalledTimes(1);
+    });
+
+    it('uses all defaults when the labels are no array', () => {
+      host.labels.set('Tage' as unknown as string[]);
+      fixture.detectChanges();
+
+      expect(ariaLabels()).toEqual(['Days', 'Hours', 'Minutes', 'Seconds']);
+      expect(warn).toHaveBeenCalled();
+    });
+
+    it('reads a missing value as empty and a bare readOnly attribute as true', () => {
+      host.value.set(null as unknown as string);
+      host.readOnly.set('' as unknown as boolean);
+      fixture.detectChanges();
+
+      expect(segments()).toEqual([]);
+      expect(fixture.nativeElement.querySelector('.legacy-hint')).toBeNull();
+      expect(warn).not.toHaveBeenCalled();
+
+      host.readOnly.set('yes' as unknown as boolean);
+      fixture.detectChanges();
+      expect(segments().length).toBe(4);
+      expect(warn).toHaveBeenCalledTimes(1);
+    });
   });
 });

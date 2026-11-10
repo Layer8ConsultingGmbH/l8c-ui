@@ -1,5 +1,9 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { StatusTone } from '../table/table.component';
+import { StringInput, optionalOneOf, stringInput } from '../shared/input-validation';
+
+const TONES: readonly StatusTone[] = ['neutral', 'primary', 'success', 'warning', 'error'];
+const toneTransform = optionalOneOf('l8c-status', 'tone', TONES);
 
 /** Workflow statuses with their own `--status-*` colors */
 export type WorkflowStatus =
@@ -76,9 +80,13 @@ const STATUS_TONES: Record<string, StatusTone> = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class L8cStatusComponent {
-  status = input.required<string>();
+  status = input.required<string, StringInput>({
+    transform: stringInput('l8c-status', 'status', ''),
+  });
   /** Overrides the mapping of the status to a tone */
-  tone = input<StatusTone | null>(null);
+  tone = input<StatusTone | null, StatusTone | null | undefined>(null, {
+    transform: (value) => toneTransform(value) ?? null,
+  });
 
   protected resolvedTone = computed<StatusTone>(
     () => this.tone() ?? STATUS_TONES[this.status().toLowerCase()] ?? 'neutral',

@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+﻿import { Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FileInputItem, L8cFileInputComponent, formatFileSize } from './file-input.component';
 
@@ -10,7 +10,7 @@ import { FileInputItem, L8cFileInputComponent, formatFileSize } from './file-inp
       [accept]="'.csv,text/csv'"
       [files]="files()"
       [label]="'Questions (CSV)'"
-      [buttonLabel]="'Datei wählen'"
+      [buttonLabel]="'Choose file'"
       [dropLabel]="'CSV hierher ziehen oder'"
       [removeLabel]="'Entfernen'"
       [buttonAction]="'nav'"
@@ -62,7 +62,7 @@ describe('L8cFileInputComponent', () => {
     expect(fixture.nativeElement.querySelector('.dropzone-text').textContent.trim()).toBe(
       'CSV hierher ziehen oder',
     );
-    expect(buttons().map((b) => b.textContent?.trim())).toEqual(['Datei wählen']);
+    expect(buttons().map((b) => b.textContent?.trim())).toEqual(['Choose file']);
   });
 
   it('opens the file dialog from the button and reports the chosen file', () => {
@@ -132,5 +132,53 @@ describe('L8cFileInputComponent', () => {
     expect(formatFileSize(10)).toBe('1 KB');
     expect(formatFileSize(1536)).toBe('2 KB');
     expect(formatFileSize(1.25 * 1024 * 1024)).toBe('1.3 MB');
+  });
+
+  describe('input validation', () => {
+    let warn: ReturnType<typeof vi.spyOn>;
+    let plain: ComponentFixture<L8cFileInputComponent>;
+
+    beforeEach(() => {
+      warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+      plain = TestBed.createComponent(L8cFileInputComponent);
+      plain.detectChanges();
+    });
+
+    afterEach(() => {
+      warn.mockRestore();
+    });
+
+    it('reads an unknown variant, button action and icon as their defaults and warns', () => {
+      plain.componentRef.setInput('variant', 'inline' as unknown as 'button');
+      plain.componentRef.setInput('buttonAction', 'loud' as unknown as 'primary');
+      plain.componentRef.setInput('buttonIcon', 'rocket' as unknown as 'upload');
+      plain.detectChanges();
+
+      expect(plain.componentInstance.variant()).toBe('dropzone');
+      expect(plain.componentInstance.buttonAction()).toBe('primary');
+      expect(plain.componentInstance.buttonIcon()).toBe('upload');
+      expect(warn).toHaveBeenCalledTimes(3);
+    });
+
+    it('reads bare boolean attributes as true', () => {
+      plain.componentRef.setInput('multiple', '' as unknown as boolean);
+      plain.componentRef.setInput('disabled', '' as unknown as boolean);
+      plain.detectChanges();
+
+      expect(plain.componentInstance.multiple()).toBe(true);
+      expect(plain.componentInstance.disabled()).toBe(true);
+      expect(warn).not.toHaveBeenCalled();
+    });
+
+    it('reads a non-array files value as an empty list and drops empty entries', () => {
+      plain.componentRef.setInput('files', 'a.csv' as unknown as FileInputItem[]);
+      plain.detectChanges();
+      expect(plain.componentInstance.files()).toEqual([]);
+
+      plain.componentRef.setInput('files', [{ name: 'a.csv' }, null] as unknown as FileInputItem[]);
+      plain.detectChanges();
+      expect(plain.componentInstance.files()).toEqual([{ name: 'a.csv' }]);
+      expect(warn).toHaveBeenCalledTimes(2);
+    });
   });
 });

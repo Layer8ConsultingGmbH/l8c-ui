@@ -1,8 +1,8 @@
-<aside
+﻿<aside
   class="side-nav"
   [class.collapsed]="collapsed()"
   [style.width.px]="collapsed() ? collapsedWidth() : width()"
-  [style.top]="topOffset()"
+  [style.top]="topOffsetCss()"
 >
   <!-- Top Slot (e.g. ProductSwitcher) -->
   @if (topTemplate(); as top) {

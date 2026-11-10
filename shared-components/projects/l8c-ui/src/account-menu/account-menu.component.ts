@@ -1,6 +1,9 @@
-import { Component, input, output, ChangeDetectionStrategy, signal } from '@angular/core';
+﻿import { Component, input, output, ChangeDetectionStrategy, signal } from '@angular/core';
 import { L8cIconComponent } from '../icon/icon.component';
 import { IconName } from '../icon/icon-registry';
+import { arrayInput, stringInput, type StringInput } from '../shared/input-validation';
+
+const C = 'l8c-account-menu';
 
 export interface AccountMenuOption {
   label: string;
@@ -28,8 +31,11 @@ export interface AccountMenuButton {
   },
 })
 export class L8cAccountMenuComponent {
-  userName = input.required<string>();
-  menuOptions = input.required<AccountMenuOption[]>();
+  userName = input.required<string, StringInput>({ transform: stringInput(C, 'userName', '') });
+  menuOptions = input.required<
+    AccountMenuOption[],
+    readonly AccountMenuOption[] | null | undefined
+  >({ transform: arrayInput(C, 'menuOptions') });
 
   optionSelected = output<string>();
 

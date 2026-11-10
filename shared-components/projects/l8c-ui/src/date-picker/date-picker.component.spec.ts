@@ -14,6 +14,7 @@ import { formatDate, parseIsoDate, toIsoDate } from './date-format';
       [max]="max()"
       [todayLabel]="'Heute'"
       [clearLabel]="'Leeren'"
+      [width]="width()"
       [formControl]="control"
     />
   `,
@@ -21,8 +22,9 @@ import { formatDate, parseIsoDate, toIsoDate } from './date-format';
 class HostComponent {
   control = new FormControl('2026-03-07', { nonNullable: true });
   lang = signal('en');
-  min = signal<string | undefined>(undefined);
-  max = signal<string | undefined>(undefined);
+  min = signal<string | Date | undefined>(undefined);
+  max = signal<string | Date | undefined>(undefined);
+  width = signal<number | string>(260);
 }
 
 describe('L8cDatePickerComponent', () => {
@@ -51,9 +53,10 @@ describe('L8cDatePickerComponent', () => {
     expect(field().textContent?.trim()).toBe('07 Mar 2026');
     expect(fixture.nativeElement.querySelector('label').getAttribute('for')).toBe(field().id);
 
+    host.control.setValue('2026-10-07');
     host.lang.set('de');
     fixture.detectChanges();
-    expect(field().textContent?.trim()).toBe('07 Mär 2026');
+    expect(field().textContent?.trim()).toBe('07 Okt 2026');
   });
 
   it('opens the calendar on the selected month with the selected day marked', () => {
@@ -161,12 +164,64 @@ describe('L8cDatePickerComponent', () => {
     fixture.detectChanges();
     expect(panel()).toBeNull();
   });
+
+  describe('input validation', () => {
+    let warn: ReturnType<typeof vi.spyOn>;
+    const container = (): HTMLElement => fixture.nativeElement.querySelector('.picker-container');
+
+    beforeEach(() => {
+      warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    });
+
+    afterEach(() => {
+      warn.mockRestore();
+    });
+
+    it('falls back to English for an unknown language and reads a locale by its language', () => {
+      host.lang.set('xx');
+      fixture.detectChanges();
+      expect(field().textContent?.trim()).toBe('07 Mar 2026');
+      expect(warn).toHaveBeenCalledTimes(1);
+
+      host.control.setValue('2026-10-07');
+      host.lang.set('de-DE');
+      fixture.detectChanges();
+      expect(field().textContent?.trim()).toBe('07 Okt 2026');
+      expect(warn).toHaveBeenCalledTimes(1);
+    });
+
+    it('reads min as a Date and ignores a min that is no ISO date', () => {
+      host.min.set(new Date(2026, 2, 10));
+      fixture.detectChanges();
+      field().click();
+      fixture.detectChanges();
+      expect(day('2026-03-09')?.disabled).toBe(true);
+      expect(day('2026-03-10')?.disabled).toBe(false);
+      expect(warn).not.toHaveBeenCalled();
+
+      host.min.set('10.03.2026');
+      fixture.detectChanges();
+      expect(day('2026-03-09')?.disabled).toBe(false);
+      expect(warn).toHaveBeenCalledTimes(1);
+    });
+
+    it('keeps the default width for a width that is no CSS length', () => {
+      host.width.set('100%');
+      fixture.detectChanges();
+      expect(container().style.width).toBe('100%');
+
+      host.width.set('wide');
+      fixture.detectChanges();
+      expect(container().style.width).toBe('260px');
+      expect(warn).toHaveBeenCalledTimes(1);
+    });
+  });
 });
 
 describe('date helpers', () => {
   it('formats ISO dates and leaves other text alone', () => {
     expect(formatDate('2026-03-07')).toBe('07 Mar 2026');
-    expect(formatDate('2026-03-07T10:00:00', 'de')).toBe('07 Mär 2026');
+    expect(formatDate('2026-10-07T10:00:00', 'de')).toBe('07 Okt 2026');
     expect(formatDate(new Date(2026, 11, 24), 'fr')).toBe('24 Dec 2026');
     expect(formatDate('next week')).toBe('next week');
     expect(formatDate('')).toBe('');

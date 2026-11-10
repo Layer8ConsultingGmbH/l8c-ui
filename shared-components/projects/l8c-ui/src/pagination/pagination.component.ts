@@ -1,4 +1,22 @@
-import { ChangeDetectionStrategy, Component, computed, input, model, output } from '@angular/core';
+﻿import { ChangeDetectionStrategy, Component, computed, input, model, output } from '@angular/core';
+import {
+  arrayInput,
+  booleanInput,
+  numberInput,
+  stringInput,
+  warnInvalidInput,
+  type BooleanInput,
+  type NumberInput,
+  type StringInput,
+} from '../shared/input-validation';
+
+const C = 'l8c-pagination';
+const DEFAULT_PAGE_SIZE_OPTIONS = [2, 10, 25];
+const DEFAULT_PAGE_INFO_TEMPLATE = 'Showing {start} to {end} of {total} entries';
+
+function isPositiveInteger(value: unknown): value is number {
+  return typeof value === 'number' && Number.isInteger(value) && value > 0;
+}
 
 export interface PageChangeEvent {
   page: number;
@@ -12,20 +30,67 @@ export interface PageChangeEvent {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class L8cPaginationComponent {
-  currentPage = input<number>(0);
-  totalPages = input<number>(0);
-  // Writable input: also set internally when the user picks a new page size
+  currentPage = input<number, NumberInput>(0, {
+    transform: numberInput(C, 'currentPage', 0, { min: 0, integer: true }),
+  });
+  totalPages = input<number, NumberInput>(0, {
+    transform: numberInput(C, 'totalPages', 0, { min: 0, integer: true }),
+  });
+  // Writable input: also set internally when the user picks a new page size.
+  // A model has no transform, so read it through `safePageSize`.
   pageSize = model<number>(2);
-  totalItems = input<number>(0);
-  maxVisiblePages = input<number>(5);
-  showFirstLast = input<boolean>(true);
-  showPageInfo = input<boolean>(true);
-  showPageSizeSelector = input<boolean>(true);
-  pageSizeOptions = input<number[]>([2, 10, 25]);
-  pageInfoTemplate = input<string>('Showing {start} to {end} of {total} entries');
-  itemsPerPageLabel = input<string>('Items per page:');
+  totalItems = input<number, NumberInput>(0, {
+    transform: numberInput(C, 'totalItems', 0, { min: 0, integer: true }),
+  });
+  maxVisiblePages = input<number, NumberInput>(5, {
+    transform: numberInput(C, 'maxVisiblePages', 5, { min: 1, integer: true }),
+  });
+  showFirstLast = input<boolean, BooleanInput>(true, {
+    transform: booleanInput(C, 'showFirstLast', true),
+  });
+  showPageInfo = input<boolean, BooleanInput>(true, {
+    transform: booleanInput(C, 'showPageInfo', true),
+  });
+  showPageSizeSelector = input<boolean, BooleanInput>(true, {
+    transform: booleanInput(C, 'showPageSizeSelector', true),
+  });
+  pageSizeOptions = input<number[], readonly number[] | null | undefined>(
+    DEFAULT_PAGE_SIZE_OPTIONS,
+    { transform: arrayInput(C, 'pageSizeOptions') },
+  );
+  pageInfoTemplate = input<string, StringInput>(DEFAULT_PAGE_INFO_TEMPLATE, {
+    transform: stringInput(C, 'pageInfoTemplate', DEFAULT_PAGE_INFO_TEMPLATE),
+  });
+  itemsPerPageLabel = input<string, StringInput>('Items per page:', {
+    transform: stringInput(C, 'itemsPerPageLabel', 'Items per page:'),
+  });
 
   pageChange = output<PageChangeEvent>();
+
+  /** `pageSize` as a positive integer; anything else reads as 1 */
+  safePageSize = computed<number>(() => {
+    const size = this.pageSize();
+    if (isPositiveInteger(size)) {
+      return size;
+    }
+    warnInvalidInput(C, 'pageSize', size, 'expected a positive integer, using 1');
+    return 1;
+  });
+
+  /** `pageSizeOptions` reduced to positive integers; invalid entries are dropped */
+  validPageSizeOptions = computed<number[]>(() => {
+    const options = this.pageSizeOptions();
+    const valid = options.filter(isPositiveInteger);
+    if (valid.length !== options.length) {
+      warnInvalidInput(
+        C,
+        'pageSizeOptions',
+        options,
+        'dropped entries that are no positive integer',
+      );
+    }
+    return valid;
+  });
 
   visiblePages = computed(() => {
     const current = this.currentPage();
@@ -50,8 +115,10 @@ export class L8cPaginationComponent {
   canGoPrevious = computed(() => this.currentPage() > 0);
   canGoNext = computed(() => this.currentPage() < this.totalPages() - 1);
 
-  startItem = computed(() => this.currentPage() * this.pageSize() + 1);
-  endItem = computed(() => Math.min((this.currentPage() + 1) * this.pageSize(), this.totalItems()));
+  startItem = computed(() => this.currentPage() * this.safePageSize() + 1);
+  endItem = computed(() =>
+    Math.min((this.currentPage() + 1) * this.safePageSize(), this.totalItems()),
+  );
 
   pageInfoText = computed(() => {
     return this.pageInfoTemplate()
@@ -62,7 +129,7 @@ export class L8cPaginationComponent {
 
   goToPage(page: number): void {
     if (page >= 0 && page < this.totalPages() && page !== this.currentPage()) {
-      this.pageChange.emit({ page, size: this.pageSize() });
+      this.pageChange.emit({ page, size: this.safePageSize() });
     }
   }
 
@@ -85,7 +152,10 @@ export class L8cPaginationComponent {
   onPageSizeChange(event: Event): void {
     const select = event.target as HTMLSelectElement;
     const newSize = parseInt(select.value, 10);
-    if (newSize !== this.pageSize()) {
+    if (!isPositiveInteger(newSize)) {
+      return;
+    }
+    if (newSize !== this.safePageSize()) {
       this.pageSize.set(newSize);
       this.pageChange.emit({ page: 0, size: newSize });
     }

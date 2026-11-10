@@ -1,6 +1,15 @@
 import { ChangeDetectionStrategy, Component, input, model } from '@angular/core';
+import {
+  BooleanInput,
+  booleanInput,
+  oneOf,
+  optionalStringInput,
+  stringInput,
+  StringInput,
+} from '../shared/input-validation';
 
-export type RadioAppearance = 'plain' | 'row';
+const RADIO_APPEARANCES = ['plain', 'row'] as const;
+export type RadioAppearance = (typeof RADIO_APPEARANCES)[number];
 
 /**
  * Custom-styled radio button with a projected label.
@@ -21,10 +30,16 @@ export type RadioAppearance = 'plain' | 'row';
 export class L8cRadioComponent {
   checked = model<boolean>(false);
   /** Native radio group name */
-  name = input<string>('');
-  appearance = input<RadioAppearance>('plain');
-  disabled = input<boolean>(false);
-  ariaLabel = input<string | undefined>(undefined);
+  name = input<string, StringInput>('', { transform: stringInput('l8c-radio', 'name', '') });
+  appearance = input<RadioAppearance, RadioAppearance | null | undefined>('plain', {
+    transform: oneOf('l8c-radio', 'appearance', RADIO_APPEARANCES, 'plain'),
+  });
+  disabled = input<boolean, BooleanInput>(false, {
+    transform: booleanInput('l8c-radio', 'disabled'),
+  });
+  ariaLabel = input<string | undefined, StringInput>(undefined, {
+    transform: optionalStringInput('l8c-radio', 'ariaLabel'),
+  });
 
   onSelect(): void {
     if (!this.disabled()) {

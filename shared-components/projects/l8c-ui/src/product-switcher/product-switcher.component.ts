@@ -1,4 +1,4 @@
-import {
+﻿import {
   Component,
   ElementRef,
   inject,
@@ -11,6 +11,15 @@ import {
 import { L8cIconComponent } from '../icon/icon.component';
 import { IconName } from '../icon/icon-registry';
 import { PlatformProduct } from './product-switcher.model';
+import {
+  arrayInput,
+  booleanInput,
+  optionalStringInput,
+  type BooleanInput,
+  type StringInput,
+} from '../shared/input-validation';
+
+const C = 'l8c-product-switcher';
 
 @Component({
   selector: 'l8c-product-switcher',
@@ -26,10 +35,14 @@ import { PlatformProduct } from './product-switcher.model';
   },
 })
 export class L8cProductSwitcherComponent {
-  products = input<PlatformProduct[]>([]);
-  active = input<string>();
-  collapsed = input<boolean>(false);
-  block = input<boolean>(false);
+  products = input<PlatformProduct[], readonly PlatformProduct[] | null | undefined>([], {
+    transform: arrayInput(C, 'products'),
+  });
+  active = input<string | undefined, StringInput>(undefined, {
+    transform: optionalStringInput(C, 'active'),
+  });
+  collapsed = input<boolean, BooleanInput>(false, { transform: booleanInput(C, 'collapsed') });
+  block = input<boolean, BooleanInput>(false, { transform: booleanInput(C, 'block') });
   onSwitch = output<string>();
 
   open = signal<boolean>(false);

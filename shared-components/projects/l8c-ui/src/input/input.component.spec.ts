@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+﻿import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { L8cInputComponent } from './input.component';
 
 describe('L8cInputComponent', () => {
@@ -129,5 +129,40 @@ describe('L8cInputComponent', () => {
 
     expect(emitted).toBe('line 1\nline 2');
     expect(textarea.style.height).toBe(textarea.scrollHeight + 'px');
+  });
+  describe('input validation', () => {
+    let warn: ReturnType<typeof vi.spyOn>;
+    beforeEach(() => {
+      warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    });
+    afterEach(() => warn.mockRestore());
+
+    it('falls back to type text for an unknown type', () => {
+      fixture.componentRef.setInput('type', 'color' as unknown as 'text');
+      fixture.detectChanges();
+
+      expect(inputElement().type).toBe('text');
+      expect(warn).toHaveBeenCalledTimes(1);
+    });
+
+    it('parses numeric strings for maxLength and rows and clamps rows to at least 1', () => {
+      fixture.componentRef.setInput('maxLength', '20');
+      fixture.componentRef.setInput('multiline', '');
+      fixture.componentRef.setInput('rows', 0);
+      fixture.detectChanges();
+
+      const textarea: HTMLTextAreaElement = fixture.nativeElement.querySelector('textarea');
+      expect(textarea.getAttribute('maxlength')).toBe('20');
+      expect(textarea.getAttribute('rows')).toBe('1');
+      expect(warn).toHaveBeenCalledTimes(1);
+    });
+
+    it('drops a non-numeric minLength with a warning', () => {
+      fixture.componentRef.setInput('minLength', 'few');
+      fixture.detectChanges();
+
+      expect(inputElement().getAttribute('minlength')).toBeNull();
+      expect(warn).toHaveBeenCalledTimes(1);
+    });
   });
 });

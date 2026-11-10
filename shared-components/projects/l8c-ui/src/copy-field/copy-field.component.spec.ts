@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+﻿import { Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { L8cButtonComponent } from '../button/button.component';
@@ -129,5 +129,50 @@ describe('L8cCopyFieldComponent', () => {
 
     expect(writeText).not.toHaveBeenCalled();
     expect(field.copied()).toBe(false);
+  });
+
+  describe('input validation', () => {
+    let warn: ReturnType<typeof vi.spyOn>;
+    let plain: ComponentFixture<L8cCopyFieldComponent>;
+
+    beforeEach(() => {
+      warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+      plain = TestBed.createComponent(L8cCopyFieldComponent);
+      plain.componentRef.setInput('value', 12345);
+      plain.detectChanges();
+    });
+
+    afterEach(() => {
+      warn.mockRestore();
+    });
+
+    it('stringifies a numeric value', () => {
+      expect(plain.componentInstance.value()).toBe('12345');
+      expect(plain.nativeElement.querySelector('.copy-field-value').textContent.trim()).toBe(
+        '12345',
+      );
+      expect(warn).not.toHaveBeenCalled();
+    });
+
+    it('reads an object value as empty, copies nothing and warns', async () => {
+      plain.componentRef.setInput('value', {} as unknown as string);
+      plain.detectChanges();
+
+      await plain.componentInstance.copy();
+
+      expect(plain.componentInstance.value()).toBe('');
+      expect(writeText).not.toHaveBeenCalled();
+      expect(warn).toHaveBeenCalledTimes(1);
+    });
+
+    it('falls back to the default copy label for null and ignores an object label', () => {
+      plain.componentRef.setInput('copyLabel', null);
+      plain.componentRef.setInput('label', {} as unknown as string);
+      plain.detectChanges();
+
+      expect(plain.componentInstance.copyLabel()).toBe('Copy');
+      expect(plain.componentInstance.label()).toBeUndefined();
+      expect(warn).toHaveBeenCalledTimes(1);
+    });
   });
 });

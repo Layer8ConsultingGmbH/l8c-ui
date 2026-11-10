@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+﻿import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { L8cProductSwitcherComponent } from './product-switcher.component';
 import { PlatformProduct } from './product-switcher.model';
 
@@ -109,5 +109,46 @@ describe('L8cProductSwitcherComponent', () => {
   it('should default to the layout-grid icon when a product has none', () => {
     expect(component.getIconName(undefined)).toBe('layout-grid');
     expect(component.getIconName('clipboard-list')).toBe('clipboard-list');
+  });
+
+  describe('input validation', () => {
+    let warn: ReturnType<typeof vi.spyOn>;
+
+    beforeEach(() => {
+      warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    });
+
+    afterEach(() => {
+      warn.mockRestore();
+    });
+
+    it('drops empty entries from products and warns', () => {
+      fixture.componentRef.setInput('products', [
+        products[0],
+        null,
+      ] as unknown as PlatformProduct[]);
+      fixture.detectChanges();
+
+      expect(component.products()).toEqual([products[0]]);
+      expect(warn).toHaveBeenCalledTimes(1);
+    });
+
+    it('ignores a non-string active value and falls back to the first product', () => {
+      fixture.componentRef.setInput('active', {} as unknown as string);
+      fixture.detectChanges();
+
+      expect(component.active()).toBeUndefined();
+      expect(component.activeProduct().key).toBe('survey');
+      expect(warn).toHaveBeenCalledTimes(1);
+    });
+
+    it('reads the bare collapsed attribute as true', () => {
+      fixture.componentRef.setInput('collapsed', '');
+      fixture.detectChanges();
+
+      expect(component.collapsed()).toBe(true);
+      expect(fixture.nativeElement.classList.contains('collapsed')).toBe(true);
+      expect(warn).not.toHaveBeenCalled();
+    });
   });
 });

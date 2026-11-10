@@ -9,6 +9,15 @@ import {
   viewChildren,
 } from '@angular/core';
 import {
+  BooleanInput,
+  StringInput,
+  arrayInput,
+  booleanInput,
+  optionalStringInput,
+  stringInput,
+  warnInvalidInput,
+} from '../shared/input-validation';
+import {
   DURATION_SEGMENT_MAX,
   durationFromSegments,
   durationToSegments,
@@ -24,8 +33,31 @@ import {
   segmentKeydown,
 } from './segments';
 
+const SELECTOR = 'l8c-duration-input';
 const UNITS = ['D', 'H', 'M', 'S'] as const;
 const DIGITS = segmentDigits(DURATION_SEGMENT_MAX);
+const DEFAULT_SEGMENT_LABELS: readonly string[] = ['Days', 'Hours', 'Minutes', 'Seconds'];
+const DEFAULT_LEGACY_HINT = 'Stored value: {{value}}';
+
+/** Exactly four segment names; missing or non-string entries take the default */
+function segmentLabelsInput(value: readonly string[] | null | undefined): readonly string[] {
+  const given = arrayInput<unknown>(SELECTOR, 'segmentLabels')(value);
+  const labels = DEFAULT_SEGMENT_LABELS.map((fallback, index) => {
+    const label = given[index];
+    return typeof label === 'string' ? label : fallback;
+  });
+  if (Array.isArray(value) && given.length !== UNITS.length) {
+    warnInvalidInput(
+      SELECTOR,
+      'segmentLabels',
+      value,
+      `expected ${UNITS.length} labels, missing ones use the defaults`,
+    );
+  } else if (given.some((label) => typeof label !== 'string')) {
+    warnInvalidInput(SELECTOR, 'segmentLabels', value, 'expected strings, using the defaults');
+  }
+  return labels;
+}
 
 /**
  * Duration entry as four segments, each labelled with its unit: days,
@@ -51,19 +83,33 @@ const DIGITS = segmentDigits(DURATION_SEGMENT_MAX);
 })
 export class L8cDurationInputComponent {
   /** Stored value in "DD:HH:MM:SS"; legacy "HH:MM:SS" is read as well */
-  value = input<string>('');
-  ariaLabel = input<string | undefined>(undefined);
+  value = input<string, StringInput>('', { transform: stringInput(SELECTOR, 'value', '') });
+  ariaLabel = input<string | undefined, StringInput>(undefined, {
+    transform: optionalStringInput(SELECTOR, 'ariaLabel'),
+  });
   /** Show the saved value with its units instead of editable segments */
-  readOnly = input<boolean>(false);
-  disabled = input<boolean>(false);
-  error = input<boolean>(false);
-  /** Accessible names of the four segments: days, hours, minutes, seconds */
-  segmentLabels = input<readonly string[]>(['Days', 'Hours', 'Minutes', 'Seconds']);
+  readOnly = input<boolean, BooleanInput>(false, {
+    transform: booleanInput(SELECTOR, 'readOnly'),
+  });
+  disabled = input<boolean, BooleanInput>(false, {
+    transform: booleanInput(SELECTOR, 'disabled'),
+  });
+  error = input<boolean, BooleanInput>(false, { transform: booleanInput(SELECTOR, 'error') });
+  /**
+   * Accessible names of the four segments: days, hours, minutes, seconds.
+   * Missing or non-string entries fall back to the English defaults.
+   */
+  segmentLabels = input<readonly string[], readonly string[] | null | undefined>(
+    DEFAULT_SEGMENT_LABELS,
+    { transform: segmentLabelsInput },
+  );
   /**
    * Text below the field for a stored value that is no duration;
    * `{{value}}` is replaced with that value. Empty: no hint.
    */
-  legacyHint = input<string>('Stored value: {{value}}');
+  legacyHint = input<string, StringInput>(DEFAULT_LEGACY_HINT, {
+    transform: stringInput(SELECTOR, 'legacyHint', DEFAULT_LEGACY_HINT),
+  });
   /** Canonical value after every edit, empty while no segment is filled */
   valueChange = output<string>();
 

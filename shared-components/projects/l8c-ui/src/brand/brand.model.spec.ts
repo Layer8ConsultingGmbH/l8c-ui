@@ -133,13 +133,13 @@ describe('brand model helpers', () => {
 
   it('lays passed labels over the English defaults', () => {
     const labels = mergeBrandEditorLabels({
-      title: 'Marke',
-      colors: { token: { primary: { label: 'Primär', description: 'Knöpfe' } } },
+      title: 'Brand',
+      colors: { token: { primary: { label: 'Primary color', description: 'Buttons' } } },
     });
 
-    expect(labels.title).toBe('Marke');
+    expect(labels.title).toBe('Brand');
     expect(labels.actions.save).toBe(BRAND_EDITOR_LABELS.actions.save);
-    expect(labels.colors.token['primary'].label).toBe('Primär');
+    expect(labels.colors.token['primary'].label).toBe('Primary color');
     expect(labels.colors.token['bg']).toEqual(BRAND_EDITOR_LABELS.colors.token['bg']);
     expect(mergeBrandEditorLabels(null)).toEqual(BRAND_EDITOR_LABELS);
   });

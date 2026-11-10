@@ -11,6 +11,15 @@ import {
   viewChild,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import {
+  BooleanInput,
+  CssLengthInput,
+  StringInput,
+  booleanInput,
+  cssLengthInput,
+  optionalStringInput,
+  stringInput,
+} from '../shared/input-validation';
 
 const HEX6 = /^#[0-9a-f]{6}$/i;
 const HEX3 = /^#[0-9a-f]{3}$/i;
@@ -71,19 +80,35 @@ function isColor(value: string): boolean {
   ],
 })
 export class L8cColorInputComponent implements ControlValueAccessor {
-  label = input<string | undefined>(undefined);
+  label = input<string | undefined, StringInput>(undefined, {
+    transform: optionalStringInput('l8c-color-input', 'label'),
+  });
   /** Accessible name when there is no visible label */
-  ariaLabel = input<string | undefined>(undefined);
-  required = input<boolean>(false);
-  hint = input<string | undefined>(undefined);
-  error = input<string | undefined>(undefined);
+  ariaLabel = input<string | undefined, StringInput>(undefined, {
+    transform: optionalStringInput('l8c-color-input', 'ariaLabel'),
+  });
+  required = input<boolean, BooleanInput>(false, {
+    transform: booleanInput('l8c-color-input', 'required'),
+  });
+  hint = input<string | undefined, StringInput>(undefined, {
+    transform: optionalStringInput('l8c-color-input', 'hint'),
+  });
+  error = input<string | undefined, StringInput>(undefined, {
+    transform: optionalStringInput('l8c-color-input', 'error'),
+  });
   /** Shown while the value is not a color the browser understands */
-  invalidMessage = input<string | undefined>(undefined);
+  invalidMessage = input<string | undefined, StringInput>(undefined, {
+    transform: optionalStringInput('l8c-color-input', 'invalidMessage'),
+  });
   // Writable input: also set internally by setDisabledState
   disabled = model<boolean>(false);
-  placeholder = input<string>('#rrggbb');
+  placeholder = input<string, StringInput>('#rrggbb', {
+    transform: stringInput('l8c-color-input', 'placeholder', '#rrggbb'),
+  });
   /** Field width; default 200px */
-  width = input<number | string>(200);
+  width = input<number | string, CssLengthInput>(200, {
+    transform: cssLengthInput('l8c-color-input', 'width', 200),
+  });
   valueChange = output<string>();
 
   value = signal<string>('');

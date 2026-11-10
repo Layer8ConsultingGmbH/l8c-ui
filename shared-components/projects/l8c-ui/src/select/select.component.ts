@@ -9,6 +9,14 @@ import {
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { L8cIconComponent } from '../icon/icon.component';
+import {
+  arrayInput,
+  BooleanInput,
+  booleanInput,
+  optionalStringInput,
+  stringInput,
+  StringInput,
+} from '../shared/input-validation';
 
 export interface SelectOption {
   value: string;
@@ -30,14 +38,26 @@ export interface SelectOption {
   ],
 })
 export class L8cSelectComponent implements ControlValueAccessor {
-  label = input<string | undefined>(undefined);
-  placeholder = input<string | undefined>('');
-  options = input<SelectOption[]>([]);
+  label = input<string | undefined, StringInput>(undefined, {
+    transform: optionalStringInput('l8c-select', 'label'),
+  });
+  placeholder = input<string | undefined, StringInput>('', {
+    transform: stringInput('l8c-select', 'placeholder', ''),
+  });
+  options = input<SelectOption[], readonly SelectOption[] | null | undefined>([], {
+    transform: arrayInput('l8c-select', 'options'),
+  });
   // Writable input: also set internally by setDisabledState
   disabled = model<boolean>(false);
-  required = input<boolean>(false);
-  error = input<string | undefined>(undefined);
-  ariaLabel = input<string | undefined>(undefined);
+  required = input<boolean, BooleanInput>(false, {
+    transform: booleanInput('l8c-select', 'required'),
+  });
+  error = input<string | undefined, StringInput>(undefined, {
+    transform: optionalStringInput('l8c-select', 'error'),
+  });
+  ariaLabel = input<string | undefined, StringInput>(undefined, {
+    transform: optionalStringInput('l8c-select', 'ariaLabel'),
+  });
   valueChange = output<string>();
 
   value = signal<string>('');

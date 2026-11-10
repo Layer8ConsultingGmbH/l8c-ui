@@ -12,6 +12,7 @@ import {
   AfterContentInit,
 } from '@angular/core';
 import { L8cCarouselSlideComponent } from './carousel-slide.component';
+import { BooleanInput, booleanInput, NumberInput, numberInput } from '../shared/input-validation';
 
 @Component({
   selector: 'l8c-carousel',
@@ -22,10 +23,18 @@ import { L8cCarouselSlideComponent } from './carousel-slide.component';
 export class L8cCarouselComponent implements AfterContentInit {
   @ContentChildren(L8cCarouselSlideComponent) slides!: QueryList<L8cCarouselSlideComponent>;
 
-  readonly currentSlide = input<number>(0);
-  readonly showNavigation = input<boolean>(true);
-  readonly showIndicators = input<boolean>(false);
-  readonly animationDuration = input<number>(300);
+  readonly currentSlide = input<number, NumberInput>(0, {
+    transform: numberInput('l8c-carousel', 'currentSlide', 0, { min: 0, integer: true }),
+  });
+  readonly showNavigation = input<boolean, BooleanInput>(true, {
+    transform: booleanInput('l8c-carousel', 'showNavigation', true),
+  });
+  readonly showIndicators = input<boolean, BooleanInput>(false, {
+    transform: booleanInput('l8c-carousel', 'showIndicators'),
+  });
+  readonly animationDuration = input<number, NumberInput>(300, {
+    transform: numberInput('l8c-carousel', 'animationDuration', 300, { min: 0 }),
+  });
 
   readonly slideChange = output<number>();
 

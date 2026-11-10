@@ -9,7 +9,40 @@ import {
 } from '@angular/core';
 import { ButtonAction, L8cButtonComponent } from '../button/button.component';
 import { L8cIconComponent } from '../icon/icon.component';
-import { IconName } from '../icon/icon-registry';
+import { IconName, isIconName } from '../icon/icon-registry';
+import {
+  BooleanInput,
+  StringInput,
+  arrayInput,
+  booleanInput,
+  oneOf,
+  optionalStringInput,
+  stringInput,
+  warnInvalidInput,
+} from '../shared/input-validation';
+
+const VARIANTS = ['dropzone', 'button'] as const;
+type Variant = (typeof VARIANTS)[number];
+// Mirrors ButtonAction of l8c-button, which exports the type only
+const BUTTON_ACTIONS: readonly ButtonAction[] = [
+  'primary',
+  'nav',
+  'secondary',
+  'ghost',
+  'tab',
+  'danger',
+];
+
+function buttonIconInput(value: IconName | null | undefined): IconName {
+  if (value === null || value === undefined) {
+    return 'upload';
+  }
+  if (isIconName(value)) {
+    return value;
+  }
+  warnInvalidInput('l8c-file-input', 'buttonIcon', value, 'unknown icon, using "upload"');
+  return 'upload';
+}
 
 /** A chosen file as listed below the drop zone; a File is one */
 export interface FileInputItem {
@@ -43,24 +76,52 @@ export function formatFileSize(bytes: number): string {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class L8cFileInputComponent {
-  variant = input<'dropzone' | 'button'>('dropzone');
-  accept = input<string | undefined>(undefined);
-  multiple = input<boolean>(false);
+  variant = input<Variant, Variant | null | undefined>('dropzone', {
+    transform: oneOf('l8c-file-input', 'variant', VARIANTS, 'dropzone'),
+  });
+  accept = input<string | undefined, StringInput>(undefined, {
+    transform: optionalStringInput('l8c-file-input', 'accept'),
+  });
+  multiple = input<boolean, BooleanInput>(false, {
+    transform: booleanInput('l8c-file-input', 'multiple'),
+  });
   /** Chosen files, listed below the drop zone */
-  files = input<readonly FileInputItem[]>([]);
-  label = input<string | undefined>(undefined);
-  required = input<boolean>(false);
-  hint = input<string | undefined>(undefined);
-  error = input<string | undefined>(undefined);
-  disabled = input<boolean>(false);
-  buttonLabel = input<string>('Choose file');
-  dropLabel = input<string>('Drop a file here or');
+  files = input<readonly FileInputItem[], readonly FileInputItem[] | null | undefined>([], {
+    transform: arrayInput<FileInputItem>('l8c-file-input', 'files'),
+  });
+  label = input<string | undefined, StringInput>(undefined, {
+    transform: optionalStringInput('l8c-file-input', 'label'),
+  });
+  required = input<boolean, BooleanInput>(false, {
+    transform: booleanInput('l8c-file-input', 'required'),
+  });
+  hint = input<string | undefined, StringInput>(undefined, {
+    transform: optionalStringInput('l8c-file-input', 'hint'),
+  });
+  error = input<string | undefined, StringInput>(undefined, {
+    transform: optionalStringInput('l8c-file-input', 'error'),
+  });
+  disabled = input<boolean, BooleanInput>(false, {
+    transform: booleanInput('l8c-file-input', 'disabled'),
+  });
+  buttonLabel = input<string, StringInput>('Choose file', {
+    transform: stringInput('l8c-file-input', 'buttonLabel', 'Choose file'),
+  });
+  dropLabel = input<string, StringInput>('Drop a file here or', {
+    transform: stringInput('l8c-file-input', 'dropLabel', 'Drop a file here or'),
+  });
   /** Accessible name prefix of the remove buttons in the file list */
-  removeLabel = input<string>('Remove');
+  removeLabel = input<string, StringInput>('Remove', {
+    transform: stringInput('l8c-file-input', 'removeLabel', 'Remove'),
+  });
   /** Button action of variant "button" */
-  buttonAction = input<ButtonAction>('primary');
+  buttonAction = input<ButtonAction, ButtonAction | null | undefined>('primary', {
+    transform: oneOf('l8c-file-input', 'buttonAction', BUTTON_ACTIONS, 'primary'),
+  });
   /** Icon of the button in variant "button" */
-  buttonIcon = input<IconName>('upload');
+  buttonIcon = input<IconName, IconName | null | undefined>('upload', {
+    transform: buttonIconInput,
+  });
 
   /** The chosen files; after a removal the list without the removed file */
   filesChange = output<File[]>();

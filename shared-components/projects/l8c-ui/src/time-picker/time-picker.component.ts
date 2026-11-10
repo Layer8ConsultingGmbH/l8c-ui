@@ -18,6 +18,15 @@ import {
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { L8cIconComponent } from '../icon/icon.component';
 import {
+  BooleanInput,
+  NumberInput,
+  StringInput,
+  booleanInput,
+  numberInput,
+  optionalStringInput,
+  stringInput,
+} from '../shared/input-validation';
+import {
   EMPTY_SEGMENT,
   applySegmentDigits,
   focusSegment,
@@ -26,6 +35,7 @@ import {
   segmentKeydown,
 } from '../duration-input/segments';
 
+const SELECTOR = 'l8c-time-picker';
 const MAX = [23, 59] as const;
 
 /** "HH:MM" into its two segment texts; anything else is empty */
@@ -69,18 +79,34 @@ function fromSegments(segments: readonly string[]): string {
 export class L8cTimePickerComponent implements ControlValueAccessor {
   /** "HH:MM" or "" */
   value = model<string>('');
-  label = input<string | undefined>(undefined);
-  required = input<boolean>(false);
-  hint = input<string | undefined>(undefined);
-  error = input<string | undefined>(undefined);
+  label = input<string | undefined, StringInput>(undefined, {
+    transform: optionalStringInput(SELECTOR, 'label'),
+  });
+  required = input<boolean, BooleanInput>(false, {
+    transform: booleanInput(SELECTOR, 'required'),
+  });
+  hint = input<string | undefined, StringInput>(undefined, {
+    transform: optionalStringInput(SELECTOR, 'hint'),
+  });
+  error = input<string | undefined, StringInput>(undefined, {
+    transform: optionalStringInput(SELECTOR, 'error'),
+  });
   // Writable input: also set internally by setDisabledState
   disabled = model<boolean>(false);
-  /** Minutes between the times in the list; default 30 */
-  step = input<number>(30);
-  hourLabel = input<string>('Hours');
-  minuteLabel = input<string>('Minutes');
+  /** Minutes between the times in the list, 1 to 1440; default 30 */
+  step = input<number, NumberInput>(30, {
+    transform: numberInput(SELECTOR, 'step', 30, { min: 1, max: 24 * 60, integer: true }),
+  });
+  hourLabel = input<string, StringInput>('Hours', {
+    transform: stringInput(SELECTOR, 'hourLabel', 'Hours'),
+  });
+  minuteLabel = input<string, StringInput>('Minutes', {
+    transform: stringInput(SELECTOR, 'minuteLabel', 'Minutes'),
+  });
   /** Accessible name of the clock button and the list */
-  listLabel = input<string>('Choose time');
+  listLabel = input<string, StringInput>('Choose time', {
+    transform: stringInput(SELECTOR, 'listLabel', 'Choose time'),
+  });
 
   protected readonly emptySegment = EMPTY_SEGMENT;
   protected readonly open = signal(false);

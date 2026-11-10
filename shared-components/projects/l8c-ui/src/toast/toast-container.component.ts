@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
 import { L8cToastComponent } from './toast.component';
 import { L8cToastService } from './toast.service';
+import { StringInput, stringInput } from '../shared/input-validation';
 
 /**
  * Shows the toasts of `L8cToastService` fixed top right below the top
@@ -9,7 +10,7 @@ import { L8cToastService } from './toast.service';
  *
  * `dismissLabel` is the accessible name and tooltip of the dismiss button
  * of error toasts - pass a translated value from the host app.
- */
+ **/
 @Component({
   selector: 'l8c-toast-container',
   imports: [L8cToastComponent],
@@ -43,5 +44,7 @@ import { L8cToastService } from './toast.service';
 export class L8cToastContainerComponent {
   protected readonly toasts = inject(L8cToastService);
 
-  dismissLabel = input<string>('Close');
+  dismissLabel = input<string, StringInput>('Close', {
+    transform: stringInput('l8c-toast-container', 'dismissLabel', 'Close'),
+  });
 }

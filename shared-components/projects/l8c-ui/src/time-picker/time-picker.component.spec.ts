@@ -9,7 +9,7 @@ import { L8cTimePickerComponent } from './time-picker.component';
     [step]="step()"
     [hourLabel]="'Stunden'"
     [minuteLabel]="'Minuten'"
-    [listLabel]="'Uhrzeit wählen'"
+    [listLabel]="'Pick a time'"
   />`,
 })
 class HostComponent {
@@ -53,7 +53,7 @@ describe('L8cTimePickerComponent', () => {
       'Minuten',
     ]);
     expect(texts()).toEqual(['', '']);
-    expect(clock().getAttribute('aria-label')).toBe('Uhrzeit wählen');
+    expect(clock().getAttribute('aria-label')).toBe('Pick a time');
   });
 
   it('types a time across both segments', () => {
@@ -132,5 +132,41 @@ describe('L8cTimePickerComponent', () => {
     fixture.detectChanges();
 
     expect(options()).toEqual([]);
+  });
+
+  describe('input validation', () => {
+    let warn: ReturnType<typeof vi.spyOn>;
+
+    beforeEach(() => {
+      warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    });
+
+    afterEach(() => {
+      warn.mockRestore();
+    });
+
+    it('keeps the default step for a step that is no number', () => {
+      host.step.set('fast' as unknown as number);
+      fixture.detectChanges();
+      clock().click();
+      fixture.detectChanges();
+
+      expect(options().length).toBe(48);
+      expect(warn).toHaveBeenCalledTimes(1);
+    });
+
+    it('clamps the step to one day and reads numeric strings', () => {
+      host.step.set(5000);
+      fixture.detectChanges();
+      clock().click();
+      fixture.detectChanges();
+      expect(options().length).toBe(1);
+      expect(warn).toHaveBeenCalledTimes(1);
+
+      host.step.set('60' as unknown as number);
+      fixture.detectChanges();
+      expect(options().length).toBe(24);
+      expect(warn).toHaveBeenCalledTimes(1);
+    });
   });
 });

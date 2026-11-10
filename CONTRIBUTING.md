@@ -1,4 +1,4 @@
-# Contributing to l8c-ui
+﻿# Contributing to l8c-ui
 
 Thanks for your interest in contributing. This document explains how to get set up, how we work, and what we expect from a pull request.
 
@@ -24,10 +24,10 @@ Please do **not** report security vulnerabilities in public issues. See [SECURIT
 
 ## Making changes
 
-1. Fork the repository and create a branch from `main` (`feat/…`, `fix/…`, `docs/…`).
+1. Fork the repository and create a branch from `main` (`feat/â€¦`, `fix/â€¦`, `docs/â€¦`).
 2. Keep pull requests focused. One change per PR is much easier to review than several unrelated ones.
 3. Add or update unit tests for behaviour you change. Every component has a `*.spec.ts` next to it.
-4. Run `npm run build` and `npm test` in `shared-components/` before pushing.
+4. Run `npm run build` and `npm test` in `shared-components/` before pushing. `npm run test:coverage` runs the suite once and writes a coverage summary to the terminal plus an HTML report to `shared-components/coverage/l8c-ui/index.html`.
 5. Update `CHANGELOG.md` under **Unreleased** when the change is user-visible.
 6. Open the pull request against `main` and fill in the template.
 
@@ -38,6 +38,7 @@ For larger changes or new components, open an issue first so we can agree on the
 - **Standalone components only.** No NgModules.
 - **Signals API.** Use `input()`, `output()`, `model()` and `computed()` rather than decorators.
 - **Selector prefix** is `l8c-`. Component files follow the Angular CLI layout (`name/name.component.{ts,html,scss,spec.ts}`).
+- **Input validation.** Every `input()` gets a transform from `src/shared/input-validation.ts` (`numberInput`, `booleanInput`, `stringInput`, `oneOf`, `arrayInput`, `cssLengthInput`, `isoDateInput` and their `optional*` variants). The transform coerces what a template may hand in (numeric strings, the bare attribute for booleans), clamps numbers to a sensible range and falls back to the default for anything invalid, with a `console.warn` in dev mode. Components never throw on bad input. Type the write side explicitly (`input<number, NumberInput>(…)`) so template type checking stays strict. Each spec has an `input validation` block that covers the fallback and the warning.
 - **Public API.** Anything consumers should import must be exported from `src/public-api.ts`. Export supporting types with `export type`.
 - **Styling.** Use CSS custom properties with a fallback (`var(--primary, #2a7ab8)`) so components work without a theme and pick up the host application's tokens when present. Avoid global styles.
 - **Formatting.** Prettier is configured in `shared-components/package.json` (single quotes, 100 columns). Run `npx prettier --write "projects/**/*.{ts,html,scss}"` in `shared-components/` before committing; CI rejects unformatted code.

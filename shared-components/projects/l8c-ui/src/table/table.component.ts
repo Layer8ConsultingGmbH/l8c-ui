@@ -1,4 +1,4 @@
-import {
+﻿import {
   ChangeDetectionStrategy,
   Component,
   ContentChild,
@@ -13,12 +13,22 @@ import { L8cPaginationComponent, PageChangeEvent } from '../pagination/paginatio
 import { L8cButtonComponent } from '../button/button.component';
 import { L8cIconComponent } from '../icon/icon.component';
 import { IconName } from '../icon/icon-registry';
+import {
+  arrayInput,
+  booleanInput,
+  stringInput,
+  type BooleanInput,
+  type StringInput,
+} from '../shared/input-validation';
+
+const C = 'l8c-table';
+const DEFAULT_SHOWING_ENTRIES_TEMPLATE = 'Showing {start} to {end} of {total} entries';
 
 export type CellType = 'text' | 'number' | 'status' | 'action' | 'textCopy';
 export type ColumnSort = 'none' | 'asc' | 'desc';
 export type StatusTone = 'neutral' | 'primary' | 'success' | 'warning' | 'error';
 
-// Status → tone mapping per Layer8 Design System v0.2 (components/data/StatusBadge).
+// Status â†’ tone mapping per Layer8 Design System v0.2 (components/data/StatusBadge).
 // Unknown values fall back to neutral.
 const STATUS_TONES: Record<string, StatusTone> = {
   // ready / scheduled / open / active
@@ -101,16 +111,24 @@ export interface PageableData<T> {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class L8cTableComponent<T = any> {
-  columns = input.required<TableColumn[]>();
-  data = input<T[]>([]);
-  striped = input<boolean>(false);
-  hoverable = input<boolean>(true);
-  bordered = input<boolean>(true);
-  compact = input<boolean>(false);
-  showPagination = input<boolean>(false);
+  columns = input.required<TableColumn[], readonly TableColumn[] | null | undefined>({
+    transform: arrayInput(C, 'columns'),
+  });
+  data = input<T[], readonly T[] | null | undefined>([], { transform: arrayInput<T>(C, 'data') });
+  striped = input<boolean, BooleanInput>(false, { transform: booleanInput(C, 'striped') });
+  hoverable = input<boolean, BooleanInput>(true, { transform: booleanInput(C, 'hoverable', true) });
+  bordered = input<boolean, BooleanInput>(true, { transform: booleanInput(C, 'bordered', true) });
+  compact = input<boolean, BooleanInput>(false, { transform: booleanInput(C, 'compact') });
+  showPagination = input<boolean, BooleanInput>(false, {
+    transform: booleanInput(C, 'showPagination'),
+  });
   pageableData = input<PageableData<T> | undefined>(undefined);
-  paginationItemsPerPageLabel = input<string>('Items per page:');
-  paginationShowingEntriesTemplate = input<string>('Showing {start} to {end} of {total} entries');
+  paginationItemsPerPageLabel = input<string, StringInput>('Items per page:', {
+    transform: stringInput(C, 'paginationItemsPerPageLabel', 'Items per page:'),
+  });
+  paginationShowingEntriesTemplate = input<string, StringInput>(DEFAULT_SHOWING_ENTRIES_TEMPLATE, {
+    transform: stringInput(C, 'paginationShowingEntriesTemplate', DEFAULT_SHOWING_ENTRIES_TEMPLATE),
+  });
 
   rowClicked = output<T>();
   pageChanged = output<PageChangeEvent>();
@@ -125,7 +143,7 @@ export class L8cTableComponent<T = any> {
 
   displayData = computed<T[]>(() => {
     const pageable = this.pageableData();
-    return pageable ? pageable.items : this.data();
+    return pageable && Array.isArray(pageable.items) ? pageable.items : this.data();
   });
 
   onRowClick(row: T): void {

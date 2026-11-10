@@ -8,7 +8,16 @@ import {
   input,
 } from '@angular/core';
 
-export type TooltipPlacement = 'top' | 'bottom' | 'left' | 'right';
+import {
+  NumberInput,
+  StringInput,
+  numberInput,
+  oneOf,
+  optionalStringInput,
+} from '../shared/input-validation';
+
+const TOOLTIP_PLACEMENTS = ['top', 'bottom', 'left', 'right'] as const;
+export type TooltipPlacement = (typeof TOOLTIP_PLACEMENTS)[number];
 
 let nextId = 0;
 
@@ -34,11 +43,20 @@ const OFFSET = 6;
 })
 export class L8cTooltipDirective {
   /** The hint; nothing shows while it is empty */
-  text = input<string | null | undefined>('', { alias: 'l8cTooltip' });
+  text = input<string | undefined, StringInput>('', {
+    alias: 'l8cTooltip',
+    transform: optionalStringInput('l8cTooltip', 'l8cTooltip'),
+  });
   /** Side of the element the tooltip sits on; no automatic flipping */
-  placement = input<TooltipPlacement>('top', { alias: 'tooltipPlacement' });
+  placement = input<TooltipPlacement, TooltipPlacement | null | undefined>('top', {
+    alias: 'tooltipPlacement',
+    transform: oneOf('l8cTooltip', 'tooltipPlacement', TOOLTIP_PLACEMENTS, 'top'),
+  });
   /** Delay before showing, in milliseconds */
-  delay = input<number>(300, { alias: 'tooltipDelay' });
+  delay = input<number, NumberInput>(300, {
+    alias: 'tooltipDelay',
+    transform: numberInput('l8cTooltip', 'tooltipDelay', 300, { min: 0 }),
+  });
 
   private readonly host = inject(ElementRef<HTMLElement>);
   private readonly renderer = inject(Renderer2);

@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+﻿import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { L8cAccountMenuComponent, AccountMenuOption } from './account-menu.component';
 
 describe('L8cAccountMenuComponent', () => {
@@ -130,5 +130,33 @@ describe('L8cAccountMenuComponent', () => {
     fixture.detectChanges();
 
     expect(component.isOpen()).toBe(true);
+  });
+
+  describe('input validation', () => {
+    let warn: ReturnType<typeof vi.spyOn>;
+
+    beforeEach(() => {
+      warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    });
+
+    afterEach(() => {
+      warn.mockRestore();
+    });
+
+    it('reads a non-array menuOptions value as an empty list and warns', () => {
+      fixture.componentRef.setInput('menuOptions', 'profile' as unknown as AccountMenuOption[]);
+      fixture.detectChanges();
+
+      expect(component.menuOptions()).toEqual([]);
+      expect(warn).toHaveBeenCalledTimes(1);
+    });
+
+    it('reads a null userName as an empty string and stringifies numbers', () => {
+      fixture.componentRef.setInput('userName', null);
+      expect(component.userName()).toBe('');
+      fixture.componentRef.setInput('userName', 42);
+      expect(component.userName()).toBe('42');
+      expect(warn).not.toHaveBeenCalled();
+    });
   });
 });

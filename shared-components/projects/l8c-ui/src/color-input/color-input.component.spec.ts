@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+﻿import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { L8cColorInputComponent } from './color-input.component';
@@ -85,5 +85,48 @@ describe('L8cColorInputComponent', () => {
     expect(swatch().disabled).toBe(true);
     swatch().click();
     expect(click).toHaveBeenCalledTimes(1);
+  });
+
+  describe('input validation', () => {
+    let warn: ReturnType<typeof vi.spyOn>;
+    let plain: ComponentFixture<L8cColorInputComponent>;
+
+    beforeEach(() => {
+      warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+      plain = TestBed.createComponent(L8cColorInputComponent);
+      plain.detectChanges();
+    });
+
+    afterEach(() => {
+      warn.mockRestore();
+    });
+
+    it('falls back to 200px for a width that is no CSS length and warns', () => {
+      plain.componentRef.setInput('width', 'wide' as unknown as number);
+      plain.detectChanges();
+
+      expect(plain.componentInstance.width()).toBe(200);
+      expect(warn).toHaveBeenCalledTimes(1);
+    });
+
+    it('keeps CSS lengths and reads the bare required attribute as true', () => {
+      plain.componentRef.setInput('width', '100%');
+      plain.componentRef.setInput('required', '' as unknown as boolean);
+      plain.detectChanges();
+
+      expect(plain.componentInstance.width()).toBe('100%');
+      expect(plain.componentInstance.required()).toBe(true);
+      expect(warn).not.toHaveBeenCalled();
+    });
+
+    it('falls back to the default placeholder for null and ignores an object label', () => {
+      plain.componentRef.setInput('placeholder', null);
+      plain.componentRef.setInput('label', {} as unknown as string);
+      plain.detectChanges();
+
+      expect(plain.componentInstance.placeholder()).toBe('#rrggbb');
+      expect(plain.componentInstance.label()).toBeUndefined();
+      expect(warn).toHaveBeenCalledTimes(1);
+    });
   });
 });

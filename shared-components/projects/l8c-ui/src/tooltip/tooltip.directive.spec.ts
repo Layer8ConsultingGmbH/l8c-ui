@@ -1,6 +1,6 @@
-import { Component, signal } from '@angular/core';
+﻿import { Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { L8cTooltipDirective } from './tooltip.directive';
+import { L8cTooltipDirective, TooltipPlacement } from './tooltip.directive';
 
 @Component({
   imports: [L8cTooltipDirective],
@@ -20,6 +20,21 @@ import { L8cTooltipDirective } from './tooltip.directive';
 })
 class HostComponent {
   text = signal<string | null>('Edit questionnaire');
+}
+
+@Component({
+  imports: [L8cTooltipDirective],
+  template: `
+    <button type="button" [l8cTooltip]="text" [tooltipPlacement]="placement" [tooltipDelay]="delay">
+      Edit
+    </button>
+  `,
+})
+class ValidationHostComponent {
+  // Values a strictly typed template would reject, as they come from untyped data
+  text = 42 as unknown as string;
+  placement = 'diagonal' as unknown as TooltipPlacement;
+  delay = -5;
 }
 
 describe('L8cTooltipDirective', () => {
@@ -108,5 +123,43 @@ describe('L8cTooltipDirective', () => {
     fixture.destroy();
 
     expect(tooltip()).toBeNull();
+  });
+
+  describe('input validation', () => {
+    let warn: ReturnType<typeof vi.spyOn>;
+
+    beforeEach(() => {
+      warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    });
+
+    afterEach(() => {
+      warn.mockRestore();
+    });
+
+    it('reads an unknown placement as top, a negative delay as 0 and a number as text', () => {
+      const validation = TestBed.createComponent(ValidationHostComponent);
+      validation.detectChanges();
+      const directive = validation.debugElement
+        .query((el) => el.name === 'button')
+        .injector.get(L8cTooltipDirective);
+
+      expect(directive.placement()).toBe('top');
+      expect(directive.delay()).toBe(0);
+      expect(directive.text()).toBe('42');
+      expect(warn).toHaveBeenCalledTimes(2);
+
+      validation.destroy();
+    });
+
+    it('shows nothing for a null text without a warning', () => {
+      host.text.set(null);
+      fixture.detectChanges();
+
+      button().dispatchEvent(new Event('mouseenter'));
+      vi.advanceTimersByTime(100);
+
+      expect(tooltip()).toBeNull();
+      expect(warn).not.toHaveBeenCalled();
+    });
   });
 });

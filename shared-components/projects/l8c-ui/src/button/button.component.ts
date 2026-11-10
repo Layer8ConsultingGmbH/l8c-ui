@@ -11,12 +11,33 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { L8cIconComponent } from '../icon/icon.component';
-import { IconName } from '../icon/icon-registry';
+import { IconName, isIconName } from '../icon/icon-registry';
+import {
+  BooleanInput,
+  booleanInput,
+  oneOf,
+  optionalStringInput,
+  StringInput,
+  warnInvalidInput,
+} from '../shared/input-validation';
 
-export type ButtonAction = 'primary' | 'nav' | 'secondary' | 'ghost' | 'tab' | 'danger';
-export type ButtonSize = 'default' | 'mini' | 'large';
+const BUTTON_ACTIONS = ['primary', 'nav', 'secondary', 'ghost', 'tab', 'danger'] as const;
+const BUTTON_SIZES = ['default', 'mini', 'large'] as const;
+const BUTTON_TONES = ['default', 'primary', 'danger', 'success', 'warning'] as const;
+const BUTTON_TYPES = ['button', 'submit'] as const;
+
+export type ButtonAction = (typeof BUTTON_ACTIONS)[number];
+export type ButtonSize = (typeof BUTTON_SIZES)[number];
 export type ButtonIconType = IconName | 'none';
-export type ButtonTone = 'default' | 'primary' | 'danger' | 'success' | 'warning';
+export type ButtonTone = (typeof BUTTON_TONES)[number];
+
+function buttonIcon(value: ButtonIconType | null | undefined): ButtonIconType {
+  if (value === null || value === undefined || value === 'none' || isIconName(value)) {
+    return value ?? 'none';
+  }
+  warnInvalidInput('l8c-button', 'icon', value, 'unknown icon name, using "none"');
+  return 'none';
+}
 
 @Component({
   selector: 'l8c-button',
@@ -31,15 +52,29 @@ export type ButtonTone = 'default' | 'primary' | 'danger' | 'success' | 'warning
   },
 })
 export class L8cButtonComponent implements AfterViewChecked {
-  action = input<ButtonAction>('nav');
-  icon = input<ButtonIconType>('none');
-  size = input<ButtonSize>('default');
+  action = input<ButtonAction, ButtonAction | null | undefined>('nav', {
+    transform: oneOf('l8c-button', 'action', BUTTON_ACTIONS, 'nav'),
+  });
+  icon = input<ButtonIconType, ButtonIconType | null | undefined>('none', {
+    transform: buttonIcon,
+  });
+  size = input<ButtonSize, ButtonSize | null | undefined>('default', {
+    transform: oneOf('l8c-button', 'size', BUTTON_SIZES, 'default'),
+  });
   /** Icon-only buttons: semantic recoloring of icon + hover border (DS IconButton `tone`) */
-  tone = input<ButtonTone>('default');
-  type = input<'button' | 'submit'>('button');
-  disabled = input<boolean>(false);
-  active = input<boolean>(false);
-  ariaLabel = input<string>();
+  tone = input<ButtonTone, ButtonTone | null | undefined>('default', {
+    transform: oneOf('l8c-button', 'tone', BUTTON_TONES, 'default'),
+  });
+  type = input<'button' | 'submit', 'button' | 'submit' | null | undefined>('button', {
+    transform: oneOf('l8c-button', 'type', BUTTON_TYPES, 'button'),
+  });
+  disabled = input<boolean, BooleanInput>(false, {
+    transform: booleanInput('l8c-button', 'disabled'),
+  });
+  active = input<boolean, BooleanInput>(false, { transform: booleanInput('l8c-button', 'active') });
+  ariaLabel = input<string | undefined, StringInput>(undefined, {
+    transform: optionalStringInput('l8c-button', 'ariaLabel'),
+  });
 
   clicked = output<void>();
 

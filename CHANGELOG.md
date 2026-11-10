@@ -1,10 +1,16 @@
-# Changelog
+﻿# Changelog
 
 All notable changes to `@l8c/ui` are documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
+
+### Changed
+
+- All components validate their inputs: numbers and booleans are coerced from strings (so bare attributes and `size="20"` work), numbers are clamped to a sensible range, literal unions, arrays, CSS lengths and ISO dates are checked, and invalid values fall back to the default with a `console.warn` in dev mode instead of breaking the component. The read types are unchanged, the write types now also accept `null`, `undefined` and numeric strings.
+- `l8c-number-input`: the field is now a text input with the numeric or decimal on-screen keyboard (`inputmode`) and `role="spinbutton"` instead of `type="number"`, whose key filtering differs per browser (Firefox takes any text). The component filters keys and pastes itself: digits, one leading minus when `min` allows a negative value and, with `decimals` above 0, one `.` or `,` as separator. Everything else is dropped, so the typed text is always a number or empty. ArrowUp and ArrowDown still step.
+- Unit tests added for `l8c-toast`, `l8c-carousel-slide`, the icon registry, the date, duration and brand label helpers, and an `input validation` block in every component spec.
 
 ## [1.2.0] - 2026-11-06
 
@@ -17,9 +23,9 @@ Everything the story "Next version of @l8c/ui: new components, icons and fixes" 
 - `l8c-file-input` (Design System v0.5.1 FileInput): drop zone with file list or a plain button that opens the file dialog; `filesChange` with `File[]`, `accept`, `multiple`, `buttonAction`, `buttonIcon`, translated texts as inputs. The brand editor's logo buttons use it.
 - `l8c-copy-field` (Design System v0.5.1 CopyField, ported from l8c-survey): read-only value with a copy button, check mark and live-region announcement for 2 s after copying, `copiedValue` output.
 - `l8c-status` (Design System v0.5.1 StatusBadge, ported from l8c-survey `app-status-badge`): workflow statuses on the `--status-*` tokens with `--status-border`, other known statuses on the pill tones, `tone` override, `data-status` / `data-tone` attributes; all tokens with fallbacks.
-- `l8c-date-picker` (Design System v0.5.1 DatePicker): calendar popover instead of the native `type="date"`, ISO value, platform notation `07 Mar 2026` / `07 Mär 2026` via `lang`, `min` / `max`, keyboard navigation, Today and Clear in the footer, translated labels as inputs; `ControlValueAccessor` and `[(value)]`. With `formatDate`, `parseIsoDate`, `toIsoDate` and the `l8cFormatDate` pipe.
+- `l8c-date-picker` (Design System v0.5.1 DatePicker): calendar popover instead of the native `type="date"`, ISO value, platform notation `07 Mar 2026` / `07 MÃ¤r 2026` via `lang`, `min` / `max`, keyboard navigation, Today and Clear in the footer, translated labels as inputs; `ControlValueAccessor` and `[(value)]`. With `formatDate`, `parseIsoDate`, `toIsoDate` and the `l8cFormatDate` pipe.
 - `l8c-time-picker` (Design System v0.5.1 TimePicker): `HH:MM` as two typed segments plus a list of times every `step` minutes; lines up with the date picker.
-- `l8c-duration-input` (Design System v0.5.1 DurationInput, ported from l8c-survey): D · H · M · S segments, `DD:HH:MM:SS`, legacy `HH:MM:SS` read, read-only rendering, `legacyHint` for stored values that are no duration. With `parseDuration`, `formatDuration`, `durationToSegments`, `durationFromSegments`.
+- `l8c-duration-input` (Design System v0.5.1 DurationInput, ported from l8c-survey): D Â· H Â· M Â· S segments, `DD:HH:MM:SS`, legacy `HH:MM:SS` read, read-only rendering, `legacyHint` for stored values that are no duration. With `parseDuration`, `formatDuration`, `durationToSegments`, `durationFromSegments`.
 - `l8c-color-input` (Design System v0.5.1 ColorInput): a swatch on a checkerboard that opens the system color picker plus a text field for any CSS color; `invalidMessage` while the browser cannot read the value; `ControlValueAccessor`.
 - `l8c-brand-editor` (Design System v0.5.1 BrandEditor, ported from l8c-survey): configurations (select, new, activate, delete with confirmation), name and description, logos and favicon (200 KB, type check), 19 color tokens per theme via `l8c-color-input`, typography and design tokens. Host-controlled: `selected`, `created`, `saved`, `activated`, `deleted` and `preview` outputs; `labels` takes the Survey `brandEditor` translation object. With the brand model (`BrandConfig`, `BrandConfigItem`, token lists) and the helpers `applyBrand`, `readBrandDefaults`, `mergeBrandConfig`, `compactBrandConfig`, `hexToRgb`.
 - `l8c-icon`: new icons from Design System v0.5.1: `upload`, `save`, `server`, `ban`, `map-pin` and `circle-question-mark` with its alias `circle-help` (the older Lucide name, used by the side-nav help link).
@@ -47,7 +53,7 @@ Everything the story "Next version of @l8c/ui: new components, icons and fixes" 
 - `l8c-table`: text cells can render their value as a toned pill via the new `TableColumn.valueTone` callback (Design System Badge without status dot).
 - `l8c-table`: `CellBadge` accepts an optional `tone` (defaults to `neutral`).
 - `l8c-table`: status `scheduled` maps to the `primary` tone.
-- `l8c-navigation-bar`: numbered items are shown as a window around the active item, limited by the new `maxVisibleItems` input (default `10`); hidden ranges are reachable via clickable `…` buttons that page the window.
+- `l8c-navigation-bar`: numbered items are shown as a window around the active item, limited by the new `maxVisibleItems` input (default `10`); hidden ranges are reachable via clickable `â€¦` buttons that page the window.
 - `l8c-navigation-bar`: new `showCount` input (default `true`) renders `active / total` next to the numbers.
 - `l8c-navigation-bar`: custom actions can be projected into the top row next to the done button via `<ng-content select="[navActions]">`.
 - `l8c-icon`: new `grip-vertical` icon for drag-and-drop handles.

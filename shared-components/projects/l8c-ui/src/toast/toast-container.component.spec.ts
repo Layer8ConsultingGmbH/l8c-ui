@@ -72,15 +72,15 @@ describe('L8cToastContainerComponent', () => {
   });
 
   it('gives only error toasts a dismiss button, labelled with dismissLabel', () => {
-    fixture.componentRef.setInput('dismissLabel', 'Schließen');
+    fixture.componentRef.setInput('dismissLabel', 'Dismiss');
     service.success('Saved');
     service.error('Not saved');
     fixture.detectChanges();
 
     const [success, error] = toasts();
     expect(dismissButton(success)).toBeNull();
-    expect(dismissButton(error)?.getAttribute('aria-label')).toBe('Schließen');
-    expect(error.querySelector('.toast-dismiss')?.getAttribute('title')).toBe('Schließen');
+    expect(dismissButton(error)?.getAttribute('aria-label')).toBe('Dismiss');
+    expect(error.querySelector('.toast-dismiss')?.getAttribute('title')).toBe('Dismiss');
   });
 
   it('removes an error toast when its dismiss button is clicked', () => {

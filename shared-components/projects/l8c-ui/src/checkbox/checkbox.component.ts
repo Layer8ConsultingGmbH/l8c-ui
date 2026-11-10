@@ -1,5 +1,11 @@
 import { ChangeDetectionStrategy, Component, input, model } from '@angular/core';
 import { L8cIconComponent } from '../icon/icon.component';
+import {
+  BooleanInput,
+  booleanInput,
+  optionalStringInput,
+  StringInput,
+} from '../shared/input-validation';
 
 /**
  * Custom-styled checkbox with a projected label.
@@ -16,8 +22,12 @@ import { L8cIconComponent } from '../icon/icon.component';
 })
 export class L8cCheckboxComponent {
   checked = model<boolean>(false);
-  disabled = input<boolean>(false);
-  ariaLabel = input<string | undefined>(undefined);
+  disabled = input<boolean, BooleanInput>(false, {
+    transform: booleanInput('l8c-checkbox', 'disabled'),
+  });
+  ariaLabel = input<string | undefined, StringInput>(undefined, {
+    transform: optionalStringInput('l8c-checkbox', 'ariaLabel'),
+  });
 
   onToggle(): void {
     if (!this.disabled()) {

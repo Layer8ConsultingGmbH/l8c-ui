@@ -249,7 +249,8 @@ export function mergeBrandEditorLabels(
       const current = result[key];
       if (isPlainObject(value)) {
         result[key] = merge(isPlainObject(current) ? current : {}, value);
-      } else if (typeof value === 'string') {
+      } else if (typeof value === 'string' && !isPlainObject(current)) {
+        // A string never replaces a group of labels
         result[key] = value;
       }
     }

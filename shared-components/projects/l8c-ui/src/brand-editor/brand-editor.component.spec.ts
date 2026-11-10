@@ -34,8 +34,8 @@ const SPRING: BrandConfigItem = { id: 2, name: 'Spring', isCurrent: false };
       [activeTheme]="'light'"
       [saving]="saving()"
       [labels]="labels"
-      [cancelLabel]="'Abbrechen'"
-      [deleteLabel]="'Löschen'"
+      [cancelLabel]="'Go back'"
+      [deleteLabel]="'Delete'"
       (selected)="events.push(['selected', $event])"
       (created)="events.push(['created', $event])"
       (saved)="events.push(['saved', $event])"
@@ -52,7 +52,7 @@ class HostComponent {
   draft: BrandConfig | null = null;
   defaults = DEFAULTS;
   saving = signal(false);
-  labels: Record<string, unknown> = { configs: { newName: 'Neue Konfiguration' } };
+  labels: Record<string, unknown> = { configs: { newName: 'Untitled configuration' } };
   events: [string, unknown][] = [];
   previews: (BrandConfig | null)[] = [];
 
@@ -224,7 +224,7 @@ describe('L8cBrandEditorComponent', () => {
   it('asks for a new configuration with the default name from the labels', () => {
     api.newConfig();
 
-    expect(host.events).toEqual([['created', 'Neue Konfiguration']]);
+    expect(host.events).toEqual([['created', 'Untitled configuration']]);
   });
 
   it('activates a saved, inactive configuration', () => {
@@ -245,7 +245,7 @@ describe('L8cBrandEditorComponent', () => {
     expect(open).toHaveBeenCalledWith(
       'Delete configuration',
       'Delete "Corporate"? It is the active branding; everyone will see the default branding afterwards.',
-      'Löschen',
+      'Delete',
     );
     expect(host.events.filter(([name]) => name === 'deleted')).toEqual([]);
 
@@ -274,5 +274,65 @@ describe('L8cBrandEditorComponent', () => {
     expect(names).toContain('Primary (Dark theme)');
     expect(names).toContain('Primary (Light theme)');
     expect(names.length).toBe(38);
+  });
+
+  describe('input validation', () => {
+    let warn: ReturnType<typeof vi.spyOn>;
+    // Angular warns about [disabled] on reactive controls; only the library's warnings count
+    const libWarnings = () =>
+      warn.mock.calls.filter((call: unknown[]) => String(call[0]).startsWith('[@l8c/ui]'));
+
+    beforeEach(() => {
+      warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    });
+
+    afterEach(() => {
+      warn.mockRestore();
+    });
+
+    it('offers no configurations when configs is no array', () => {
+      host.configs.set('Corporate' as unknown as BrandConfigItem[]);
+      fixture.detectChanges();
+
+      expect(api.selectionOptions().map((o) => o.value)).toEqual(['']);
+      expect(libWarnings().length).toBe(1);
+    });
+
+    it('reads a numeric selectedId string and treats a non-numeric one as no selection', () => {
+      host.selectedId.set('1' as unknown as number);
+      host.config.set(STORED);
+      fixture.detectChanges();
+      expect(control('name').value).toBe('Corporate');
+      expect(api.canDelete()).toBe(true);
+      expect(libWarnings()).toEqual([]);
+
+      host.selectedId.set('first' as unknown as number);
+      fixture.detectChanges();
+      expect(api.canDelete()).toBe(false);
+      expect(libWarnings().length).toBe(1);
+    });
+
+    it('ignores a config that is no object and keeps the defaults', () => {
+      host.selectedId.set(2);
+      host.config.set('red' as unknown as BrandConfig);
+      fixture.detectChanges();
+
+      expect(control('colors.dark.primary').value).toBe('#2a7ab8');
+      expect(libWarnings().length).toBe(1);
+    });
+
+    it('reads saving as a boolean attribute and warns on other text', () => {
+      host.selectedId.set(1);
+      host.config.set(STORED);
+      host.saving.set('' as unknown as boolean);
+      fixture.detectChanges();
+      expect(api.canDelete()).toBe(false);
+      expect(libWarnings()).toEqual([]);
+
+      host.saving.set('maybe' as unknown as boolean);
+      fixture.detectChanges();
+      expect(api.canDelete()).toBe(true);
+      expect(libWarnings().length).toBe(1);
+    });
   });
 });

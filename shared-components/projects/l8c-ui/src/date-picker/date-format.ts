@@ -1,5 +1,6 @@
 /** Languages the pickers know month and weekday names for; anything else gets English */
-export type PickerLang = 'en' | 'de';
+export const PICKER_LANGS = ['en', 'de'] as const;
+export type PickerLang = (typeof PICKER_LANGS)[number];
 
 /** Month abbreviations per UI language, the platform's one date notation */
 export const MONTHS: Record<PickerLang, string[]> = {

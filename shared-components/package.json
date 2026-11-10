@@ -8,6 +8,8 @@
     "build:dev": "ng build l8c-ui --configuration development",
     "watch": "ng build l8c-ui --watch --configuration development",
     "test": "ng test",
+    "test:ci": "ng test --watch=false",
+    "test:coverage": "ng test --watch=false --coverage --coverage-reporters text-summary --coverage-reporters html --coverage-reporters lcov --coverage-exclude \"**/*.spec.ts\" --coverage-exclude \"**/public-api.ts\"",
     "pack": "cd dist/l8c-ui && npm pack",
     "publish:local": "npm run build && npm run pack"
   },

@@ -1,6 +1,7 @@
-import {
+﻿import {
   Component,
   ElementRef,
+  computed,
   inject,
   input,
   output,
@@ -13,6 +14,18 @@ import { SideNavItem } from './side-nav.model';
 import { L8cIconComponent } from '../icon/icon.component';
 import { IconName } from '../icon/icon-registry';
 import { L8cTooltipDirective } from '../tooltip/tooltip.directive';
+import {
+  arrayInput,
+  cssLengthInput,
+  numberInput,
+  optionalStringInput,
+  stringInput,
+  type CssLengthInput,
+  type NumberInput,
+  type StringInput,
+} from '../shared/input-validation';
+
+const C = 'l8c-side-nav';
 
 /**
  * Collapsible side navigation rail with optional sub-items per section.
@@ -42,20 +55,42 @@ import { L8cTooltipDirective } from '../tooltip/tooltip.directive';
   },
 })
 export class L8cSideNavComponent {
-  items = input<SideNavItem[]>([]);
-  active = input<string>();
+  items = input<SideNavItem[], readonly SideNavItem[] | null | undefined>([], {
+    transform: arrayInput(C, 'items'),
+  });
+  active = input<string | undefined, StringInput>(undefined, {
+    transform: optionalStringInput(C, 'active'),
+  });
   itemSelected = output<string>();
   collapsedChange = output<boolean>();
 
-  width = input<number>(240);
-  collapsedWidth = input<number>(68);
-  topOffset = input<string>('0px');
+  width = input<number, NumberInput>(240, {
+    transform: numberInput(C, 'width', 240, { min: 0, integer: true }),
+  });
+  collapsedWidth = input<number, NumberInput>(68, {
+    transform: numberInput(C, 'collapsedWidth', 68, { min: 0, integer: true }),
+  });
+  /** Distance from the top as a CSS length; a px number gets its unit */
+  topOffset = input<number | string, CssLengthInput>('0px', {
+    transform: cssLengthInput(C, 'topOffset', '0px'),
+  });
+  /** `topOffset` as the CSS value for `style.top` */
+  topOffsetCss = computed<string>(() => {
+    const offset = this.topOffset();
+    return typeof offset === 'number' ? `${offset}px` : offset;
+  });
 
   // Labels of the collapse toggle; pass translated values from the host app
-  collapseLabel = input<string>('Collapse');
-  expandLabel = input<string>('Expand');
+  collapseLabel = input<string, StringInput>('Collapse', {
+    transform: stringInput(C, 'collapseLabel', 'Collapse'),
+  });
+  expandLabel = input<string, StringInput>('Expand', {
+    transform: stringInput(C, 'expandLabel', 'Expand'),
+  });
   /** Tooltip of the help links; their accessible name is `<helpLabel>: <item label>` */
-  helpLabel = input<string>('Open user guide');
+  helpLabel = input<string, StringInput>('Open user guide', {
+    transform: stringInput(C, 'helpLabel', 'Open user guide'),
+  });
 
   // Template inputs for slots
   topTemplate = input<TemplateRef<any> | null>(null);

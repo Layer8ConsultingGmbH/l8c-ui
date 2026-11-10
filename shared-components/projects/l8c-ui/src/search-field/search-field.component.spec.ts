@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+﻿import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { L8cSearchFieldComponent } from './search-field.component';
 
 describe('L8cSearchFieldComponent', () => {
@@ -101,5 +101,43 @@ describe('L8cSearchFieldComponent', () => {
 
     const input = fixture.nativeElement.querySelector('input');
     expect(input.disabled).toBe(true);
+  });
+
+  describe('input validation', () => {
+    let warn: ReturnType<typeof vi.spyOn>;
+
+    beforeEach(() => {
+      warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    });
+
+    afterEach(() => {
+      warn.mockRestore();
+    });
+
+    it('drops empty entries from results and warns', () => {
+      fixture.componentRef.setInput('results', ['a', null, 'b'] as unknown as string[]);
+      fixture.detectChanges();
+
+      expect(component.results()).toEqual(['a', 'b']);
+      expect(warn).toHaveBeenCalledTimes(1);
+    });
+
+    it('reads a non-array results value as an empty list', () => {
+      fixture.componentRef.setInput('results', 'nope' as unknown as string[]);
+      fixture.detectChanges();
+
+      expect(component.results()).toEqual([]);
+      expect(warn).toHaveBeenCalledTimes(1);
+    });
+
+    it('reads the bare disabled attribute as true and keeps the default placeholder for null', () => {
+      fixture.componentRef.setInput('disabled', '');
+      fixture.componentRef.setInput('placeholder', null);
+      fixture.detectChanges();
+
+      expect(component.disabled()).toBe(true);
+      expect(component.placeholder()).toBe('Search...');
+      expect(warn).not.toHaveBeenCalled();
+    });
   });
 });

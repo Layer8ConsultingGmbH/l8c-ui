@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+﻿import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { L8cTableComponent, TableColumn, PageableData } from './table.component';
 
 describe('L8cTableComponent', () => {
@@ -233,6 +233,46 @@ describe('L8cTableComponent', () => {
       nextButton.click();
 
       expect(emitted).toEqual({ page: 1, size: 2 });
+    });
+  });
+
+  describe('input validation', () => {
+    let warn: ReturnType<typeof vi.spyOn>;
+
+    beforeEach(() => {
+      warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    });
+
+    afterEach(() => {
+      warn.mockRestore();
+    });
+
+    it('renders no columns for a non-array columns value and warns', () => {
+      fixture.componentRef.setInput('columns', 'name' as unknown as TableColumn[]);
+      fixture.detectChanges();
+
+      expect(fixture.nativeElement.querySelectorAll('th').length).toBe(0);
+      expect(warn).toHaveBeenCalledTimes(1);
+    });
+
+    it('drops empty rows from data and warns', () => {
+      fixture.componentRef.setInput('columns', [{ key: 'name', label: 'Name' }]);
+      fixture.componentRef.setInput('data', [{ name: 'A' }, null, { name: 'B' }]);
+      fixture.detectChanges();
+
+      expect(fixture.nativeElement.querySelectorAll('tbody tr').length).toBe(2);
+      expect(warn).toHaveBeenCalledTimes(1);
+    });
+
+    it('reads the bare striped attribute as true and an unknown string as the default', () => {
+      fixture.componentRef.setInput('columns', []);
+      fixture.componentRef.setInput('striped', '');
+      fixture.componentRef.setInput('hoverable', 'maybe');
+      fixture.detectChanges();
+
+      expect(component.striped()).toBe(true);
+      expect(component.hoverable()).toBe(true);
+      expect(warn).toHaveBeenCalledTimes(1);
     });
   });
 });

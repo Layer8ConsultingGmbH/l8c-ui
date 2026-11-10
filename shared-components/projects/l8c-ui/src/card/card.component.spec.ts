@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+﻿import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { L8cCardComponent } from './card.component';
 
 describe('L8cCardComponent', () => {
@@ -176,5 +176,43 @@ describe('L8cCardComponent', () => {
 
     const cardElement = fixture.nativeElement.firstElementChild;
     expect(cardElement.classList.contains('collapsed')).toBeTruthy();
+  });
+  describe('input validation', () => {
+    let warn: ReturnType<typeof vi.spyOn>;
+    beforeEach(() => {
+      warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    });
+    afterEach(() => warn.mockRestore());
+
+    it('falls back to low elevation and medium padding for unknown values', () => {
+      fixture.componentRef.setInput('elevation', 'extreme' as unknown as 'high');
+      fixture.componentRef.setInput('padding', 'huge' as unknown as 'large');
+      fixture.detectChanges();
+
+      const card = fixture.nativeElement.firstElementChild;
+      expect(card.classList.contains('elevation-low')).toBe(true);
+      expect(card.classList.contains('padding-medium')).toBe(true);
+      expect(warn).toHaveBeenCalledTimes(2);
+    });
+
+    it('reads bare boolean attributes and keeps isExpanded uncontrolled when unset', () => {
+      fixture.componentRef.setInput('clickable', '');
+      fixture.componentRef.setInput('collapsible', 'true');
+      fixture.componentRef.setInput('isExpanded', null);
+      fixture.detectChanges();
+
+      expect(component.clickable()).toBe(true);
+      expect(component.collapsible()).toBe(true);
+      expect(component.isExpanded()).toBeUndefined();
+      expect(warn).not.toHaveBeenCalled();
+    });
+
+    it('rejects a non-string title', () => {
+      fixture.componentRef.setInput('title', {} as unknown as string);
+      fixture.detectChanges();
+
+      expect(fixture.nativeElement.querySelector('.card-title')).toBeNull();
+      expect(warn).toHaveBeenCalledTimes(1);
+    });
   });
 });

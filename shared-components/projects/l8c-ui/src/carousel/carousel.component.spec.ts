@@ -1,4 +1,4 @@
-import { Component, viewChild } from '@angular/core';
+﻿import { Component, signal, viewChild } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { L8cCarouselComponent } from './carousel.component';
 import { L8cCarouselSlideComponent } from './carousel-slide.component';
@@ -112,5 +112,71 @@ describe('L8cCarouselComponent', () => {
 
     expect(activeSlideTexts()).toEqual(['Slide 3']);
     expect(indicators[2].classList.contains('active')).toBe(true);
+  });
+});
+
+describe('L8cCarouselComponent input validation', () => {
+  @Component({
+    imports: [L8cCarouselComponent, L8cCarouselSlideComponent],
+    template: `
+      <l8c-carousel
+        [currentSlide]="currentSlide()"
+        [showIndicators]="showIndicators()"
+        [animationDuration]="animationDuration()"
+      >
+        <l8c-carousel-slide>Slide 1</l8c-carousel-slide>
+        <l8c-carousel-slide>Slide 2</l8c-carousel-slide>
+      </l8c-carousel>
+    `,
+  })
+  class ValidationHostComponent {
+    carousel = viewChild.required(L8cCarouselComponent);
+    currentSlide = signal<number | string>(0);
+    showIndicators = signal<boolean | string>(true);
+    animationDuration = signal<number | string>(300);
+  }
+
+  let fixture: ComponentFixture<ValidationHostComponent>;
+  let warn: ReturnType<typeof vi.spyOn>;
+
+  beforeEach(async () => {
+    warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    await TestBed.configureTestingModule({
+      imports: [ValidationHostComponent],
+    }).compileComponents();
+    fixture = TestBed.createComponent(ValidationHostComponent);
+    fixture.detectChanges();
+  });
+
+  afterEach(() => warn.mockRestore());
+
+  it('clamps a negative currentSlide to 0 and rounds decimals', () => {
+    fixture.componentInstance.currentSlide.set(-3);
+    fixture.detectChanges();
+    expect(fixture.componentInstance.carousel().currentSlide()).toBe(0);
+
+    fixture.componentInstance.currentSlide.set(1.4);
+    fixture.detectChanges();
+    expect(fixture.componentInstance.carousel().currentSlide()).toBe(1);
+    expect(warn).toHaveBeenCalledTimes(1);
+  });
+
+  it('falls back for a non-numeric animationDuration and a non-boolean showIndicators', () => {
+    fixture.componentInstance.animationDuration.set('slow');
+    fixture.componentInstance.showIndicators.set('maybe');
+    fixture.detectChanges();
+
+    expect(fixture.componentInstance.carousel().animationDuration()).toBe(300);
+    expect(fixture.componentInstance.carousel().showIndicators()).toBe(false);
+    expect(fixture.nativeElement.querySelector('.carousel-indicators')).toBeNull();
+    expect(warn).toHaveBeenCalledTimes(2);
+  });
+
+  it('reads a bare showIndicators attribute as true', () => {
+    fixture.componentInstance.showIndicators.set('');
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('.carousel-indicators')).toBeTruthy();
+    expect(warn).not.toHaveBeenCalled();
   });
 });

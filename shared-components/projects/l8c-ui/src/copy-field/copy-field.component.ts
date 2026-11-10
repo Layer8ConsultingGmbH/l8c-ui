@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, input, output, signal } from '@angular/core';
 import { L8cButtonComponent } from '../button/button.component';
+import { StringInput, optionalStringInput, stringInput } from '../shared/input-validation';
 
 let nextId = 0;
 
@@ -20,12 +21,20 @@ let nextId = 0;
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class L8cCopyFieldComponent {
-  label = input<string | undefined>(undefined);
-  value = input.required<string>();
+  label = input<string | undefined, StringInput>(undefined, {
+    transform: optionalStringInput('l8c-copy-field', 'label'),
+  });
+  value = input.required<string, StringInput>({
+    transform: stringInput('l8c-copy-field', 'value', ''),
+  });
   /** Accessible name and tooltip of the copy button */
-  copyLabel = input<string>('Copy');
+  copyLabel = input<string, StringInput>('Copy', {
+    transform: stringInput('l8c-copy-field', 'copyLabel', 'Copy'),
+  });
   /** Confirmation announced for a short moment after copying */
-  copiedMessage = input<string>('');
+  copiedMessage = input<string, StringInput>('', {
+    transform: stringInput('l8c-copy-field', 'copiedMessage', ''),
+  });
   /** The value, right after it was copied */
   copied$ = output<string>({ alias: 'copiedValue' });
 

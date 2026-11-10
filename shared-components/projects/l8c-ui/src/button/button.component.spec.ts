@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+﻿import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { L8cButtonComponent } from './button.component';
 
 describe('L8cButtonComponent', () => {
@@ -102,5 +102,45 @@ describe('L8cButtonComponent', () => {
     host.dispatchEvent(new MouseEvent('mouseleave'));
     fixture.detectChanges();
     expect(host.classList.contains('button-hovered')).toBe(false);
+  });
+  describe('input validation', () => {
+    let warn: ReturnType<typeof vi.spyOn>;
+    beforeEach(() => {
+      warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    });
+    afterEach(() => warn.mockRestore());
+
+    it('falls back to the defaults for unknown action, size, tone and type', () => {
+      fixture.componentRef.setInput('action', 'huge' as unknown as 'nav');
+      fixture.componentRef.setInput('size', 'xl' as unknown as 'mini');
+      fixture.componentRef.setInput('tone', 'pink' as unknown as 'danger');
+      fixture.componentRef.setInput('type', 'reset' as unknown as 'button');
+      fixture.detectChanges();
+
+      expect(button().classList.contains('btn-nav')).toBe(true);
+      expect(button().classList.contains('btn-default')).toBe(true);
+      expect(component.tone()).toBe('default');
+      expect(button().type).toBe('button');
+      expect(warn).toHaveBeenCalledTimes(4);
+    });
+
+    it('ignores an unknown icon name', () => {
+      fixture.componentRef.setInput('icon', 'no-such-icon' as unknown as 'x');
+      fixture.detectChanges();
+
+      expect(fixture.nativeElement.querySelector('l8c-icon')).toBeNull();
+      expect(warn).toHaveBeenCalledTimes(1);
+    });
+
+    it('reads a bare disabled attribute as true and rejects other text', () => {
+      fixture.componentRef.setInput('disabled', '');
+      fixture.detectChanges();
+      expect(button().disabled).toBe(true);
+
+      fixture.componentRef.setInput('disabled', 'yes');
+      fixture.detectChanges();
+      expect(button().disabled).toBe(false);
+      expect(warn).toHaveBeenCalledTimes(1);
+    });
   });
 });

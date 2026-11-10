@@ -15,9 +15,21 @@ import {
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { L8cIconComponent } from '../icon/icon.component';
+import {
+  BooleanInput,
+  CssLengthInput,
+  StringInput,
+  booleanInput,
+  cssLengthInput,
+  isoDateInput,
+  optionalStringInput,
+  stringInput,
+  warnInvalidInput,
+} from '../shared/input-validation';
 import { L8cFormatDatePipe } from './format-date.pipe';
 import {
   MONTHS_LONG,
+  PICKER_LANGS,
   PickerLang,
   WEEKDAYS,
   formatDate,
@@ -26,7 +38,31 @@ import {
   toIsoDate,
 } from './date-format';
 
+const SELECTOR = 'l8c-date-picker';
+
 let nextId = 0;
+
+/** A supported picker language; a locale such as "de-DE" is read by its language, unknown ones warn and read as English */
+function langInput(value: PickerLang | string | null | undefined): PickerLang {
+  if (value === null || value === undefined || value === '') {
+    return 'en';
+  }
+  if (typeof value !== 'string') {
+    warnInvalidInput(SELECTOR, 'lang', value, 'expected a language code, using "en"');
+    return 'en';
+  }
+  const language = value.trim().toLowerCase().split(/[-_]/)[0];
+  if ((PICKER_LANGS as readonly string[]).includes(language)) {
+    return language as PickerLang;
+  }
+  warnInvalidInput(
+    SELECTOR,
+    'lang',
+    value,
+    `expected one of ${PICKER_LANGS.map((l) => `"${l}"`).join(', ')}, using "en"`,
+  );
+  return 'en';
+}
 
 interface CalendarDay {
   date: Date;
@@ -67,26 +103,54 @@ interface CalendarDay {
 export class L8cDatePickerComponent implements ControlValueAccessor {
   /** ISO "YYYY-MM-DD" or "" */
   value = model<string>('');
-  label = input<string | undefined>(undefined);
-  placeholder = input<string>('Select date');
-  required = input<boolean>(false);
-  hint = input<string | undefined>(undefined);
-  error = input<string | undefined>(undefined);
+  label = input<string | undefined, StringInput>(undefined, {
+    transform: optionalStringInput(SELECTOR, 'label'),
+  });
+  placeholder = input<string, StringInput>('Select date', {
+    transform: stringInput(SELECTOR, 'placeholder', 'Select date'),
+  });
+  required = input<boolean, BooleanInput>(false, {
+    transform: booleanInput(SELECTOR, 'required'),
+  });
+  hint = input<string | undefined, StringInput>(undefined, {
+    transform: optionalStringInput(SELECTOR, 'hint'),
+  });
+  error = input<string | undefined, StringInput>(undefined, {
+    transform: optionalStringInput(SELECTOR, 'error'),
+  });
   // Writable input: also set internally by setDisabledState
   disabled = model<boolean>(false);
-  /** Earliest selectable day, ISO */
-  min = input<string | undefined>(undefined);
-  /** Latest selectable day, ISO */
-  max = input<string | undefined>(undefined);
-  /** Language of month names and weekdays */
-  lang = input<PickerLang | string>('en');
-  todayLabel = input<string>('Today');
-  clearLabel = input<string>('Clear');
-  openLabel = input<string>('Open calendar');
-  prevLabel = input<string>('Previous month');
-  nextLabel = input<string>('Next month');
-  /** Field width; default 260px */
-  width = input<number | string>(260);
+  /** Earliest selectable day, ISO (a Date is read as its local calendar day) */
+  min = input<string | undefined, string | Date | null | undefined>(undefined, {
+    transform: isoDateInput(SELECTOR, 'min'),
+  });
+  /** Latest selectable day, ISO (a Date is read as its local calendar day) */
+  max = input<string | undefined, string | Date | null | undefined>(undefined, {
+    transform: isoDateInput(SELECTOR, 'max'),
+  });
+  /** Language of month names and weekdays; unknown languages fall back to English */
+  lang = input<PickerLang, PickerLang | string | null | undefined>('en', {
+    transform: langInput,
+  });
+  todayLabel = input<string, StringInput>('Today', {
+    transform: stringInput(SELECTOR, 'todayLabel', 'Today'),
+  });
+  clearLabel = input<string, StringInput>('Clear', {
+    transform: stringInput(SELECTOR, 'clearLabel', 'Clear'),
+  });
+  openLabel = input<string, StringInput>('Open calendar', {
+    transform: stringInput(SELECTOR, 'openLabel', 'Open calendar'),
+  });
+  prevLabel = input<string, StringInput>('Previous month', {
+    transform: stringInput(SELECTOR, 'prevLabel', 'Previous month'),
+  });
+  nextLabel = input<string, StringInput>('Next month', {
+    transform: stringInput(SELECTOR, 'nextLabel', 'Next month'),
+  });
+  /** Field width as px number or CSS length; default 260px */
+  width = input<number | string, CssLengthInput>(260, {
+    transform: cssLengthInput(SELECTOR, 'width', 260),
+  });
 
   protected readonly id = `l8c-date-picker-${nextId++}`;
   protected readonly open = signal(false);

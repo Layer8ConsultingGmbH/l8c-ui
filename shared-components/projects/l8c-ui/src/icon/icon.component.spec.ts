@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+﻿import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { L8cIconComponent } from './icon.component';
 
 describe('L8cIconComponent', () => {
@@ -75,5 +75,40 @@ describe('L8cIconComponent', () => {
     const paths = fixture.nativeElement.querySelectorAll('svg path');
     expect(paths.length).toBe(2);
     expect(paths[0].getAttribute('d')).toBe('M18 6 6 18');
+  });
+  describe('input validation', () => {
+    let warn: ReturnType<typeof vi.spyOn>;
+    beforeEach(() => {
+      warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    });
+    afterEach(() => warn.mockRestore());
+
+    it('renders an empty svg for an unknown name without throwing', () => {
+      fixture.componentRef.setInput('name', 'no-such-icon');
+      fixture.detectChanges();
+
+      expect(fixture.nativeElement.querySelector('svg')).toBeTruthy();
+      expect(fixture.nativeElement.querySelectorAll('svg > *').length).toBe(0);
+      expect(warn).toHaveBeenCalledTimes(1);
+    });
+
+    it('parses a numeric string size and clamps size to at least 1', () => {
+      fixture.componentRef.setInput('size', '20');
+      fixture.detectChanges();
+      expect(fixture.nativeElement.querySelector('svg').getAttribute('width')).toBe('20');
+
+      fixture.componentRef.setInput('size', -4);
+      fixture.detectChanges();
+      expect(fixture.nativeElement.querySelector('svg').getAttribute('width')).toBe('1');
+      expect(warn).toHaveBeenCalledTimes(1);
+    });
+
+    it('falls back to 24 for a non-numeric size', () => {
+      fixture.componentRef.setInput('size', 'big');
+      fixture.detectChanges();
+
+      expect(fixture.nativeElement.querySelector('svg').getAttribute('width')).toBe('24');
+      expect(warn).toHaveBeenCalledTimes(1);
+    });
   });
 });
