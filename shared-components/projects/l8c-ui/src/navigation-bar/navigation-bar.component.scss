@@ -182,13 +182,15 @@
         color: var(--text-muted);
       }
 
-      /* Remove spinner in number input */
+      // Hide the native spinner of the jump field: the unprefixed property
+      // covers Firefox (textfield) and the pseudo-elements Chromium and WebKit
+      appearance: textfield;
+
       &::-webkit-inner-spin-button,
       &::-webkit-outer-spin-button {
-        -webkit-appearance: none;
+        appearance: none;
         margin: 0;
       }
-      -moz-appearance: textfield;
     }
   }
 }

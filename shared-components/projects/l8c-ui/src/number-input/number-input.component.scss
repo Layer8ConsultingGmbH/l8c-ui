@@ -45,16 +45,6 @@
     padding: 10px 12px;
     outline: none;
 
-    // The custom arrows are the only stepper -
-    // hide the native spinner in every browser
-    appearance: textfield;
-    -moz-appearance: textfield;
-
-    &::-webkit-inner-spin-button,
-    &::-webkit-outer-spin-button {
-      display: none;
-    }
-
     &:disabled {
       cursor: default;
     }
