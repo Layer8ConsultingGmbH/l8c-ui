@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+﻿import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { L8cDropdownComponent, DropdownOption } from './dropdown.component';
 
 describe('L8cDropdownComponent', () => {
@@ -200,6 +200,54 @@ describe('L8cDropdownComponent', () => {
       subItems[1].dispatchEvent(new MouseEvent('mousedown'));
       expect(emitted).toBe('Sub B');
       expect(component.open()).toBe(false);
+    });
+  });
+
+  describe('input validation', () => {
+    let warn: ReturnType<typeof vi.spyOn>;
+
+    beforeEach(() => {
+      warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    });
+
+    afterEach(() => {
+      warn.mockRestore();
+    });
+
+    it('falls back to left for an unknown iconPosition and warns', () => {
+      fixture.componentRef.setInput('iconPosition', 'top' as unknown as 'left');
+      fixture.detectChanges();
+
+      expect(component.iconPosition()).toBe('left');
+      expect(warn).toHaveBeenCalledTimes(1);
+    });
+
+    it('reads a non-array options value as an empty list and warns', () => {
+      fixture.componentRef.setInput('options', 'A,B' as unknown as string[]);
+      fixture.detectChanges();
+
+      expect(component.options()).toEqual([]);
+      expect(warn).toHaveBeenCalledTimes(1);
+    });
+
+    it('turns a px number minWidth into a CSS length and rejects text', () => {
+      fixture.componentRef.setInput('minWidth', 200);
+      fixture.detectChanges();
+      expect(component.minWidthCss()).toBe('200px');
+      expect(toggleButton().style.minWidth).toBe('200px');
+
+      fixture.componentRef.setInput('menuMinWidth', 'wide');
+      fixture.detectChanges();
+      expect(component.menuMinWidthCss()).toBeNull();
+      expect(warn).toHaveBeenCalledTimes(1);
+    });
+
+    it('reads the bare showSelectedValue attribute as true and the string false as false', () => {
+      fixture.componentRef.setInput('showSelectedValue', '');
+      expect(component.showSelectedValue()).toBe(true);
+      fixture.componentRef.setInput('showSelectedValue', 'false');
+      expect(component.showSelectedValue()).toBe(false);
+      expect(warn).not.toHaveBeenCalled();
     });
   });
 });

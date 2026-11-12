@@ -1,4 +1,4 @@
-<div class="dropdown" tabindex="0" (blur)="open.set(false)">
+﻿<div class="dropdown" tabindex="0" (blur)="open.set(false)">
   <button
     class="dropdown-toggle"
     [class.dropdown-toggle-hovered]="hoveredToggle()"
@@ -7,7 +7,7 @@
     [style.border]="border() || null"
     [style.border-radius]="borderRadius() || null"
     [style.color]="color() || null"
-    [style.min-width]="minWidth() || null"
+    [style.min-width]="minWidthCss()"
     (click)="toggle()"
     (mouseenter)="onButtonEnter()"
     (mouseleave)="onButtonLeave()"
@@ -27,7 +27,7 @@
     [style.border]="menuBorder() || null"
     [style.border-radius]="menuBorderRadius() || null"
     [style.color]="menuColor() || null"
-    [style.min-width]="menuMinWidth() || null"
+    [style.min-width]="menuMinWidthCss()"
     (mouseenter)="onMenuEnter()"
     (mouseleave)="onMenuLeave()"
   >

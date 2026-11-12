@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+﻿import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { L8cCheckboxComponent } from './checkbox.component';
 
 describe('L8cCheckboxComponent', () => {
@@ -60,5 +60,32 @@ describe('L8cCheckboxComponent', () => {
 
     const input: HTMLInputElement = fixture.nativeElement.querySelector('input');
     expect(input.checked).toBe(true);
+  });
+  describe('input validation', () => {
+    let warn: ReturnType<typeof vi.spyOn>;
+    beforeEach(() => {
+      warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    });
+    afterEach(() => warn.mockRestore());
+
+    it('reads a bare disabled attribute as true', () => {
+      fixture.componentRef.setInput('disabled', '');
+      fixture.detectChanges();
+
+      const input: HTMLInputElement = fixture.nativeElement.querySelector('input');
+      expect(input.disabled).toBe(true);
+      expect(warn).not.toHaveBeenCalled();
+    });
+
+    it('rejects other text for disabled and a non-string ariaLabel', () => {
+      fixture.componentRef.setInput('disabled', 'maybe');
+      fixture.componentRef.setInput('ariaLabel', {} as unknown as string);
+      fixture.detectChanges();
+
+      const input: HTMLInputElement = fixture.nativeElement.querySelector('input');
+      expect(input.disabled).toBe(false);
+      expect(input.getAttribute('aria-label')).toBeNull();
+      expect(warn).toHaveBeenCalledTimes(2);
+    });
   });
 });

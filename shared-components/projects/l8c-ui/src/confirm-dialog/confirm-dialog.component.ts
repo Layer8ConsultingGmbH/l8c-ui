@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { L8cDialogComponent } from '../dialog/dialog.component';
 import { L8cButtonComponent } from '../button/button.component';
+import { StringInput, stringInput } from '../shared/input-validation';
 
 /**
  * Modal confirm dialog with a cancel and a confirm button.
@@ -28,8 +29,12 @@ import { L8cButtonComponent } from '../button/button.component';
 export class L8cConfirmDialogComponent {
   @ViewChild(L8cDialogComponent) dialog!: L8cDialogComponent;
 
-  cancelLabel = input<string>('Cancel');
-  confirmLabel = input<string>('OK');
+  cancelLabel = input<string, StringInput>('Cancel', {
+    transform: stringInput('l8c-confirm-dialog', 'cancelLabel', 'Cancel'),
+  });
+  confirmLabel = input<string, StringInput>('OK', {
+    transform: stringInput('l8c-confirm-dialog', 'confirmLabel', 'OK'),
+  });
 
   confirmed = output<void>();
   cancelled = output<void>();

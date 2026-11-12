@@ -1,4 +1,4 @@
-<div class="pagination-container">
+﻿<div class="pagination-container">
   @if (showPageInfo() && totalItems() > 0) {
     <div class="page-info">
       {{ pageInfoText() }}
@@ -10,8 +10,8 @@
       <div class="page-size-selector">
         <label for="pageSize">{{ itemsPerPageLabel() }}</label>
         <select id="pageSize" class="page-size-select" (change)="onPageSizeChange($event)">
-          @for (option of pageSizeOptions(); track option) {
-            <option [value]="option" [selected]="option === pageSize()">{{ option }}</option>
+          @for (option of validPageSizeOptions(); track option) {
+            <option [value]="option" [selected]="option === safePageSize()">{{ option }}</option>
           }
         </select>
       </div>

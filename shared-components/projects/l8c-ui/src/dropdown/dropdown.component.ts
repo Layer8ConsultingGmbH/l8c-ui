@@ -1,4 +1,4 @@
-import {
+﻿import {
   Component,
   ChangeDetectionStrategy,
   computed,
@@ -9,6 +9,28 @@ import {
 } from '@angular/core';
 import { L8cIconComponent } from '../icon/icon.component';
 import { IconName } from '../icon/icon-registry';
+import {
+  arrayInput,
+  booleanInput,
+  cssLengthInput,
+  oneOf,
+  optionalStringInput,
+  stringInput,
+  type BooleanInput,
+  type CssLengthInput,
+  type StringInput,
+} from '../shared/input-validation';
+
+const ICON_POSITIONS = ['left', 'right'] as const;
+export type DropdownIconPosition = (typeof ICON_POSITIONS)[number];
+const C = 'l8c-dropdown';
+
+function toCssLength(value: number | string | undefined): string | null {
+  if (value === undefined || value === '') {
+    return null;
+  }
+  return typeof value === 'number' ? `${value}px` : value;
+}
 
 export interface DropdownOption {
   label: string;
@@ -27,30 +49,64 @@ export interface DropdownOption {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class L8cDropdownComponent {
-  readonly options = input<string[]>([]);
-  readonly optionsWithSubmenus = input<DropdownOption[]>([]);
-  readonly selected = input<string>('');
-  readonly defaultValue = input<string>('');
+  readonly options = input<string[], readonly string[] | null | undefined>([], {
+    transform: arrayInput(C, 'options'),
+  });
+  readonly optionsWithSubmenus = input<
+    DropdownOption[],
+    readonly DropdownOption[] | null | undefined
+  >([], { transform: arrayInput(C, 'optionsWithSubmenus') });
+  readonly selected = input<string, StringInput>('', { transform: stringInput(C, 'selected', '') });
+  readonly defaultValue = input<string, StringInput>('', {
+    transform: stringInput(C, 'defaultValue', ''),
+  });
   // true shows the selected value, false always shows the default value
-  readonly showSelectedValue = input<boolean>(true);
+  readonly showSelectedValue = input<boolean, BooleanInput>(true, {
+    transform: booleanInput(C, 'showSelectedValue', true),
+  });
   // Icon support
   readonly icon = input<IconName | undefined>(undefined);
   readonly iconAlternative = input<IconName | undefined>(undefined);
-  readonly iconPosition = input<'left' | 'right'>('left');
+  readonly iconPosition = input<DropdownIconPosition, DropdownIconPosition | null | undefined>(
+    'left',
+    { transform: oneOf(C, 'iconPosition', ICON_POSITIONS, 'left') },
+  );
   // Optional custom styling
   // Button/Toggle style
-  readonly backgroundColor = input<string | undefined>(undefined);
-  readonly border = input<string | undefined>(undefined);
-  readonly borderRadius = input<string | undefined>(undefined);
-  readonly color = input<string | undefined>(undefined);
-  readonly minWidth = input<string | undefined>(undefined);
+  readonly backgroundColor = input<string | undefined, StringInput>(undefined, {
+    transform: optionalStringInput(C, 'backgroundColor'),
+  });
+  readonly border = input<string | undefined, StringInput>(undefined, {
+    transform: optionalStringInput(C, 'border'),
+  });
+  readonly borderRadius = input<string | undefined, StringInput>(undefined, {
+    transform: optionalStringInput(C, 'borderRadius'),
+  });
+  readonly color = input<string | undefined, StringInput>(undefined, {
+    transform: optionalStringInput(C, 'color'),
+  });
+  readonly minWidth = input<number | string | undefined, CssLengthInput>(undefined, {
+    transform: cssLengthInput(C, 'minWidth', undefined),
+  });
   // Menu style
-  readonly menuBackgroundColor = input<string | undefined>(undefined);
-  readonly menuBorder = input<string | undefined>(undefined);
-  readonly menuBorderRadius = input<string | undefined>(undefined);
-  readonly menuColor = input<string | undefined>(undefined);
-  readonly menuMinWidth = input<string | undefined>(undefined);
-  readonly selectionGroup = input<string | undefined>(undefined);
+  readonly menuBackgroundColor = input<string | undefined, StringInput>(undefined, {
+    transform: optionalStringInput(C, 'menuBackgroundColor'),
+  });
+  readonly menuBorder = input<string | undefined, StringInput>(undefined, {
+    transform: optionalStringInput(C, 'menuBorder'),
+  });
+  readonly menuBorderRadius = input<string | undefined, StringInput>(undefined, {
+    transform: optionalStringInput(C, 'menuBorderRadius'),
+  });
+  readonly menuColor = input<string | undefined, StringInput>(undefined, {
+    transform: optionalStringInput(C, 'menuColor'),
+  });
+  readonly menuMinWidth = input<number | string | undefined, CssLengthInput>(undefined, {
+    transform: cssLengthInput(C, 'menuMinWidth', undefined),
+  });
+  readonly selectionGroup = input<string | undefined, StringInput>(undefined, {
+    transform: optionalStringInput(C, 'selectionGroup'),
+  });
 
   readonly selectedValue = output<string>();
 
@@ -71,6 +127,10 @@ export class L8cDropdownComponent {
   );
 
   readonly hasSubmenus = computed(() => this.optionsWithSubmenus().length > 0);
+
+  /** `minWidth` as a CSS length (px numbers get their unit), or null when unset */
+  readonly minWidthCss = computed(() => toCssLength(this.minWidth()));
+  readonly menuMinWidthCss = computed(() => toCssLength(this.menuMinWidth()));
 
   readonly displayValue = computed(() =>
     this.showSelectedValue() ? this.selectedState() : this.defaultValue(),

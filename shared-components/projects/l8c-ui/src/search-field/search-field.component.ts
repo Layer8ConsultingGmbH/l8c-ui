@@ -1,4 +1,4 @@
-import {
+﻿import {
   Component,
   TemplateRef,
   ContentChild,
@@ -8,6 +8,15 @@ import {
   signal,
 } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
+import {
+  arrayInput,
+  booleanInput,
+  stringInput,
+  type BooleanInput,
+  type StringInput,
+} from '../shared/input-validation';
+
+const C = 'l8c-search-field';
 
 @Component({
   selector: 'l8c-search-field',
@@ -17,12 +26,22 @@ import { NgTemplateOutlet } from '@angular/common';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class L8cSearchFieldComponent<T = any> {
-  readonly loading = input<boolean>(false);
-  readonly results = input<T[]>([]);
-  readonly placeholder = input<string>('Search...');
-  readonly disabled = input<boolean>(false);
-  readonly noResultsText = input<string>('No results found');
-  readonly noResultsHint = input<string>('Try a different search term');
+  readonly loading = input<boolean, BooleanInput>(false, { transform: booleanInput(C, 'loading') });
+  readonly results = input<T[], readonly T[] | null | undefined>([], {
+    transform: arrayInput<T>(C, 'results'),
+  });
+  readonly placeholder = input<string, StringInput>('Search...', {
+    transform: stringInput(C, 'placeholder', 'Search...'),
+  });
+  readonly disabled = input<boolean, BooleanInput>(false, {
+    transform: booleanInput(C, 'disabled'),
+  });
+  readonly noResultsText = input<string, StringInput>('No results found', {
+    transform: stringInput(C, 'noResultsText', 'No results found'),
+  });
+  readonly noResultsHint = input<string, StringInput>('Try a different search term', {
+    transform: stringInput(C, 'noResultsHint', 'Try a different search term'),
+  });
 
   @ContentChild('resultItem') resultItemTemplate?: TemplateRef<any>;
 

@@ -1,0 +1,89 @@
+<div class="picker-container">
+  @if (label()) {
+    <span class="picker-label">
+      {{ label() }}
+      @if (required()) {
+        <span class="required-indicator">*</span>
+      }
+    </span>
+  }
+
+  <div class="picker-anchor">
+    <div
+      #field
+      class="picker-field"
+      role="group"
+      [class.open]="open()"
+      [class.focused]="focused()"
+      [class.error]="error()"
+      [class.disabled]="disabled()"
+      [attr.aria-label]="label()"
+    >
+      @for (segment of segments; track segment.index) {
+        @if (segment.index === 1) {
+          <span class="separator" aria-hidden="true">:</span>
+        }
+        <input
+          #segmentInput
+          type="text"
+          class="segment"
+          inputmode="numeric"
+          autocomplete="off"
+          maxlength="2"
+          [disabled]="disabled()"
+          [placeholder]="emptySegment"
+          [attr.aria-label]="segment.label()"
+          [value]="segmentTexts()[segment.index]"
+          (input)="onInput(segment.index, $event)"
+          (keydown)="onKeydown(segment.index, $event)"
+          (paste)="onPaste(segment.index, $event)"
+          (focus)="onFocus()"
+          (blur)="onBlur(segment.index)"
+        />
+      }
+      <button
+        #trigger
+        type="button"
+        class="clock-button"
+        [disabled]="disabled()"
+        [attr.aria-label]="listLabel()"
+        [title]="listLabel()"
+        aria-haspopup="listbox"
+        [attr.aria-expanded]="open()"
+        (click)="toggle()"
+      >
+        <l8c-icon [name]="'clock'" [size]="16" />
+      </button>
+    </div>
+
+    @if (open()) {
+      <div
+        #list
+        class="picker-panel time-list"
+        popover="manual"
+        role="listbox"
+        [attr.aria-label]="listLabel()"
+        (keydown)="onListKeydown($event)"
+      >
+        @for (time of options(); track time) {
+          <button
+            type="button"
+            class="time-option"
+            role="option"
+            [class.selected]="time === value()"
+            [attr.aria-selected]="time === value()"
+            (click)="pick(time)"
+          >
+            {{ time }}
+          </button>
+        }
+      </div>
+    }
+  </div>
+
+  @if (error(); as message) {
+    <span class="error-message">{{ message }}</span>
+  } @else if (hint()) {
+    <span class="hint-message">{{ hint() }}</span>
+  }
+</div>

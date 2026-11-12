@@ -1,0 +1,98 @@
+:host {
+  display: inline-flex;
+}
+
+// One pill per DS StatusBadge: semantic tone, pill shape, a dot in the text color
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  padding: 0.22em 0.65em;
+  border-radius: var(--radius-pill, 999px);
+  font-family: var(--font-family);
+  font-size: var(--font-size-xs, 12px);
+  font-weight: var(--font-weight-medium, 500);
+  line-height: var(--line-height-normal, 1.4);
+  white-space: nowrap;
+
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+  }
+
+  // Semantic tones: text color on a low-alpha background with a 40% border
+  &,
+  &[data-tone='neutral'] {
+    color: var(--neutral, var(--text-muted, #98a3b8));
+    background: var(--neutral-bg, rgba(152, 163, 184, 0.14));
+    border: 1px solid var(--neutral-border, var(--border, rgba(255, 255, 255, 0.08)));
+  }
+
+  &[data-tone='primary'] {
+    color: var(--info, var(--primary, #2a7ab8));
+    background: var(--info-bg, rgba(42, 122, 184, 0.16));
+    border-color: var(--info-border, var(--border-action, rgba(42, 122, 184, 0.6)));
+  }
+
+  &[data-tone='success'] {
+    color: var(--success, #10b981);
+    background: var(--success-bg, rgba(16, 185, 129, 0.14));
+    border-color: var(--success-border, rgba(16, 185, 129, 0.4));
+  }
+
+  &[data-tone='warning'] {
+    color: var(--warning, #ff9500);
+    background: var(--warning-bg, rgba(255, 149, 0, 0.14));
+    border-color: var(--warning-border, rgba(255, 149, 0, 0.4));
+  }
+
+  &[data-tone='error'] {
+    color: var(--error, #f44336);
+    background: var(--error-bg, rgba(244, 67, 54, 0.14));
+    border-color: var(--error-border, rgba(244, 67, 54, 0.4));
+  }
+
+  // Workflow statuses take their own --status-* tokens; the border is the
+  // text color at 40% unless the host defines --status-border
+  &[data-status] {
+    border: 1px solid var(--status-border, color-mix(in srgb, currentColor 40%, transparent));
+  }
+
+  &[data-status='draft'] {
+    color: var(--status-draft, var(--text-muted, #98a3b8));
+    background: var(--status-draft-bg, rgba(152, 163, 184, 0.14));
+  }
+
+  &[data-status='ready'] {
+    color: var(--status-ready, var(--primary, #2a7ab8));
+    background: var(--status-ready-bg, rgba(42, 122, 184, 0.16));
+  }
+
+  &[data-status='open'] {
+    color: var(--status-open, var(--brand-sky, #389bd6));
+    background: var(--status-open-bg, rgba(56, 155, 214, 0.14));
+  }
+
+  &[data-status='in-progress'] {
+    color: var(--status-in-progress, var(--warning, #ff9500));
+    background: var(--status-in-progress-bg, rgba(255, 149, 0, 0.14));
+  }
+
+  &[data-status='completed'] {
+    color: var(--status-completed, var(--success, #10b981));
+    background: var(--status-completed-bg, rgba(16, 185, 129, 0.14));
+  }
+
+  &[data-status='done'] {
+    color: var(--status-done, var(--violet, #8b5cf6));
+    background: var(--status-done-bg, rgba(139, 92, 246, 0.14));
+  }
+
+  &[data-status='archived'] {
+    color: var(--status-archived, var(--text-faint, #5b6678));
+    background: var(--status-archived-bg, rgba(91, 102, 120, 0.12));
+  }
+}

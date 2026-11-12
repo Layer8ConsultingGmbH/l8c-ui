@@ -1,21 +1,29 @@
 <div class="number-input-container">
   <div class="number-input-row">
     <div class="number-input" [class.disabled]="disabled()" [class.focused]="isFocused()">
+      <!-- A text field with the decimal keyboard instead of type="number": the
+           browsers disagree on what type="number" lets through (Firefox takes
+           any text), so the component filters keys and pastes itself -->
       <input
-        type="number"
+        type="text"
         class="number-field"
-        [attr.step]="inputStep()"
-        [attr.min]="min()"
-        [attr.max]="max()"
+        role="spinbutton"
+        [attr.inputmode]="decimals() > 0 ? 'decimal' : 'numeric'"
+        autocomplete="off"
         [attr.aria-label]="ariaLabel()"
+        [attr.aria-valuemin]="min()"
+        [attr.aria-valuemax]="max()"
+        [attr.aria-valuenow]="value()"
         [disabled]="disabled()"
         [value]="displayValue()"
+        (keydown)="onKeydown($event)"
+        (paste)="onPaste($event)"
         (input)="onInput($event)"
         (focus)="onFocus()"
         (blur)="onBlur()"
       />
-      <!-- The arrows are the only stepper; arrow keys already work on the
-           native input, so the buttons stay out of the tab order -->
+      <!-- The arrows are the only stepper; the arrow keys step as well, so
+           the buttons stay out of the tab order -->
       <div class="number-arrows">
         <button
           type="button"

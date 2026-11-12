@@ -11,6 +11,20 @@ import {
   signal,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import {
+  BooleanInput,
+  booleanInput,
+  NumberInput,
+  numberInput,
+  oneOf,
+  optionalNumberInput,
+  optionalStringInput,
+  stringInput,
+  StringInput,
+} from '../shared/input-validation';
+
+const INPUT_TYPES = ['text', 'email', 'password', 'number', 'tel', 'url', 'date'] as const;
+type InputType = (typeof INPUT_TYPES)[number];
 
 @Component({
   selector: 'l8c-input',
@@ -26,22 +40,46 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
   ],
 })
 export class L8cInputComponent implements ControlValueAccessor {
-  label = input<string | undefined>(undefined);
-  placeholder = input<string | undefined>('');
-  type = input<'text' | 'email' | 'password' | 'number' | 'tel' | 'url' | 'date'>('text');
+  label = input<string | undefined, StringInput>(undefined, {
+    transform: optionalStringInput('l8c-input', 'label'),
+  });
+  placeholder = input<string | undefined, StringInput>('', {
+    transform: stringInput('l8c-input', 'placeholder', ''),
+  });
+  type = input<InputType, InputType | null | undefined>('text', {
+    transform: oneOf('l8c-input', 'type', INPUT_TYPES, 'text'),
+  });
   // Writable input: also set internally by setDisabledState
   disabled = model<boolean>(false);
-  required = input<boolean>(false);
-  error = input<string | undefined>(undefined);
-  ariaLabel = input<string | undefined>(undefined);
-  maxLength = input<number | undefined>(undefined);
-  minLength = input<number | undefined>(undefined);
+  required = input<boolean, BooleanInput>(false, {
+    transform: booleanInput('l8c-input', 'required'),
+  });
+  error = input<string | undefined, StringInput>(undefined, {
+    transform: optionalStringInput('l8c-input', 'error'),
+  });
+  ariaLabel = input<string | undefined, StringInput>(undefined, {
+    transform: optionalStringInput('l8c-input', 'ariaLabel'),
+  });
+  maxLength = input<number | undefined, NumberInput>(undefined, {
+    transform: optionalNumberInput('l8c-input', 'maxLength', { min: 0, integer: true }),
+  });
+  minLength = input<number | undefined, NumberInput>(undefined, {
+    transform: optionalNumberInput('l8c-input', 'minLength', { min: 0, integer: true }),
+  });
   /** Lower bound for date/number inputs (native min attribute) */
-  min = input<string | undefined>(undefined);
+  min = input<string | undefined, StringInput>(undefined, {
+    transform: optionalStringInput('l8c-input', 'min'),
+  });
   /** Upper bound for date/number inputs (native max attribute) */
-  max = input<string | undefined>(undefined);
-  multiline = input<boolean>(false);
-  rows = input<number>(1);
+  max = input<string | undefined, StringInput>(undefined, {
+    transform: optionalStringInput('l8c-input', 'max'),
+  });
+  multiline = input<boolean, BooleanInput>(false, {
+    transform: booleanInput('l8c-input', 'multiline'),
+  });
+  rows = input<number, NumberInput>(1, {
+    transform: numberInput('l8c-input', 'rows', 1, { min: 1, integer: true }),
+  });
   valueChange = output<string>();
 
   value = signal<string>('');

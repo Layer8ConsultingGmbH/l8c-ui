@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+﻿import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { L8cSelectComponent, SelectOption } from './select.component';
 
 describe('L8cSelectComponent', () => {
@@ -135,5 +135,34 @@ describe('L8cSelectComponent', () => {
 
     const error = fixture.nativeElement.querySelector('.error-message');
     expect(error.textContent.trim()).toBe('Required field');
+  });
+  describe('input validation', () => {
+    let warn: ReturnType<typeof vi.spyOn>;
+    beforeEach(() => {
+      warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    });
+    afterEach(() => warn.mockRestore());
+
+    it('renders no options for a non-array and drops empty entries', () => {
+      fixture.componentRef.setInput('options', 'de,en' as unknown as SelectOption[]);
+      fixture.detectChanges();
+      expect(fixture.nativeElement.querySelectorAll('option').length).toBe(0);
+
+      fixture.componentRef.setInput('options', [options[0], null] as unknown as SelectOption[]);
+      fixture.detectChanges();
+      expect(fixture.nativeElement.querySelectorAll('option').length).toBe(1);
+      expect(warn).toHaveBeenCalledTimes(2);
+    });
+
+    it('reads a bare required attribute and rejects other text', () => {
+      fixture.componentRef.setInput('required', '');
+      fixture.detectChanges();
+      expect(fixture.nativeElement.querySelector('select').required).toBe(true);
+
+      fixture.componentRef.setInput('required', 'nope');
+      fixture.detectChanges();
+      expect(fixture.nativeElement.querySelector('select').required).toBe(false);
+      expect(warn).toHaveBeenCalledTimes(1);
+    });
   });
 });

@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+﻿import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { L8cRadioComponent } from './radio.component';
 
 describe('L8cRadioComponent', () => {
@@ -72,5 +72,31 @@ describe('L8cRadioComponent', () => {
 
     selectRadio();
     expect(component.checked()).toBe(false);
+  });
+  describe('input validation', () => {
+    let warn: ReturnType<typeof vi.spyOn>;
+    beforeEach(() => {
+      warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    });
+    afterEach(() => warn.mockRestore());
+
+    it('falls back to the plain appearance for an unknown value', () => {
+      fixture.componentRef.setInput('appearance', 'card' as unknown as 'row');
+      fixture.detectChanges();
+
+      expect(fixture.nativeElement.querySelector('.radio-circle')).toBeTruthy();
+      expect(warn).toHaveBeenCalledTimes(1);
+    });
+
+    it('stringifies a numeric name and reads a bare disabled attribute', () => {
+      fixture.componentRef.setInput('name', 7);
+      fixture.componentRef.setInput('disabled', '');
+      fixture.detectChanges();
+
+      const input: HTMLInputElement = fixture.nativeElement.querySelector('input');
+      expect(input.name).toBe('7');
+      expect(input.disabled).toBe(true);
+      expect(warn).not.toHaveBeenCalled();
+    });
   });
 });

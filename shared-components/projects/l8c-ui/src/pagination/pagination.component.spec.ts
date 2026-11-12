@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+﻿import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { L8cPaginationComponent, PageChangeEvent } from './pagination.component';
 
 describe('L8cPaginationComponent', () => {
@@ -147,5 +147,59 @@ describe('L8cPaginationComponent', () => {
     select.dispatchEvent(new Event('change'));
 
     expect(events).toEqual([]);
+  });
+
+  describe('input validation', () => {
+    let warn: ReturnType<typeof vi.spyOn>;
+
+    beforeEach(() => {
+      warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    });
+
+    afterEach(() => {
+      warn.mockRestore();
+    });
+
+    it('falls back for non-numeric totalPages and clamps a negative currentPage', () => {
+      fixture.componentRef.setInput('totalPages', 'many' as unknown as number);
+      fixture.componentRef.setInput('currentPage', -3);
+      fixture.detectChanges();
+
+      expect(component.totalPages()).toBe(0);
+      expect(component.currentPage()).toBe(0);
+      expect(pageButtons().length).toBe(0);
+      expect(warn).toHaveBeenCalledTimes(2);
+    });
+
+    it('parses numeric strings and rounds maxVisiblePages to at least 1', () => {
+      fixture.componentRef.setInput('totalPages', '4');
+      fixture.componentRef.setInput('maxVisiblePages', 0);
+      fixture.detectChanges();
+
+      expect(component.totalPages()).toBe(4);
+      expect(component.maxVisiblePages()).toBe(1);
+      expect(component.visiblePages()).toEqual([0]);
+    });
+
+    it('drops page size options that are no positive integer', () => {
+      fixture.componentRef.setInput('pageSizeOptions', [10, 0, -5, 2.5, 'x', 25]);
+      fixture.detectChanges();
+
+      const options = Array.from(
+        fixture.nativeElement.querySelectorAll('.page-size-select option'),
+      ).map((o) => (o as HTMLOptionElement).value);
+      expect(options).toEqual(['10', '25']);
+      expect(warn).toHaveBeenCalled();
+    });
+
+    it('treats an invalid pageSize model value as 1 in the page info', () => {
+      fixture.componentRef.setInput('pageSize', Number.NaN);
+      fixture.componentRef.setInput('currentPage', 2);
+      fixture.detectChanges();
+
+      expect(component.safePageSize()).toBe(1);
+      expect(component.startItem()).toBe(3);
+      expect(warn).toHaveBeenCalled();
+    });
   });
 });

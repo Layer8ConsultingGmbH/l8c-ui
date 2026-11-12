@@ -1,0 +1,162 @@
+// Shared looks of l8c-date-picker and l8c-time-picker: the label / hint /
+// error frame of l8c-input, the 36px field box and the popover panel.
+
+@mixin container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: 100%;
+  box-sizing: border-box;
+  font-family: var(--font-family);
+}
+
+@mixin label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+
+  .required-indicator {
+    color: var(--error, #f44336);
+  }
+}
+
+// The box of both pickers: hover lifts the border, open / focus adds the ring
+@mixin box {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  box-sizing: border-box;
+  padding: 0 6px 0 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md, 8px);
+  color: var(--text);
+  font-family: var(--font-family);
+  font-size: var(--font-size-sm, 0.875rem);
+  font-variant-numeric: tabular-nums;
+  outline: none;
+  transition:
+    border-color var(--transition-fast, 0.15s),
+    box-shadow var(--transition-fast, 0.15s);
+
+  &:hover:not(:disabled):not(.open):not(.focused) {
+    border-color: var(--border-action, rgba(42, 122, 184, 0.6));
+  }
+
+  &.open,
+  &.focused,
+  &:focus-visible {
+    border-color: var(--primary);
+    box-shadow: var(--shadow-focus, 0 0 0 3px rgba(var(--primary-rgb, 42, 122, 184), 0.25));
+  }
+
+  &.error {
+    border-color: var(--error, #f44336);
+  }
+
+  &:disabled,
+  &.disabled {
+    opacity: 0.6;
+    background: var(--surface-2);
+  }
+}
+
+// The panel is a `popover="manual"` element placed by picker/popover.ts in
+// viewport coordinates (top/left inline), so it is never clipped by an
+// `overflow: hidden` around the field. The UA popover styles (inset, margin,
+// padding, border, colours, overflow) are overridden here.
+@mixin panel {
+  position: fixed;
+  inset: auto;
+  top: 0;
+  left: 0;
+  margin: 0;
+  height: auto;
+  overflow: visible;
+  z-index: 1100;
+  box-sizing: border-box;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg, 12px);
+  box-shadow: var(--shadow-high);
+  font-family: var(--font-family);
+}
+
+// Small icon button inside a field or panel (month navigation, clock)
+@mixin trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  flex-shrink: 0;
+  cursor: pointer;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm, 4px);
+  color: var(--text-muted);
+  outline: none;
+  transition: all var(--transition-fast, 0.15s);
+
+  &:hover:not(:disabled) {
+    background: var(--surface-3, #1a2436);
+    border-color: var(--border-action, rgba(42, 122, 184, 0.6));
+    color: var(--primary);
+  }
+
+  &:focus-visible {
+    border-color: var(--primary);
+    color: var(--primary);
+    box-shadow: var(--shadow-focus, 0 0 0 3px rgba(var(--primary-rgb, 42, 122, 184), 0.25));
+  }
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.6;
+  }
+}
+
+@mixin text-action {
+  padding: 4px 8px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm, 4px);
+  color: var(--primary);
+  font-family: var(--font-family);
+  font-size: var(--font-size-sm, 0.875rem);
+  font-weight: var(--font-weight-semibold, 600);
+  cursor: pointer;
+  outline: none;
+
+  &:hover:not(:disabled) {
+    background: var(--surface-2);
+  }
+
+  &:focus-visible {
+    border-color: var(--primary);
+    box-shadow: var(--shadow-focus, 0 0 0 3px rgba(var(--primary-rgb, 42, 122, 184), 0.25));
+  }
+
+  &:disabled {
+    color: var(--text-faint);
+    cursor: default;
+  }
+}
+
+@mixin error-message {
+  font-size: 0.75rem;
+  color: var(--error, #f44336);
+  margin-top: -0.25rem;
+}
+
+@mixin hint-message {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: -0.25rem;
+}

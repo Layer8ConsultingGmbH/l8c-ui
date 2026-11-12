@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+﻿import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { L8cConfirmDialogComponent } from './confirm-dialog.component';
 import { L8cDialogComponent } from '../dialog/dialog.component';
 
@@ -68,5 +68,35 @@ describe('L8cConfirmDialogComponent', () => {
 
     component.open('Title', 'Message');
     expect(component.displayConfirmLabel()).toBe('OK');
+  });
+
+  describe('input validation', () => {
+    let warn: ReturnType<typeof vi.spyOn>;
+
+    beforeEach(() => {
+      warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    });
+
+    afterEach(() => {
+      warn.mockRestore();
+    });
+
+    it('falls back to the default labels for null and warns for objects', () => {
+      fixture.componentRef.setInput('confirmLabel', null as unknown as string);
+      fixture.componentRef.setInput('cancelLabel', {} as unknown as string);
+      fixture.detectChanges();
+
+      expect(component.confirmLabel()).toBe('OK');
+      expect(component.cancelLabel()).toBe('Cancel');
+      expect(warn).toHaveBeenCalledTimes(1);
+    });
+
+    it('stringifies a numeric confirm label', () => {
+      fixture.componentRef.setInput('confirmLabel', 1 as unknown as string);
+      fixture.detectChanges();
+
+      expect(component.displayConfirmLabel()).toBe('1');
+      expect(warn).not.toHaveBeenCalled();
+    });
   });
 });

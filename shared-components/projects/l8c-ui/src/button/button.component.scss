@@ -61,6 +61,13 @@ button {
   // hover color defaults to brand blue; tones override below
   --_hover-color: var(--primary, #2a7ab8);
 
+  // Keyboard focus is visible: primary border plus the focus ring (DS IconButton)
+  &:focus-visible {
+    border-color: var(--primary, #2a7ab8);
+    color: var(--primary, #2a7ab8);
+    box-shadow: var(--shadow-focus, 0 0 0 3px rgba(var(--primary-rgb, 42, 122, 184), 0.25));
+  }
+
   &.btn-mini {
     width: 28px;
     height: 28px;

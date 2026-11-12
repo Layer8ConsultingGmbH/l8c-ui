@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+﻿import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { L8cNavigationBarComponent } from './navigation-bar.component';
 
 describe('L8cNavigationBarComponent', () => {
@@ -202,5 +202,56 @@ describe('L8cNavigationBarComponent', () => {
 
     fixture.nativeElement.querySelector('.navigation-topbar l8c-button button').click();
     expect(doneEmitted).toBe(true);
+  });
+
+  describe('input validation', () => {
+    let warn: ReturnType<typeof vi.spyOn>;
+
+    beforeEach(() => {
+      warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    });
+
+    afterEach(() => {
+      warn.mockRestore();
+    });
+
+    it('falls back to 0 items for a non-numeric totalItems and warns', () => {
+      fixture.componentRef.setInput('totalItems', 'lots' as unknown as number);
+      fixture.detectChanges();
+
+      expect(component.totalItems()).toBe(0);
+      expect(fixture.nativeElement.querySelectorAll('.nav-item').length).toBe(0);
+      expect(warn).toHaveBeenCalledTimes(1);
+    });
+
+    it('clamps activeItem to 1 and maxVisibleItems to 1 and parses numeric strings', () => {
+      fixture.componentRef.setInput('activeItem', 0);
+      fixture.componentRef.setInput('maxVisibleItems', -4);
+      fixture.componentRef.setInput('totalItems', '7');
+      fixture.detectChanges();
+
+      expect(component.activeItem()).toBe(1);
+      expect(component.maxVisibleItems()).toBe(1);
+      expect(component.totalItems()).toBe(7);
+      expect(component.visibleNumbers()).toEqual([1]);
+      expect(warn).toHaveBeenCalledTimes(2);
+    });
+
+    it('keeps only integers in infoPositions and completedPositions', () => {
+      fixture.componentRef.setInput('infoPositions', [2, 2.5, 'x', null] as unknown as number[]);
+      fixture.componentRef.setInput('completedPositions', [3, Number.NaN] as unknown as number[]);
+      fixture.detectChanges();
+
+      expect(component.isInfo(2)).toBe(true);
+      expect(component.isCompleted(3)).toBe(true);
+      expect(component.isCompleted(Number.NaN)).toBe(false);
+      expect(warn).toHaveBeenCalled();
+    });
+
+    it('reads the bare showCount attribute as true', () => {
+      fixture.componentRef.setInput('showCount', '');
+      expect(component.showCount()).toBe(true);
+      expect(warn).not.toHaveBeenCalled();
+    });
   });
 });

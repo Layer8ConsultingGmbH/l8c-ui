@@ -1,0 +1,112 @@
+@use '../picker/picker-shared' as picker;
+
+:host {
+  display: inline-block;
+  max-width: 100%;
+}
+
+:host(:not([variant='button'])) {
+  display: block;
+}
+
+.native-input {
+  display: none;
+}
+
+.file-container {
+  @include picker.container;
+}
+
+.file-label {
+  @include picker.label;
+}
+
+// Dashed drop area; drag-over turns border and icon primary with a light wash
+.dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: var(--space-md, 16px);
+  border: 1px dashed var(--border-strong, rgba(255, 255, 255, 0.16));
+  border-radius: var(--surface-radius, 12px);
+  background: var(--surface-2);
+  text-align: center;
+  transition: all var(--transition-fast, 0.15s);
+
+  &.dragging {
+    border-color: var(--primary);
+    background: var(--text-hover, rgba(42, 122, 184, 0.08));
+
+    .dropzone-icon {
+      color: var(--primary);
+    }
+  }
+
+  &.error {
+    border-color: var(--error, #f44336);
+  }
+
+  &.disabled {
+    opacity: 0.6;
+  }
+}
+
+.dropzone-icon {
+  display: flex;
+  color: var(--text-muted);
+}
+
+.dropzone-text {
+  font-size: var(--font-size-sm, 0.875rem);
+  color: var(--text-muted);
+}
+
+.file-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.file-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 6px 6px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md, 8px);
+  font-size: var(--font-size-sm, 0.875rem);
+}
+
+.file-icon {
+  display: flex;
+  color: var(--success, #10b981);
+}
+
+.file-name {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: var(--text);
+}
+
+.file-size {
+  color: var(--text-muted);
+  font-size: var(--font-size-xs, 0.75rem);
+}
+
+.remove-button {
+  @include picker.trigger;
+}
+
+.error-message {
+  @include picker.error-message;
+}
+
+.hint-message {
+  @include picker.hint-message;
+}

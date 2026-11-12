@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+﻿import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { L8cSpinnerComponent } from './spinner.component';
 
 describe('L8cSpinnerComponent', () => {
@@ -51,5 +51,32 @@ describe('L8cSpinnerComponent', () => {
 
     const message = fixture.nativeElement.querySelector('.spinner-message');
     expect(message.textContent.trim()).toBe('Loading data...');
+  });
+  describe('input validation', () => {
+    let warn: ReturnType<typeof vi.spyOn>;
+    beforeEach(() => {
+      warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    });
+    afterEach(() => warn.mockRestore());
+
+    it('falls back to the medium size for an unknown value', () => {
+      fixture.componentRef.setInput('size', 'huge' as unknown as 'large');
+      fixture.detectChanges();
+
+      const spinner = fixture.nativeElement.querySelector('.spinner');
+      expect(spinner.classList.contains('spinner-small')).toBe(false);
+      expect(spinner.classList.contains('spinner-large')).toBe(false);
+      expect(warn).toHaveBeenCalledTimes(1);
+    });
+
+    it('reads a bare overlay attribute and a numeric message', () => {
+      fixture.componentRef.setInput('overlay', '');
+      fixture.componentRef.setInput('message', 42);
+      fixture.detectChanges();
+
+      expect(fixture.nativeElement.querySelector('.spinner-overlay')).toBeTruthy();
+      expect(fixture.nativeElement.querySelector('.spinner-message').textContent.trim()).toBe('42');
+      expect(warn).not.toHaveBeenCalled();
+    });
   });
 });

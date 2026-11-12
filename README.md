@@ -73,6 +73,115 @@ Supporting types such as `TableColumn`, `SelectOption` or `SideNavItem` are expo
 | `l8c-product-switcher` | Switch between platform products |
 | `l8c-icon` | Icon component with bundled icon registry |
 | `l8c-spinner` | Loading indicator |
+| `l8c-toast` / `l8c-toast-container` | Short feedback after an action (info, success, error), fed by `L8cToastService` |
+| `l8c-color-input` | Color field: swatch with the system picker plus a text field for any CSS color |
+| `l8c-date-picker` | Date field with a calendar popover, value ISO `YYYY-MM-DD`, shown as `07 Mar 2026` |
+| `l8c-time-picker` | 24-hour time entry `HH:MM` with a list of times |
+| `l8c-duration-input` | Duration as four segments D · H · M · S, value `DD:HH:MM:SS` |
+| `l8c-file-input` | File selection as a drop zone with a file list, or as a plain button |
+| `l8c-copy-field` | Read-only value with a copy button; announces the copy |
+| `l8c-status` | Workflow / row status chip with a tone dot; known statuses map to a color |
+| `l8cTooltip` | Directive: text hint on hover and keyboard focus, replaces native `title` attributes |
+
+### Side nav help links and footer
+
+Give a `SideNavItem` or `SideNavSubItem` a `helpLink` (such as the matching user guide chapter) and `l8c-side-nav` renders a `circle-help` link next to the entry that opens the page in a new tab (`target="_blank" rel="noopener"`, a plain `href`: routing stays with the host). Its accessible name is `<helpLabel>: <item label>`; pass a translated `helpLabel` like `collapseLabel` and `expandLabel`. Help links show on the expanded rail only. The `footerTemplate` renders on both rails and receives the collapsed state as its implicit context:
+
+```html
+<l8c-side-nav [items]="items" [helpLabel]="'Open user guide'" [footerTemplate]="guide" />
+<ng-template #guide let-collapsed>
+  <a href="guide" target="_blank" [l8cTooltip]="collapsed ? 'User guide' : ''">
+    <l8c-icon [name]="'circle-help'" />
+    @if (!collapsed) { User guide }
+  </a>
+</ng-template>
+```
+
+### Dialog width and layout
+
+`l8c-dialog` takes its width from the `width` input (px number or CSS length) or from `--dialog-width` on any ancestor, default 520px, never wider than the viewport. Set the property in the app instead of overriding the component's styles:
+
+```css
+.import-dialog { --dialog-width: 780px; }
+```
+
+The open dialog is a flex column capped at 90vh: the header keeps its height, only the content scrolls, and the content keeps an 8px gutter so focus rings and hover glows at its edge are not clipped. `contentLayout="flex"` makes the content area a non-scrolling flex column, for projected content that scrolls a part of itself and pins the rest.
+
+### Tooltips
+
+`[l8cTooltip]="'Edit questionnaire'"` on any element shows the text after `tooltipDelay` (300 ms) on hover or focus and hides on leave, blur or Escape. `tooltipPlacement` is `top` (default), `bottom`, `left` or `right`; there is no automatic flipping, but the tooltip stays inside the viewport. It is rendered into `<body>` with a fixed position, so tables and dialogs never clip it, and it adds `aria-describedby` to the element while it shows: keep the element's own accessible name (`ariaLabel`), the tooltip only describes. Text only, at most a short sentence.
+
+### File input, copy field and status
+
+- `l8c-file-input`: `variant="dropzone"` (default) is a dashed area with the `upload` icon, `dropLabel`, a secondary mini `buttonLabel` and the `files` listed below with size and a remove button; `variant="button"` is just a button (`buttonAction`, `buttonIcon`) that opens the file dialog. `(filesChange)` gets `File[]` (one unless `multiple`); `accept` only filters the dialog, so validate type and size in the host and show the result through `error`. The native input stays hidden in the DOM.
+- `l8c-copy-field`: a read-only value (ID, link, token) styled like a disabled input with a copy button at its right end. Only the button copies and is a tab stop; after copying the icon shows a check for 2 s and `copiedMessage` is announced through a live region. `(copiedValue)` reports the copy.
+- `l8c-status`: workflow statuses Draft, Ready, Open, In Progress, Completed, Done and Archived use the `--status-<name>` and `--status-<name>-bg` tokens with `--status-border`; other known statuses (Scheduled, Sent, Approved, Pending, Overdue, …) map to a tone; `tone` overrides. The element carries `data-status` or `data-tone`. Every token has a fallback, so the chip works without the status tokens.
+
+### Date, time and duration
+
+- `l8c-date-picker` replaces the browser's native `type="date"`: the field is a button that opens a calendar (weeks start on Monday, arrows move by day and week, PageUp/PageDown by month, Enter picks, Escape closes). `min` / `max` are ISO dates and also appear as attributes on the field, `lang` (`en`, `de`) picks the month names, `todayLabel`, `clearLabel`, `openLabel`, `prevLabel`, `nextLabel` are the translated texts. Works with `[(value)]` and as a form control. `formatDate(iso, lang)` and the `l8cFormatDate` pipe render the platform notation.
+- `l8c-time-picker`: two typed segments (hours stop at 23, minutes at 59, `:` and the arrows jump) plus a clock button that lists every `step` minutes (default 30). Emits `HH:MM`, or `""` while both segments are empty.
+- `l8c-duration-input`: four segments that fill from the left and hand over on their own; days up to 365. Emits `DD:HH:MM:SS` with empty segments as zero, `""` while nothing is filled; `readOnly` renders the value as text; `legacyHint` shows a stored value that is no duration. `parseDuration`, `formatDuration`, `durationToSegments` and `durationFromSegments` are exported.
+| `l8c-brand-editor` | Organization branding: configurations, logos, theme colors, typography and design tokens; host-controlled |
+
+### Brand editor
+
+`l8c-brand-editor` edits a `BrandConfig` (name, description, logos and favicon, 19 color tokens per theme, typography, design tokens). **The host owns the data**: the editor keeps only the draft and reports intents, the host loads and stores and then passes the new `configs` / `config` back in.
+
+```ts
+<l8c-brand-editor
+  [configs]="items"                 // BrandConfigItem[]: { id, name, isCurrent }
+  [selectedId]="selectedId"
+  [config]="storedConfigOfSelection"
+  [defaults]="defaults"             // readBrandDefaults(): the stylesheet values in use
+  [activeTheme]="theme"
+  [saving]="busy"
+  [labels]="translate.instant('brandEditor')"
+  [cancelLabel]="'Cancel'" [deleteLabel]="'Delete'"
+  (selected)="open($event)"         // after the discard check; null = nothing selected
+  (created)="create($event)"        // with the default name
+  (saved)="save($event)"            // the compact draft (only filled values)
+  (activated)="activate($event)"
+  (deleted)="remove($event)"        // after the delete confirmation
+  (preview)="applyBrand($event, theme)"  // every change; null while nothing is selected
+/>
+```
+
+- Switching or creating while the draft is dirty asks first; delete always asks, with a stronger message for the active configuration. "Unsaved changes" badge; Save needs a selection, a change and a name; Activate only for a saved, inactive configuration. `draft` resumes an unsaved draft after navigating back.
+- Helpers: `applyBrand(config, theme, root?)` writes the config as CSS custom properties (status colors bring their pill tint and border, `primary` sets `--primary-rgb`, radius `lg` sets `--surface-radius`; `null` removes them), `readBrandDefaults()` reads the stylesheet values of both themes, `mergeBrandConfig()` and `compactBrandConfig()` combine and trim configs.
+- Logos PNG, JPEG, WebP or SVG, favicon PNG, SVG or ICO, each up to 200 KB, stored as data URLs.
+- `labels` takes the l8c-survey `brandEditor` translation object as it is (English defaults built in, see `BRAND_EDITOR_LABELS`); `{{name}}` is replaced with the configuration name.
+
+### Toasts
+
+`L8cToastService` (provided in root) holds the toasts; `l8c-toast-container` renders them fixed top right below the top navigation, oldest first. Place the container once in the app shell, outside any layout switch, so toasts show on every page and survive navigation.
+
+```ts
+import { L8cToastContainerComponent, L8cToastService } from '@l8c/ui';
+
+@Component({
+  selector: 'app-root',
+  imports: [L8cToastContainerComponent],
+  template: `
+    <router-outlet />
+    <l8c-toast-container [dismissLabel]="'Close'" />
+  `,
+})
+export class App {}
+
+@Component({ /* … */ })
+export class SaveBarComponent {
+  private toasts = inject(L8cToastService);
+  save() {
+    this.toasts.success('Draft saved.');
+  }
+}
+```
+
+- `info(message, duration?)` and `success(message, duration?)` close after `DEFAULT_TOAST_DURATION` (2600 ms); `setDuration(ms)` changes the default for the app, e.g. from its runtime configuration.
+- `error(message)` stays until the user dismisses it, so it cannot vanish unread; only error toasts have a dismiss button, whose accessible name and tooltip is the container's `dismissLabel`.
+- `role="status"` for info and success, `role="alert"` for errors. Toasts let clicks through to the page; only the dismiss button takes them.
+- Messages are finished strings: pass translated values from the host app.
 
 ## Theming
 

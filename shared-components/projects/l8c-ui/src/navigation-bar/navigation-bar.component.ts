@@ -1,7 +1,28 @@
-import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
+﻿import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { L8cButtonComponent } from '../button/button.component';
 import { L8cIconComponent } from '../icon/icon.component';
+import {
+  arrayInput,
+  booleanInput,
+  numberInput,
+  stringInput,
+  warnInvalidInput,
+  type BooleanInput,
+  type NumberInput,
+  type StringInput,
+} from '../shared/input-validation';
+
+const C = 'l8c-navigation-bar';
+
+/** Keeps the finite integers of a positions list and reports the rest */
+function integerPositions(name: string, positions: readonly number[]): number[] {
+  const valid = positions.filter((p) => typeof p === 'number' && Number.isInteger(p));
+  if (valid.length !== positions.length) {
+    warnInvalidInput(C, name, positions, 'dropped entries that are no integer');
+  }
+  return valid;
+}
 
 /**
  * Sticky navigation bar for stepping through a list of numbered items
@@ -26,48 +47,70 @@ import { L8cIconComponent } from '../icon/icon.component';
 })
 export class L8cNavigationBarComponent {
   // Total number of items
-  totalItems = input.required<number>();
+  totalItems = input.required<number, NumberInput>({
+    transform: numberInput(C, 'totalItems', 0, { min: 0, integer: true }),
+  });
 
   // Currently active item (1-based index)
-  activeItem = input<number>(1);
+  activeItem = input<number, NumberInput>(1, {
+    transform: numberInput(C, 'activeItem', 1, { min: 1, integer: true }),
+  });
 
   // Back link on the left (hidden when empty) - keeps the exit reachable
   // without scrolling back to the top
-  backLabel = input<string>('');
+  backLabel = input<string, StringInput>('', { transform: stringInput(C, 'backLabel', '') });
 
   // Primary done/submit button on the right (hidden when empty)
-  doneLabel = input<string>('');
+  doneLabel = input<string, StringInput>('', { transform: stringInput(C, 'doneLabel', '') });
 
   // 1-based positions that are info entries - rendered with an info icon
   // instead of their number
-  infoPositions = input<number[]>([]);
+  infoPositions = input<number[], readonly number[] | null | undefined>([], {
+    transform: arrayInput(C, 'infoPositions'),
+  });
 
   // 1-based positions that are completed (e.g. answered) - rendered muted
   // and hideable via the visibility toggle
-  completedPositions = input<number[]>([]);
+  completedPositions = input<number[], readonly number[] | null | undefined>([], {
+    transform: arrayInput(C, 'completedPositions'),
+  });
 
   // Shows the eye toggle that hides completed positions
-  showVisibilityToggle = input<boolean>(false);
+  showVisibilityToggle = input<boolean, BooleanInput>(false, {
+    transform: booleanInput(C, 'showVisibilityToggle'),
+  });
 
   // At most this many numbered buttons are rendered at once, as a window
   // that follows the active item; the rest is reachable via previous/next,
   // the jump field or by paging at the window edges
-  maxVisibleItems = input<number>(10);
+  maxVisibleItems = input<number, NumberInput>(10, {
+    transform: numberInput(C, 'maxVisibleItems', 10, { min: 1, integer: true }),
+  });
 
   // Shows "active / total" next to the numbers so the overall length is
   // visible even when the window hides most of them
-  showCount = input<boolean>(true);
+  showCount = input<boolean, BooleanInput>(true, { transform: booleanInput(C, 'showCount', true) });
 
   // Texts (hidden when empty); pass translated values from the host app
-  label = input<string>('');
-  jumpLabel = input<string>('');
-  jumpPlaceholder = input<string>('#');
-  hideCompletedLabel = input<string>('');
-  showCompletedLabel = input<string>('');
+  label = input<string, StringInput>('', { transform: stringInput(C, 'label', '') });
+  jumpLabel = input<string, StringInput>('', { transform: stringInput(C, 'jumpLabel', '') });
+  jumpPlaceholder = input<string, StringInput>('#', {
+    transform: stringInput(C, 'jumpPlaceholder', '#'),
+  });
+  hideCompletedLabel = input<string, StringInput>('', {
+    transform: stringInput(C, 'hideCompletedLabel', ''),
+  });
+  showCompletedLabel = input<string, StringInput>('', {
+    transform: stringInput(C, 'showCompletedLabel', ''),
+  });
 
   // Aria prefixes for the numbered buttons ("<prefix> <number>")
-  itemAriaLabel = input<string>('Item');
-  infoItemAriaLabel = input<string>('Info');
+  itemAriaLabel = input<string, StringInput>('Item', {
+    transform: stringInput(C, 'itemAriaLabel', 'Item'),
+  });
+  infoItemAriaLabel = input<string, StringInput>('Info', {
+    transform: stringInput(C, 'infoItemAriaLabel', 'Info'),
+  });
 
   // Output event when an item number is clicked
   itemSelected = output<number>();
@@ -84,13 +127,17 @@ export class L8cNavigationBarComponent {
     Array.from({ length: this.totalItems() }, (_, i) => i + 1),
   );
 
-  private infoPositionSet = computed<Set<number>>(() => new Set(this.infoPositions()));
+  private infoPositionSet = computed<Set<number>>(
+    () => new Set(integerPositions('infoPositions', this.infoPositions())),
+  );
 
   isInfo(itemNumber: number): boolean {
     return this.infoPositionSet().has(itemNumber);
   }
 
-  private completedPositionSet = computed<Set<number>>(() => new Set(this.completedPositions()));
+  private completedPositionSet = computed<Set<number>>(
+    () => new Set(integerPositions('completedPositions', this.completedPositions())),
+  );
 
   isCompleted(itemNumber: number): boolean {
     return this.completedPositionSet().has(itemNumber);
@@ -128,7 +175,7 @@ export class L8cNavigationBarComponent {
     return numbers.slice(start, start + max);
   });
 
-  // Whether numbers exist before/after the window - shown as "…" that pages
+  // Whether numbers exist before/after the window - shown as "â€¦" that pages
   // the window by clicking
   hasHiddenBefore = computed<boolean>(() => {
     const visible = this.visibleNumbers();

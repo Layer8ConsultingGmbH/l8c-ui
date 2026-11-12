@@ -1,13 +1,25 @@
+// Room inside the scrolling content for focus rings (4px) and hover glows (8px)
+$ring-room: 8px;
+
 .lib-dialog {
-  width: 100%;
-  min-width: 400px;
-  max-width: 520px;
+  // The width input or an ancestor's --dialog-width; never wider than the viewport
+  width: var(--dialog-width, 520px);
+  max-width: calc(100vw - 2 * var(--space-lg, 24px));
   max-height: 90vh;
+  box-sizing: border-box;
   padding: var(--space-lg);
   background: var(--surface);
   border-radius: var(--surface-radius);
   border: 1px solid var(--border);
   box-shadow: var(--shadow-high);
+
+  // A flex column, so the header keeps its height and only the content
+  // scrolls. Scoped to the open state: a closed <dialog> keeps display: none
+  &[open] {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
 
   &::backdrop {
     background: rgba(0, 0, 0, 0.5);
@@ -18,6 +30,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-shrink: 0;
     padding: 0;
     margin-bottom: var(--space-md);
     gap: var(--space-md);
@@ -52,10 +65,21 @@
     }
   }
 
+  // The gutter makes room inside the scroll container, the negative margin
+  // gives it back, so the content keeps its place and width
   .lib-dialog-content {
-    padding: 0;
-    margin: 0;
+    flex: 1 1 auto;
+    min-height: 0;
     overflow-y: auto;
-    max-height: calc(90vh - 120px);
+    padding: $ring-room;
+    margin: -$ring-room;
+  }
+
+  // The content is a flex column without own scrolling: projected content
+  // scrolls a part of itself and pins the rest (e.g. a footer with actions)
+  &.content-flex .lib-dialog-content {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
   }
 }
