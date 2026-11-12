@@ -30,6 +30,7 @@ import {
 import { showPanel } from '../picker/popover';
 import { L8cFormatDatePipe } from './format-date.pipe';
 import {
+  MONTHS,
   MONTHS_LONG,
   PICKER_LANGS,
   PickerLang,
@@ -41,6 +42,8 @@ import {
 } from './date-format';
 
 const SELECTOR = 'l8c-date-picker';
+/** Years shown at once in the year view */
+const YEARS_PER_VIEW = 12;
 
 let nextId = 0;
 
@@ -66,6 +69,9 @@ function langInput(value: PickerLang | string | null | undefined): PickerLang {
   return 'en';
 }
 
+/** What the popover shows: the days of a month, the months of a year or a block of years */
+export type DatePickerView = 'days' | 'months' | 'years';
+
 interface CalendarDay {
   date: Date;
   iso: string;
@@ -77,15 +83,41 @@ interface CalendarDay {
   disabled: boolean;
 }
 
+interface CalendarMonth {
+  index: number;
+  label: string;
+  selected: boolean;
+  current: boolean;
+  cursor: boolean;
+  disabled: boolean;
+}
+
+interface CalendarYear {
+  year: number;
+  selected: boolean;
+  current: boolean;
+  cursor: boolean;
+  disabled: boolean;
+}
+
 /**
  * Date field with a calendar popover; replaces the browser's native
  * `type="date"` so the field looks the same in every browser and theme.
  *
  * The value is ISO "YYYY-MM-DD" or ""; the field shows the platform
- * notation "07 Mar 2026" in `lang`. Weeks start on Monday. Keyboard: the
- * field is a button that opens the popover; in the grid the arrows move by
- * day and week, PageUp/PageDown by month, Home/End to the start and end of
- * the week, Enter picks, Escape closes and returns the focus to the field.
+ * notation "07 Mar 2026" in `lang`. Weeks start on Monday.
+ *
+ * Views: the title of the day view opens the month view (12 months of the
+ * year), the title of the month view opens the year view (12 years), so a
+ * date years away is three clicks from the field. Prev/next step by month,
+ * year or 12 years depending on the view.
+ *
+ * Keyboard: the field is a button that opens the popover; in the day grid
+ * the arrows move by day and week, PageUp/PageDown by month and with Shift
+ * by year, Home/End to the start and end of the week, Enter picks. In the
+ * month and year grids the arrows move by one and by row, PageUp/PageDown
+ * by year or block, Enter picks. Escape goes back one view or, in the day
+ * view, closes and returns the focus to the field.
  * Works with `[(value)]` and as a form control.
  */
 @Component({
@@ -149,6 +181,26 @@ export class L8cDatePickerComponent implements ControlValueAccessor {
   nextLabel = input<string, StringInput>('Next month', {
     transform: stringInput(SELECTOR, 'nextLabel', 'Next month'),
   });
+  /** Accessible name of the title in the day view, which opens the month view */
+  chooseMonthLabel = input<string, StringInput>('Choose month', {
+    transform: stringInput(SELECTOR, 'chooseMonthLabel', 'Choose month'),
+  });
+  /** Accessible name of the title in the month view, which opens the year view */
+  chooseYearLabel = input<string, StringInput>('Choose year', {
+    transform: stringInput(SELECTOR, 'chooseYearLabel', 'Choose year'),
+  });
+  prevYearLabel = input<string, StringInput>('Previous year', {
+    transform: stringInput(SELECTOR, 'prevYearLabel', 'Previous year'),
+  });
+  nextYearLabel = input<string, StringInput>('Next year', {
+    transform: stringInput(SELECTOR, 'nextYearLabel', 'Next year'),
+  });
+  prevYearsLabel = input<string, StringInput>('Previous years', {
+    transform: stringInput(SELECTOR, 'prevYearsLabel', 'Previous years'),
+  });
+  nextYearsLabel = input<string, StringInput>('Next years', {
+    transform: stringInput(SELECTOR, 'nextYearsLabel', 'Next years'),
+  });
   /** Field width as px number or CSS length; default 260px */
   width = input<number | string, CssLengthInput>(260, {
     transform: cssLengthInput(SELECTOR, 'width', 260),
@@ -156,6 +208,7 @@ export class L8cDatePickerComponent implements ControlValueAccessor {
 
   protected readonly id = `l8c-date-picker-${nextId++}`;
   protected readonly open = signal(false);
+  protected readonly view = signal<DatePickerView>('days');
   /** The day the keyboard is on while the popover is open */
   protected readonly cursor = signal<Date>(startOfDay(new Date()));
 
@@ -165,15 +218,62 @@ export class L8cDatePickerComponent implements ControlValueAccessor {
   protected readonly displayValue = computed(() =>
     this.value() ? formatDate(this.value(), this.language()) : '',
   );
-  protected readonly monthTitle = computed(
-    () =>
-      `${MONTHS_LONG[this.language()][this.cursor().getMonth()]} ${this.cursor().getFullYear()}`,
-  );
   protected readonly cssWidth = computed(() => {
     const width = this.width();
     return typeof width === 'number' ? `${width}px` : width;
   });
   protected readonly todayDisabled = computed(() => this.isOutOfRange(startOfDay(new Date())));
+
+  /** First year of the 12-year block around the cursor */
+  private readonly yearBlockStart = computed(
+    () => Math.floor(this.cursor().getFullYear() / YEARS_PER_VIEW) * YEARS_PER_VIEW,
+  );
+
+  /** What the header shows: "March 2026", "2026" or "2024 – 2035" */
+  protected readonly title = computed(() => {
+    const cursor = this.cursor();
+    switch (this.view()) {
+      case 'days':
+        return `${MONTHS_LONG[this.language()][cursor.getMonth()]} ${cursor.getFullYear()}`;
+      case 'months':
+        return String(cursor.getFullYear());
+      case 'years': {
+        const start = this.yearBlockStart();
+        return `${start} – ${start + YEARS_PER_VIEW - 1}`;
+      }
+    }
+  });
+  /** Accessible name of the title button; the year view's title is plain text */
+  protected readonly titleLabel = computed(() => {
+    switch (this.view()) {
+      case 'days':
+        return this.chooseMonthLabel();
+      case 'months':
+        return this.chooseYearLabel();
+      case 'years':
+        return null;
+    }
+  });
+  protected readonly prevStepLabel = computed(() => {
+    switch (this.view()) {
+      case 'days':
+        return this.prevLabel();
+      case 'months':
+        return this.prevYearLabel();
+      case 'years':
+        return this.prevYearsLabel();
+    }
+  });
+  protected readonly nextStepLabel = computed(() => {
+    switch (this.view()) {
+      case 'days':
+        return this.nextLabel();
+      case 'months':
+        return this.nextYearLabel();
+      case 'years':
+        return this.nextYearsLabel();
+    }
+  });
 
   /** Six weeks around the cursor's month, Monday first */
   protected readonly days = computed<CalendarDay[]>(() => {
@@ -199,8 +299,41 @@ export class L8cDatePickerComponent implements ControlValueAccessor {
     });
   });
 
+  /** The twelve months of the cursor's year */
+  protected readonly months = computed<CalendarMonth[]>(() => {
+    const cursor = this.cursor();
+    const year = cursor.getFullYear();
+    const selected = this.selectedDate();
+    const today = new Date();
+    return MONTHS[this.language()].map((label, index) => ({
+      index,
+      label,
+      selected: selected?.getFullYear() === year && selected.getMonth() === index,
+      current: today.getFullYear() === year && today.getMonth() === index,
+      cursor: cursor.getMonth() === index,
+      disabled: this.isMonthOutOfRange(year, index),
+    }));
+  });
+
+  /** The twelve years of the cursor's block */
+  protected readonly years = computed<CalendarYear[]>(() => {
+    const start = this.yearBlockStart();
+    const cursorYear = this.cursor().getFullYear();
+    const selectedYear = this.selectedDate()?.getFullYear();
+    const currentYear = new Date().getFullYear();
+    return Array.from({ length: YEARS_PER_VIEW }, (_, index) => {
+      const year = start + index;
+      return {
+        year,
+        selected: year === selectedYear,
+        current: year === currentYear,
+        cursor: year === cursorYear,
+        disabled: this.isYearOutOfRange(year),
+      };
+    });
+  });
+
   private readonly trigger = viewChild<ElementRef<HTMLButtonElement>>('trigger');
-  private readonly grid = viewChild<ElementRef<HTMLElement>>('grid');
   private readonly panel = viewChild<ElementRef<HTMLElement>>('panel');
   private readonly host = inject(ElementRef<HTMLElement>);
   private readonly injector = inject(Injector);
@@ -247,6 +380,7 @@ export class L8cDatePickerComponent implements ControlValueAccessor {
       return;
     }
     this.cursor.set(this.selectedDate() ?? startOfDay(new Date()));
+    this.view.set('days');
     this.open.set(true);
     afterNextRender(
       () => {
@@ -276,12 +410,55 @@ export class L8cDatePickerComponent implements ControlValueAccessor {
     this.open.set(false);
   }
 
+  /** Escape steps back one view, or closes from the day view */
   protected onPanelKeydown(event: KeyboardEvent): void {
-    if (event.key === 'Escape') {
-      event.stopPropagation();
+    if (event.key !== 'Escape') {
+      return;
+    }
+    event.stopPropagation();
+    event.preventDefault();
+    if (this.view() === 'days') {
       this.close(true);
+    } else {
+      this.showView(this.view() === 'years' ? 'months' : 'days');
     }
   }
+
+  // ---- header ----
+
+  /** The day view's title opens the month view, the month view's title the year view */
+  protected onTitleClick(): void {
+    if (this.view() === 'days') {
+      this.showView('months');
+    } else if (this.view() === 'months') {
+      this.showView('years');
+    }
+  }
+
+  protected stepPrev(): void {
+    this.step(-1);
+  }
+
+  protected stepNext(): void {
+    this.step(1);
+  }
+
+  /** One step of the header arrows: a month, a year or a block of years */
+  private step(direction: 1 | -1): void {
+    switch (this.view()) {
+      case 'days':
+        this.moveMonths(direction);
+        break;
+      case 'months':
+        this.moveYears(direction);
+        break;
+      case 'years':
+        this.moveYears(direction * YEARS_PER_VIEW);
+        break;
+    }
+  }
+
+  // ---- day view ----
 
   protected onGridKeydown(event: KeyboardEvent): void {
     const cursor = this.cursor();
@@ -300,10 +477,18 @@ export class L8cDatePickerComponent implements ControlValueAccessor {
         this.moveDays(7);
         break;
       case 'PageUp':
-        this.moveMonths(-1);
+        if (event.shiftKey) {
+          this.moveYears(-1);
+        } else {
+          this.moveMonths(-1);
+        }
         break;
       case 'PageDown':
-        this.moveMonths(1);
+        if (event.shiftKey) {
+          this.moveYears(1);
+        } else {
+          this.moveMonths(1);
+        }
         break;
       case 'Home':
         this.moveDays(-weekday);
@@ -322,11 +507,12 @@ export class L8cDatePickerComponent implements ControlValueAccessor {
   }
 
   protected moveMonths(months: number): void {
-    const cursor = this.cursor();
-    const next = new Date(cursor.getFullYear(), cursor.getMonth() + months, 1);
-    const lastDay = new Date(next.getFullYear(), next.getMonth() + 1, 0).getDate();
-    next.setDate(Math.min(cursor.getDate(), lastDay));
-    this.cursor.set(next);
+    this.cursor.set(shiftMonths(this.cursor(), months));
+    this.focusCursor();
+  }
+
+  protected moveYears(years: number): void {
+    this.cursor.set(shiftMonths(this.cursor(), years * 12));
     this.focusCursor();
   }
 
@@ -354,6 +540,108 @@ export class L8cDatePickerComponent implements ControlValueAccessor {
     this.close(true);
   }
 
+  // ---- month view ----
+
+  protected onMonthsKeydown(event: KeyboardEvent): void {
+    switch (event.key) {
+      case 'ArrowLeft':
+        this.moveMonths(-1);
+        break;
+      case 'ArrowRight':
+        this.moveMonths(1);
+        break;
+      case 'ArrowUp':
+        this.moveMonths(-3);
+        break;
+      case 'ArrowDown':
+        this.moveMonths(3);
+        break;
+      case 'PageUp':
+        this.moveYears(-1);
+        break;
+      case 'PageDown':
+        this.moveYears(1);
+        break;
+      case 'Home':
+        this.moveMonths(-this.cursor().getMonth());
+        break;
+      case 'End':
+        this.moveMonths(11 - this.cursor().getMonth());
+        break;
+      case 'Enter':
+      case ' ':
+        this.pickMonth(this.cursor().getMonth());
+        break;
+      default:
+        return;
+    }
+    event.preventDefault();
+  }
+
+  /** Shows the days of a month of the cursor's year */
+  protected pickMonth(month: number): void {
+    const cursor = this.cursor();
+    if (this.isMonthOutOfRange(cursor.getFullYear(), month)) {
+      return;
+    }
+    this.cursor.set(shiftMonths(cursor, month - cursor.getMonth()));
+    this.showView('days');
+  }
+
+  // ---- year view ----
+
+  protected onYearsKeydown(event: KeyboardEvent): void {
+    switch (event.key) {
+      case 'ArrowLeft':
+        this.moveYears(-1);
+        break;
+      case 'ArrowRight':
+        this.moveYears(1);
+        break;
+      case 'ArrowUp':
+        this.moveYears(-3);
+        break;
+      case 'ArrowDown':
+        this.moveYears(3);
+        break;
+      case 'PageUp':
+        this.moveYears(-YEARS_PER_VIEW);
+        break;
+      case 'PageDown':
+        this.moveYears(YEARS_PER_VIEW);
+        break;
+      case 'Home':
+        this.moveYears(this.yearBlockStart() - this.cursor().getFullYear());
+        break;
+      case 'End':
+        this.moveYears(this.yearBlockStart() + YEARS_PER_VIEW - 1 - this.cursor().getFullYear());
+        break;
+      case 'Enter':
+      case ' ':
+        this.pickYear(this.cursor().getFullYear());
+        break;
+      default:
+        return;
+    }
+    event.preventDefault();
+  }
+
+  /** Shows the months of a year */
+  protected pickYear(year: number): void {
+    if (this.isYearOutOfRange(year)) {
+      return;
+    }
+    this.cursor.set(shiftMonths(this.cursor(), (year - this.cursor().getFullYear()) * 12));
+    this.showView('months');
+  }
+
+  // ---- shared ----
+
+  private showView(view: DatePickerView): void {
+    this.view.set(view);
+    this.focusCursor();
+  }
+
   private update(value: string): void {
     this.value.set(value);
     this.onChange(value);
@@ -365,14 +653,44 @@ export class L8cDatePickerComponent implements ControlValueAccessor {
     return (min !== null && date < min) || (max !== null && date > max);
   }
 
-  /** Moves the focus to the cursor's cell once it is rendered */
+  /** True when no day of the month is in range */
+  private isMonthOutOfRange(year: number, month: number): boolean {
+    const min = parseIsoDate(this.min());
+    const max = parseIsoDate(this.max());
+    const first = new Date(year, month, 1);
+    const last = new Date(year, month + 1, 0);
+    return (min !== null && last < min) || (max !== null && first > max);
+  }
+
+  /** True when no day of the year is in range */
+  private isYearOutOfRange(year: number): boolean {
+    const min = parseIsoDate(this.min());
+    const max = parseIsoDate(this.max());
+    return (min !== null && year < min.getFullYear()) || (max !== null && year > max.getFullYear());
+  }
+
+  /** Moves the focus to the cursor's cell of the current view once it is rendered */
   private focusCursor(): void {
     afterNextRender(
       () => {
-        const cell = this.grid()?.nativeElement.querySelector<HTMLElement>(
-          `[data-date="${toIsoDate(this.cursor())}"]`,
-        );
-        cell?.focus();
+        const panel = this.panel()?.nativeElement;
+        if (!panel) {
+          return;
+        }
+        const cursor = this.cursor();
+        let selector: string;
+        switch (this.view()) {
+          case 'days':
+            selector = `[data-date="${toIsoDate(cursor)}"]`;
+            break;
+          case 'months':
+            selector = `[data-month="${cursor.getMonth()}"]`;
+            break;
+          case 'years':
+            selector = `[data-year="${cursor.getFullYear()}"]`;
+            break;
+        }
+        panel.querySelector<HTMLElement>(selector)?.focus();
       },
       { injector: this.injector },
     );
@@ -385,4 +703,12 @@ function startOfDay(date: Date): Date {
 
 function sameDay(a: Date | null, b: Date | null): boolean {
   return a !== null && b !== null && toIsoDate(a) === toIsoDate(b);
+}
+
+/** The same day of the month `months` away, clamped to the target month's length */
+function shiftMonths(date: Date, months: number): Date {
+  const next = new Date(date.getFullYear(), date.getMonth() + months, 1);
+  const lastDay = new Date(next.getFullYear(), next.getMonth() + 1, 0).getDate();
+  next.setDate(Math.min(date.getDate(), lastDay));
+  return next;
 }

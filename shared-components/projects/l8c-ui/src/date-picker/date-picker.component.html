@@ -39,54 +39,116 @@
         popover="manual"
         role="dialog"
         [attr.aria-label]="label() || openLabel()"
+        [attr.data-view]="view()"
         (keydown)="onPanelKeydown($event)"
       >
         <div class="calendar-header">
           <button
             type="button"
             class="nav-button"
-            [attr.aria-label]="prevLabel()"
-            [title]="prevLabel()"
-            (click)="moveMonths(-1)"
+            [attr.aria-label]="prevStepLabel()"
+            [title]="prevStepLabel()"
+            (click)="stepPrev()"
           >
             <l8c-icon [name]="'chevron-left'" [size]="16" />
           </button>
-          <span class="month-title" aria-live="polite">{{ monthTitle() }}</span>
+          <!-- The title opens the next coarser view; in the year view it is plain text -->
+          @if (titleLabel(); as titleLabel) {
+            <button
+              type="button"
+              class="title-button"
+              aria-live="polite"
+              [attr.aria-label]="titleLabel + ': ' + title()"
+              [title]="titleLabel"
+              (click)="onTitleClick()"
+            >
+              {{ title() }}
+              <l8c-icon [name]="'chevron-down'" [size]="14" />
+            </button>
+          } @else {
+            <span class="title-text" aria-live="polite">{{ title() }}</span>
+          }
           <button
             type="button"
             class="nav-button"
-            [attr.aria-label]="nextLabel()"
-            [title]="nextLabel()"
-            (click)="moveMonths(1)"
+            [attr.aria-label]="nextStepLabel()"
+            [title]="nextStepLabel()"
+            (click)="stepNext()"
           >
             <l8c-icon [name]="'chevron-right'" [size]="16" />
           </button>
         </div>
 
-        <div #grid class="calendar-grid" role="grid" (keydown)="onGridKeydown($event)">
-          @for (weekday of weekdays(); track weekday) {
-            <span class="weekday" role="columnheader">{{ weekday }}</span>
+        @switch (view()) {
+          @case ('days') {
+            <div class="calendar-grid" role="grid" (keydown)="onGridKeydown($event)">
+              @for (weekday of weekdays(); track weekday) {
+                <span class="weekday" role="columnheader">{{ weekday }}</span>
+              }
+              @for (day of days(); track day.iso) {
+                <button
+                  type="button"
+                  class="day"
+                  role="gridcell"
+                  [class.in-month]="day.inMonth"
+                  [class.selected]="day.selected"
+                  [class.today]="day.today"
+                  [attr.data-date]="day.iso"
+                  [attr.tabindex]="day.cursor ? 0 : -1"
+                  [attr.aria-selected]="day.selected"
+                  [attr.aria-current]="day.today ? 'date' : null"
+                  [attr.aria-label]="day.iso | l8cFormatDate: language()"
+                  [disabled]="day.disabled"
+                  (click)="pick(day.date)"
+                >
+                  {{ day.label }}
+                </button>
+              }
+            </div>
           }
-          @for (day of days(); track day.iso) {
-            <button
-              type="button"
-              class="day"
-              role="gridcell"
-              [class.in-month]="day.inMonth"
-              [class.selected]="day.selected"
-              [class.today]="day.today"
-              [attr.data-date]="day.iso"
-              [attr.tabindex]="day.cursor ? 0 : -1"
-              [attr.aria-selected]="day.selected"
-              [attr.aria-current]="day.today ? 'date' : null"
-              [attr.aria-label]="day.iso | l8cFormatDate: language()"
-              [disabled]="day.disabled"
-              (click)="pick(day.date)"
-            >
-              {{ day.label }}
-            </button>
+          @case ('months') {
+            <div class="option-grid months" role="grid" (keydown)="onMonthsKeydown($event)">
+              @for (month of months(); track month.index) {
+                <button
+                  type="button"
+                  class="option"
+                  role="gridcell"
+                  [class.selected]="month.selected"
+                  [class.current]="month.current"
+                  [attr.data-month]="month.index"
+                  [attr.tabindex]="month.cursor ? 0 : -1"
+                  [attr.aria-selected]="month.selected"
+                  [attr.aria-current]="month.current ? 'date' : null"
+                  [disabled]="month.disabled"
+                  (click)="pickMonth(month.index)"
+                >
+                  {{ month.label }}
+                </button>
+              }
+            </div>
           }
-        </div>
+          @case ('years') {
+            <div class="option-grid years" role="grid" (keydown)="onYearsKeydown($event)">
+              @for (year of years(); track year.year) {
+                <button
+                  type="button"
+                  class="option"
+                  role="gridcell"
+                  [class.selected]="year.selected"
+                  [class.current]="year.current"
+                  [attr.data-year]="year.year"
+                  [attr.tabindex]="year.cursor ? 0 : -1"
+                  [attr.aria-selected]="year.selected"
+                  [attr.aria-current]="year.current ? 'date' : null"
+                  [disabled]="year.disabled"
+                  (click)="pickYear(year.year)"
+                >
+                  {{ year.year }}
+                </button>
+              }
+            </div>
+          }
+        }
 
         <div class="calendar-footer">
           <button type="button" class="text-action" (click)="clear()">{{ clearLabel() }}</button>

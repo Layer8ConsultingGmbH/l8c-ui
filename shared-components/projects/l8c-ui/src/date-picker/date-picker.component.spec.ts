@@ -33,6 +33,8 @@ describe('L8cDatePickerComponent', () => {
 
   const field = (): HTMLButtonElement => fixture.nativeElement.querySelector('.picker-field');
   const panel = (): HTMLElement | null => fixture.nativeElement.querySelector('.picker-panel');
+  const title = (): string =>
+    fixture.nativeElement.querySelector('.title-button, .title-text').textContent.trim();
   const day = (iso: string): HTMLButtonElement | null =>
     fixture.nativeElement.querySelector(`[data-date="${iso}"]`);
   const keyOnGrid = (key: string) => {
@@ -82,9 +84,7 @@ describe('L8cDatePickerComponent', () => {
     fixture.detectChanges();
 
     expect(panel()).not.toBeNull();
-    expect(fixture.nativeElement.querySelector('.month-title').textContent.trim()).toBe(
-      'March 2026',
-    );
+    expect(title()).toBe('March 2026');
     const selected = day('2026-03-07')!;
     expect(selected.classList.contains('selected')).toBe(true);
     expect(selected.getAttribute('aria-selected')).toBe('true');
@@ -116,13 +116,200 @@ describe('L8cDatePickerComponent', () => {
     expect(day('2026-03-15')!.getAttribute('tabindex')).toBe('0');
 
     keyOnGrid('PageDown');
-    expect(fixture.nativeElement.querySelector('.month-title').textContent.trim()).toBe(
-      'April 2026',
-    );
+    expect(title()).toBe('April 2026');
     keyOnGrid('Enter');
 
     expect(host.control.value).toBe('2026-04-15');
     expect(panel()).toBeNull();
+  });
+
+  describe('month and year views', () => {
+    const titleButton = (): HTMLButtonElement | null =>
+      fixture.nativeElement.querySelector('.title-button');
+    const options = (): HTMLButtonElement[] =>
+      Array.from(fixture.nativeElement.querySelectorAll('.option'));
+    const view = (): string | null => panel()?.getAttribute('data-view') ?? null;
+    const keyOn = (selector: string, key: string, init: KeyboardEventInit = {}) => {
+      fixture.nativeElement
+        .querySelector(selector)
+        .dispatchEvent(
+          new KeyboardEvent('keydown', { key, cancelable: true, bubbles: true, ...init }),
+        );
+      fixture.detectChanges();
+    };
+    const nav = (label: string): HTMLButtonElement =>
+      fixture.nativeElement.querySelector(`.nav-button[aria-label="${label}"]`);
+
+    beforeEach(() => {
+      field().click();
+      fixture.detectChanges();
+    });
+
+    it('opens the month view from the title and returns to the picked month', () => {
+      expect(titleButton()!.getAttribute('aria-label')).toBe('Choose month: March 2026');
+      titleButton()!.click();
+      fixture.detectChanges();
+
+      expect(view()).toBe('months');
+      expect(title()).toBe('2026');
+      expect(options().map((o) => o.textContent?.trim())).toEqual([
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec',
+      ]);
+      expect(options()[2].classList.contains('selected')).toBe(true);
+      expect(options()[2].getAttribute('tabindex')).toBe('0');
+
+      options()[10].click();
+      fixture.detectChanges();
+
+      expect(view()).toBe('days');
+      expect(title()).toBe('November 2026');
+      expect(day('2026-11-07')!.getAttribute('tabindex')).toBe('0');
+      expect(host.control.value).toBe('2026-03-07');
+    });
+
+    it('opens the year view from the month view and steps twelve years at a time', () => {
+      titleButton()!.click();
+      fixture.detectChanges();
+      expect(titleButton()!.getAttribute('aria-label')).toBe('Choose year: 2026');
+      titleButton()!.click();
+      fixture.detectChanges();
+
+      expect(view()).toBe('years');
+      expect(titleButton()).toBeNull();
+      expect(title()).toBe('2016 – 2027');
+      expect(options().map((o) => o.textContent?.trim())[0]).toBe('2016');
+      expect(options()[10].classList.contains('selected')).toBe(true);
+
+      nav('Next years').click();
+      fixture.detectChanges();
+      expect(title()).toBe('2028 – 2039');
+      nav('Previous years').click();
+      nav('Previous years').click();
+      fixture.detectChanges();
+      expect(title()).toBe('2004 – 2015');
+
+      options()[7].click();
+      fixture.detectChanges();
+      expect(view()).toBe('months');
+      expect(title()).toBe('2011');
+
+      options()[0].click();
+      fixture.detectChanges();
+      expect(view()).toBe('days');
+      expect(title()).toBe('January 2011');
+    });
+
+    it('steps a year with the arrows in the month view', () => {
+      titleButton()!.click();
+      fixture.detectChanges();
+
+      nav('Next year').click();
+      fixture.detectChanges();
+      expect(title()).toBe('2027');
+      nav('Previous year').click();
+      nav('Previous year').click();
+      fixture.detectChanges();
+      expect(title()).toBe('2025');
+    });
+
+    it('moves a year with Shift+PageDown in the day view', () => {
+      keyOnGrid('PageDown');
+      expect(title()).toBe('April 2026');
+
+      fixture.nativeElement.querySelector('.calendar-grid').dispatchEvent(
+        new KeyboardEvent('keydown', {
+          key: 'PageDown',
+          shiftKey: true,
+          cancelable: true,
+          bubbles: true,
+        }),
+      );
+      fixture.detectChanges();
+      expect(title()).toBe('April 2027');
+    });
+
+    it('navigates the month and year grids with the keyboard', () => {
+      titleButton()!.click();
+      fixture.detectChanges();
+
+      keyOn('.option-grid', 'ArrowDown');
+      keyOn('.option-grid', 'ArrowRight');
+      expect(options()[6].getAttribute('tabindex')).toBe('0');
+      keyOn('.option-grid', 'PageDown');
+      expect(title()).toBe('2027');
+
+      titleButton()!.click();
+      fixture.detectChanges();
+      keyOn('.option-grid', 'ArrowRight');
+      expect(
+        options()
+          .find((o) => o.getAttribute('tabindex') === '0')
+          ?.textContent?.trim(),
+      ).toBe('2028');
+      keyOn('.option-grid', 'Enter');
+      expect(view()).toBe('months');
+      expect(title()).toBe('2028');
+      keyOn('.option-grid', 'Enter');
+      expect(view()).toBe('days');
+      expect(title()).toBe('July 2028');
+    });
+
+    it('steps back one view with Escape and closes from the day view', () => {
+      titleButton()!.click();
+      fixture.detectChanges();
+      titleButton()!.click();
+      fixture.detectChanges();
+      expect(view()).toBe('years');
+
+      keyOn('.picker-panel', 'Escape');
+      expect(view()).toBe('months');
+      keyOn('.picker-panel', 'Escape');
+      expect(view()).toBe('days');
+      keyOn('.picker-panel', 'Escape');
+      expect(panel()).toBeNull();
+    });
+
+    it('disables months and years that are entirely outside min and max', () => {
+      host.min.set('2026-02-10');
+      host.max.set('2027-05-20');
+      fixture.detectChanges();
+
+      titleButton()!.click();
+      fixture.detectChanges();
+      expect(options()[0].disabled).toBe(true);
+      expect(options()[1].disabled).toBe(false);
+      expect(options()[11].disabled).toBe(false);
+
+      titleButton()!.click();
+      fixture.detectChanges();
+      const years = options();
+      expect(years.find((o) => o.textContent?.trim() === '2025')!.disabled).toBe(true);
+      expect(years.find((o) => o.textContent?.trim() === '2026')!.disabled).toBe(false);
+      expect(years.find((o) => o.textContent?.trim() === '2027')!.disabled).toBe(false);
+      expect(years.find((o) => o.textContent?.trim() === '2024')!.disabled).toBe(true);
+    });
+
+    it('starts in the day view again after reopening', () => {
+      titleButton()!.click();
+      fixture.detectChanges();
+      field().click();
+      fixture.detectChanges();
+      field().click();
+      fixture.detectChanges();
+
+      expect(view()).toBe('days');
+    });
   });
 
   it('disables days outside min and max and the today shortcut outside the range', () => {
