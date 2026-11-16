@@ -1,10 +1,26 @@
-﻿# Changelog
+# Changelog
 
 All notable changes to `@l8c/ui` are documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
+
+## [1.3.0] - 2026-11-16
+
+### Added
+
+- Secondary entry points: the library is built into one file per entry point instead of a single file: `@l8c/ui/core`, `@l8c/ui/navigation`, `@l8c/ui/pickers`, `@l8c/ui/table`, `@l8c/ui/file-input` and `@l8c/ui/brand` (plus `@l8c/ui/internal` for shared helpers, not public API). `@l8c/ui` re-exports all of them, so existing imports keep working and no import path has to change. An application bundler can now put components that only a lazy route uses into the chunk of that route. Measured in the production build of l8c-survey: the library share of the initial chunks went from 311 kB (1.2.0) to 163 kB, 145 kB moved into lazy chunks; the same result with imports from `@l8c/ui` and from the entry points. The README lists the exports of each entry point.
+- `isIconName` is exported next to `IconName`.
+
+- `l8c-confirm-dialog`: new `mode` input (Design System v0.5.4 ConfirmDialog). `confirm` (default, unchanged) shows the cancel and the confirm button; `info` shows a single button for messages that need no decision, labelled by the new `closeLabel` input (default "Close"), and emits the new `closed` output instead of `confirmed` or `cancelled`.
+
+### Changed
+
+- `l8c-button`: every button shows a focus ring on keyboard focus (2px `primary` outline with 2px offset, the Design System focus ring); before, only icon-only buttons did, and a button reached with Tab looked like any other.
+- `l8c-dialog`: `closed` is now also emitted when the browser closes the dialog (Escape), once per closing; before, only `close()` and the header button emitted it. Apps that reset state on `closed` now also do so on Escape.
+- `l8c-confirm-dialog`: Escape counts as dismissing and emits `cancelled` (confirm mode) or `closed` (info mode); before, it closed the dialog without an event.
+- `l8c-confirm-dialog`: a long message scrolls inside the dialog while the buttons stay visible below it; before, the buttons scrolled away with the message.
 
 ## [1.2.0] - 2026-11-12
 
@@ -83,7 +99,8 @@ Deprecated on npm in favour of 1.0.1 because of incorrect peer dependency ranges
 
 - Initial public release with standalone components: button, card, input, number-input, checkbox, radio, select, dropdown, search-field, table, pagination, carousel, dialog, confirm-dialog, navigation-bar, side-nav, account-menu, product-switcher, icon and spinner.
 
-[Unreleased]: https://github.com/Layer8ConsultingGmbH/l8c-ui/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/Layer8ConsultingGmbH/l8c-ui/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/Layer8ConsultingGmbH/l8c-ui/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/Layer8ConsultingGmbH/l8c-ui/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/Layer8ConsultingGmbH/l8c-ui/compare/v1.0.2...v1.1.0
 [1.0.2]: https://github.com/Layer8ConsultingGmbH/l8c-ui/compare/v1.0.1...v1.0.2

@@ -1,4 +1,4 @@
-﻿# Contributing to l8c-ui
+# Contributing to l8c-ui
 
 Thanks for your interest in contributing. This document explains how to get set up, how we work, and what we expect from a pull request.
 
@@ -14,7 +14,7 @@ npm run build
 npm test
 ```
 
-The Angular CLI workspace lives in `shared-components/`; the library source is in `shared-components/projects/l8c-ui/src`.
+The Angular CLI workspace lives in `shared-components/`; the library source is in `shared-components/projects/l8c-ui`, one folder per entry point (`core`, `navigation`, `pickers`, `table`, `file-input`, `brand`, `internal`) with the components inside.
 
 ## Reporting bugs and requesting features
 
@@ -39,7 +39,8 @@ For larger changes or new components, open an issue first so we can agree on the
 - **Signals API.** Use `input()`, `output()`, `model()` and `computed()` rather than decorators.
 - **Selector prefix** is `l8c-`. Component files follow the Angular CLI layout (`name/name.component.{ts,html,scss,spec.ts}`).
 - **Input validation.** Every `input()` gets a transform from `src/shared/input-validation.ts` (`numberInput`, `booleanInput`, `stringInput`, `oneOf`, `arrayInput`, `cssLengthInput`, `isoDateInput` and their `optional*` variants). The transform coerces what a template may hand in (numeric strings, the bare attribute for booleans), clamps numbers to a sensible range and falls back to the default for anything invalid, with a `console.warn` in dev mode. Components never throw on bad input. Type the write side explicitly (`input<number, NumberInput>(…)`) so template type checking stays strict. Each spec has an `input validation` block that covers the fallback and the warning.
-- **Public API.** Anything consumers should import must be exported from `src/public-api.ts`. Export supporting types with `export type`.
+- **Public API.** Anything consumers should import must be exported from the `public-api.ts` of its entry point; `src/public-api.ts` re-exports all public entry points, so the symbol is also available from `@l8c/ui`. Export supporting types with `export type`.
+- **Entry points.** Inside an entry point, import with relative paths. Across entry points, import through the package name (`@l8c/ui/core`, `@l8c/ui/internal`), never with a relative path. Dependencies go one way: `internal` has none, `core` uses `internal`, the other entry points use `core` and `internal` (`brand` also `file-input`). The build fails on a circular dependency.
 - **Styling.** Use CSS custom properties with a fallback (`var(--primary, #2a7ab8)`) so components work without a theme and pick up the host application's tokens when present. Avoid global styles.
 - **Formatting.** Prettier is configured in `shared-components/package.json` (single quotes, 100 columns). Run `npx prettier --write "projects/**/*.{ts,html,scss}"` in `shared-components/` before committing; CI rejects unformatted code.
 - **Accessibility.** Interactive components need keyboard support and appropriate ARIA attributes.
