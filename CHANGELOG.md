@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-11-16
+
 ### Added
 
 - Secondary entry points: the library is built into one file per entry point instead of a single file: `@l8c/ui/core`, `@l8c/ui/navigation`, `@l8c/ui/pickers`, `@l8c/ui/table`, `@l8c/ui/file-input` and `@l8c/ui/brand` (plus `@l8c/ui/internal` for shared helpers, not public API). `@l8c/ui` re-exports all of them, so existing imports keep working and no import path has to change. An application bundler can now put components that only a lazy route uses into the chunk of that route. Measured in the production build of l8c-survey: the library share of the initial chunks went from 311 kB (1.2.0) to 163 kB, 145 kB moved into lazy chunks; the same result with imports from `@l8c/ui` and from the entry points. The README lists the exports of each entry point.
@@ -97,7 +99,8 @@ Deprecated on npm in favour of 1.0.1 because of incorrect peer dependency ranges
 
 - Initial public release with standalone components: button, card, input, number-input, checkbox, radio, select, dropdown, search-field, table, pagination, carousel, dialog, confirm-dialog, navigation-bar, side-nav, account-menu, product-switcher, icon and spinner.
 
-[Unreleased]: https://github.com/Layer8ConsultingGmbH/l8c-ui/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/Layer8ConsultingGmbH/l8c-ui/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/Layer8ConsultingGmbH/l8c-ui/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/Layer8ConsultingGmbH/l8c-ui/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/Layer8ConsultingGmbH/l8c-ui/compare/v1.0.2...v1.1.0
 [1.0.2]: https://github.com/Layer8ConsultingGmbH/l8c-ui/compare/v1.0.1...v1.0.2
