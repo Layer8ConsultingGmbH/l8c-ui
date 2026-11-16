@@ -30,6 +30,10 @@ export class SaveBarComponent {
 
 `l8c-button`, `l8c-card`, `l8c-input`, `l8c-number-input`, `l8c-checkbox`, `l8c-radio`, `l8c-select`, `l8c-dropdown`, `l8c-search-field`, `l8c-table`, `l8c-pagination`, `l8c-carousel`, `l8c-dialog`, `l8c-confirm-dialog`, `l8c-navigation-bar`, `l8c-side-nav`, `l8c-account-menu`, `l8c-product-switcher`, `l8c-icon`, `l8c-spinner`, `l8c-toast` / `l8c-toast-container` (with `L8cToastService`), `l8c-color-input`, `l8c-brand-editor` (with `applyBrand`, `readBrandDefaults`), `l8c-date-picker` (with `formatDate`), `l8c-time-picker`, `l8c-duration-input` (with `parseDuration`), `l8c-file-input`, `l8c-copy-field`, `l8c-status`, `l8cTooltip` (directive)
 
+## Entry points
+
+Every symbol can be imported from `@l8c/ui`. The package is also split into `@l8c/ui/core`, `@l8c/ui/navigation`, `@l8c/ui/pickers`, `@l8c/ui/table`, `@l8c/ui/file-input` and `@l8c/ui/brand`, each built into its own file, so a bundler can load the components of a lazy route together with that route. The exports of each entry point are listed in the [repository README](https://github.com/Layer8ConsultingGmbH/l8c-ui#entry-points).
+
 ## Theming
 
 Components read CSS custom properties such as `--primary`, `--surface`, `--text`, `--border`, `--font-family` and `--radius-md`, each with a built-in fallback. Define them on `:root` in your global stylesheet to apply your own design tokens.

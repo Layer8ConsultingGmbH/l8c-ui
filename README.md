@@ -52,8 +52,29 @@ export class SaveBarComponent {
 }
 ```
 
-Supporting types such as `TableColumn`, `SelectOption` or `SideNavItem` are exported from the package root as well. The full public surface is listed in [public-api.ts](shared-components/projects/l8c-ui/src/public-api.ts).
+Supporting types such as `TableColumn`, `SelectOption` or `SideNavItem` are exported from the package root as well. The full public surface is listed in the `public-api.ts` of each entry point under [shared-components/projects/l8c-ui](shared-components/projects/l8c-ui).
 
+## Entry points
+
+The package is split into entry points, each built into its own file. Every symbol can be imported from `@l8c/ui`; importing from the entry point that owns it says where it comes from and gives the same result. An application bundler puts the code of an entry point into the chunk of a lazy route when only that route uses it, so a page that never opens the brand editor or a date picker does not load them.
+
+| Entry point | Exports |
+| --- | --- |
+| `@l8c/ui` | Everything below, except `@l8c/ui/internal` |
+| `@l8c/ui/core` | `l8c-button`, `l8c-icon` (`IconName`, `isIconName`), `l8c-input`, `l8c-number-input`, `l8c-select` (`SelectOption`), `l8c-checkbox`, `l8c-radio`, `l8c-card`, `l8c-dialog`, `l8c-confirm-dialog`, `l8c-toast`, `l8c-toast-container`, `L8cToastService`, `l8c-spinner`, `l8c-status` (`StatusTone`, `WorkflowStatus`), `l8cTooltip`, `l8c-copy-field`, `l8c-search-field`, `l8c-dropdown`, `l8c-carousel`, `l8c-carousel-slide`, and the brand model (`BrandConfig`, `applyBrand`, `readBrandDefaults`, `mergeBrandConfig`, `compactBrandConfig`, `hexToRgb`, token lists) |
+| `@l8c/ui/navigation` | `l8c-side-nav` (`SideNavItem`, `SideNavSubItem`), `l8c-navigation-bar`, `l8c-account-menu` (`AccountMenuOption`, `AccountMenuButton`), `l8c-product-switcher` (`PlatformProduct`) |
+| `@l8c/ui/pickers` | `l8c-date-picker`, `l8c-time-picker`, `l8c-duration-input`, the `l8cFormatDate` pipe, `formatDate`, `parseIsoDate`, `toIsoDate`, `parseDuration`, `formatDuration`, `durationToSegments`, `durationFromSegments` |
+| `@l8c/ui/table` | `l8c-table` (`TableColumn`, `PageableData`, `CellType`, `ColumnSort`, `CellBadge`), `l8c-pagination` (`PageChangeEvent`) |
+| `@l8c/ui/file-input` | `l8c-file-input` (`FileInputItem`) |
+| `@l8c/ui/brand` | `l8c-brand-editor`, `l8c-color-input`, `BRAND_EDITOR_LABELS`, `mergeBrandEditorLabels` |
+| `@l8c/ui/internal` | Helpers shared by the entry points (input validation). Not part of the public API and may change in any release |
+
+The brand model is part of `@l8c/ui/core`, not of `@l8c/ui/brand`: an app that applies a brand at start-up with `applyBrand` does not load the brand editor for it.
+
+```ts
+import { L8cButtonComponent } from '@l8c/ui';
+import { L8cDatePickerComponent } from '@l8c/ui/pickers';
+```
 ## Components
 
 | Component | Description |
@@ -235,7 +256,7 @@ Components style themselves through CSS custom properties and ship with fallback
 }
 ```
 
-Only override what you need. Search the component stylesheets under [shared-components/projects/l8c-ui/src](shared-components/projects/l8c-ui/src) for `var(--` to see every token a component reads.
+Only override what you need. Search the component stylesheets under [shared-components/projects/l8c-ui](shared-components/projects/l8c-ui) for `var(--` to see every token a component reads.
 
 ## Compatibility
 

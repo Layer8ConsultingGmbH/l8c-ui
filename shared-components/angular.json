@@ -10,7 +10,7 @@
     "l8c-ui": {
       "projectType": "library",
       "root": "projects/l8c-ui",
-      "sourceRoot": "projects/l8c-ui/src",
+      "sourceRoot": "projects/l8c-ui",
       "prefix": "l8c",
       "architect": {
         "build": {
