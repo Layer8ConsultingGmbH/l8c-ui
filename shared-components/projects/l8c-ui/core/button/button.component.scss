@@ -36,6 +36,13 @@ button {
     border-color: var(--primary, #2a7ab8);
     box-shadow: var(--glow-primary, 0 0 8px var(--primary), 0 0 2px var(--primary));
   }
+
+  // Keyboard focus is visible on every action (the DS focus ring); the
+  // icon-only variant draws its own below
+  &:focus-visible:not(.btn-icon-only) {
+    outline: 2px solid var(--primary, #2a7ab8);
+    outline-offset: 2px;
+  }
 }
 
 // Size variants

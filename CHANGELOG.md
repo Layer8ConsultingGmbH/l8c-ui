@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 
+- `l8c-button`: every button shows a focus ring on keyboard focus (2px `primary` outline with 2px offset, the Design System focus ring); before, only icon-only buttons did, and a button reached with Tab looked like any other.
 - `l8c-dialog`: `closed` is now also emitted when the browser closes the dialog (Escape), once per closing; before, only `close()` and the header button emitted it. Apps that reset state on `closed` now also do so on Escape.
 - `l8c-confirm-dialog`: Escape counts as dismissing and emits `cancelled` (confirm mode) or `closed` (info mode); before, it closed the dialog without an event.
 - `l8c-confirm-dialog`: a long message scrolls inside the dialog while the buttons stay visible below it; before, the buttons scrolled away with the message.
