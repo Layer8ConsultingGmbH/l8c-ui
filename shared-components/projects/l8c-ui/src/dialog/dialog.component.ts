@@ -24,7 +24,8 @@ type ContentLayout = (typeof CONTENT_LAYOUTS)[number];
 /**
  * Modal dialog with a blurred backdrop: header (title + close) and a
  * scrollable content area. Open and close it imperatively via `open()` and
- * `close()`.
+ * `close()`. `closed` is emitted once per closing, whether through `close()`,
+ * the header button or the browser (Escape).
  *
  * Width: the `width` input (px number or any CSS length) or the custom
  * property `--dialog-width` on any ancestor; default 520px. The dialog is
@@ -75,12 +76,26 @@ export class L8cDialogComponent {
     return typeof width === 'number' ? `${width}px` : width;
   });
 
+  /** True once `close()` has reported the closing, so the native event does not report it again */
+  private closeReported = false;
+
   open(): void {
+    this.closeReported = false;
     this.dialogElement.nativeElement.showModal();
   }
 
   close(): void {
+    this.closeReported = true;
     this.dialogElement.nativeElement.close();
+    this.closed.emit();
+  }
+
+  /** The browser closed the dialog: Escape, or the native event that follows `close()` */
+  protected onNativeClose(): void {
+    if (this.closeReported) {
+      this.closeReported = false;
+      return;
+    }
     this.closed.emit();
   }
 }

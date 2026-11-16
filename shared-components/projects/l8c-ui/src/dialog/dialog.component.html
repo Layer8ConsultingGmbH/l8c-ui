@@ -3,6 +3,7 @@
   class="lib-dialog"
   [class.content-flex]="contentLayout() === 'flex'"
   [style.--dialog-width]="cssWidth()"
+  (close)="onNativeClose()"
 >
   <div class="lib-dialog-header">
     <h2>{{ title() }}</h2>

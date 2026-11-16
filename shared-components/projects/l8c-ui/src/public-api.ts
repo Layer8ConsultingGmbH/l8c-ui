@@ -31,6 +31,7 @@ export type { SideNavItem, SideNavSubItem } from './side-nav/side-nav.model';
 export type { PageChangeEvent } from './pagination/pagination.component';
 export * from './dialog/dialog.component';
 export * from './confirm-dialog/confirm-dialog.component';
+export type { ConfirmDialogMode } from './confirm-dialog/confirm-dialog.component';
 export * from './icon/icon.component';
 export type { IconName } from './icon/icon-registry';
 export * from './color-input/color-input.component';

@@ -1,4 +1,4 @@
-﻿import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { L8cDialogComponent } from './dialog.component';
 
 describe('L8cDialogComponent', () => {
@@ -62,6 +62,27 @@ describe('L8cDialogComponent', () => {
 
     expect(isDialogOpen()).toBe(false);
     expect(closedEmitted).toBe(true);
+  });
+
+  it('should emit closed when the browser closes the dialog (Escape)', () => {
+    let closedCount = 0;
+    component.closed.subscribe(() => closedCount++);
+
+    component.open();
+    component.dialogElement.nativeElement.dispatchEvent(new Event('close'));
+
+    expect(closedCount).toBe(1);
+  });
+
+  it('should emit closed only once when close() is followed by the native close event', () => {
+    let closedCount = 0;
+    component.closed.subscribe(() => closedCount++);
+
+    component.open();
+    component.close();
+    component.dialogElement.nativeElement.dispatchEvent(new Event('close'));
+
+    expect(closedCount).toBe(1);
   });
 
   it('should inherit the width by default and set --dialog-width from the input', () => {

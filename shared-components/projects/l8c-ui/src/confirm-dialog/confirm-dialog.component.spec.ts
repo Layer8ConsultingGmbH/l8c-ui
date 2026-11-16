@@ -1,4 +1,4 @@
-﻿import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { L8cConfirmDialogComponent } from './confirm-dialog.component';
 import { L8cDialogComponent } from '../dialog/dialog.component';
 
@@ -68,6 +68,109 @@ describe('L8cConfirmDialogComponent', () => {
 
     component.open('Title', 'Message');
     expect(component.displayConfirmLabel()).toBe('OK');
+  });
+
+  describe('modes', () => {
+    const buttonLabels = (): string[] =>
+      Array.from(
+        (fixture.nativeElement as HTMLElement).querySelectorAll('.dialog-actions l8c-button'),
+      ).map((button) => button.textContent?.trim() ?? '');
+
+    it('shows the cancel and the confirm button by default', () => {
+      expect(component.mode()).toBe('confirm');
+      expect(buttonLabels()).toEqual(['Cancel', 'OK']);
+    });
+
+    it('shows only the close button in info mode', () => {
+      fixture.componentRef.setInput('mode', 'info');
+      fixture.componentRef.setInput('closeLabel', 'Got it');
+      fixture.detectChanges();
+
+      expect(buttonLabels()).toEqual(['Got it']);
+    });
+
+    it('emits closed, not cancelled or confirmed, when an info dialog closes', () => {
+      fixture.componentRef.setInput('mode', 'info');
+      fixture.detectChanges();
+      const events: string[] = [];
+      component.closed.subscribe(() => events.push('closed'));
+      component.cancelled.subscribe(() => events.push('cancelled'));
+      component.confirmed.subscribe(() => events.push('confirmed'));
+
+      component.open('Title', 'Message');
+      component.close();
+
+      expect(events).toEqual(['closed']);
+    });
+
+    it('does not emit closed in confirm mode', () => {
+      let closedCount = 0;
+      component.closed.subscribe(() => closedCount++);
+
+      component.open('Title', 'Message');
+      component.close();
+      component.open('Title', 'Message');
+      component.onConfirm();
+
+      expect(closedCount).toBe(0);
+    });
+
+    describe('closed by the browser (Escape)', () => {
+      let events: string[];
+      let nativeDialog: HTMLDialogElement;
+
+      beforeEach(() => {
+        // The real l8c-dialog instead of the stub, with the jsdom gaps filled
+        fixture = TestBed.createComponent(L8cConfirmDialogComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
+        nativeDialog = fixture.nativeElement.querySelector('dialog');
+        nativeDialog.showModal = () => nativeDialog.setAttribute('open', '');
+        nativeDialog.close = () => nativeDialog.removeAttribute('open');
+        events = [];
+        component.closed.subscribe(() => events.push('closed'));
+        component.cancelled.subscribe(() => events.push('cancelled'));
+        component.confirmed.subscribe(() => events.push('confirmed'));
+      });
+
+      it('emits cancelled in confirm mode', () => {
+        component.open('Title', 'Message');
+        nativeDialog.dispatchEvent(new Event('close'));
+
+        expect(events).toEqual(['cancelled']);
+      });
+
+      it('emits closed in info mode', () => {
+        fixture.componentRef.setInput('mode', 'info');
+        fixture.detectChanges();
+        component.open('Title', 'Message');
+        nativeDialog.dispatchEvent(new Event('close'));
+
+        expect(events).toEqual(['closed']);
+      });
+
+      it('emits each outcome once when a button closes the dialog', () => {
+        component.open('Title', 'Message');
+        component.onConfirm();
+        nativeDialog.dispatchEvent(new Event('close'));
+        component.open('Title', 'Message');
+        component.close();
+        nativeDialog.dispatchEvent(new Event('close'));
+
+        expect(events).toEqual(['confirmed', 'cancelled']);
+      });
+    });
+
+    it('falls back to confirm mode for an unknown mode and warns', () => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+      fixture.componentRef.setInput('mode', 'alert' as unknown as 'info');
+      fixture.detectChanges();
+
+      expect(component.mode()).toBe('confirm');
+      expect(buttonLabels()).toEqual(['Cancel', 'OK']);
+      expect(warn).toHaveBeenCalledTimes(1);
+      warn.mockRestore();
+    });
   });
 
   describe('input validation', () => {

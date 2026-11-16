@@ -1,10 +1,20 @@
-﻿# Changelog
+# Changelog
 
 All notable changes to `@l8c/ui` are documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
+
+### Added
+
+- `l8c-confirm-dialog`: new `mode` input (Design System v0.5.4 ConfirmDialog). `confirm` (default, unchanged) shows the cancel and the confirm button; `info` shows a single button for messages that need no decision, labelled by the new `closeLabel` input (default "Close"), and emits the new `closed` output instead of `confirmed` or `cancelled`.
+
+### Changed
+
+- `l8c-dialog`: `closed` is now also emitted when the browser closes the dialog (Escape), once per closing; before, only `close()` and the header button emitted it. Apps that reset state on `closed` now also do so on Escape.
+- `l8c-confirm-dialog`: Escape counts as dismissing and emits `cancelled` (confirm mode) or `closed` (info mode); before, it closed the dialog without an event.
+- `l8c-confirm-dialog`: a long message scrolls inside the dialog while the buttons stay visible below it; before, the buttons scrolled away with the message.
 
 ## [1.2.0] - 2026-11-12
 

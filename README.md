@@ -67,7 +67,7 @@ Supporting types such as `TableColumn`, `SelectOption` or `SideNavItem` are expo
 | `l8c-table` | Data table with sorting and pageable data |
 | `l8c-pagination` | Pagination controls |
 | `l8c-carousel` / `l8c-carousel-slide` | Slide carousel |
-| `l8c-dialog` / `l8c-confirm-dialog` | Modal dialogs |
+| `l8c-dialog` / `l8c-confirm-dialog` | Modal dialogs; the confirm dialog asks a question (`mode="confirm"`, cancel and confirm) or shows a message with a single close button (`mode="info"`) |
 | `l8c-navigation-bar` / `l8c-side-nav` | App navigation |
 | `l8c-account-menu` | User account menu |
 | `l8c-product-switcher` | Switch between platform products |

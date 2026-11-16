@@ -1,12 +1,18 @@
 .confirm-dialog-content {
   display: flex;
   flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
   gap: var(--spacing-lg, 20px);
   padding: var(--spacing-md, 16px);
   min-width: 400px;
 }
 
+// Only the message scrolls; the buttons stay visible below it
 .confirm-message {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
   font-family: var(--font-family, inherit);
   font-size: var(--font-size-sm, 0.875rem);
   color: var(--text);
@@ -16,6 +22,7 @@
 }
 
 .dialog-actions {
+  flex-shrink: 0;
   display: flex;
   justify-content: flex-end;
   gap: var(--spacing-md, 16px);
